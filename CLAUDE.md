@@ -1,5 +1,7 @@
 # Pixel Tower
 
+Player-facing name: **Idle Pixel Tower** (matches the live URL; used for the page title and home screen). The repo stays `pixel-tower`.
+
 A very simple single-tower defence game in pixel style, for web and mobile browsers.
 The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canvas 2D). No build step, no dependencies.
 

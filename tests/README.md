@@ -27,6 +27,7 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 
 ## Suites
 - `home.test.js`: home menu, How to play, menu/foundry/game over navigation
+- `layout.test.js`: HUD keeps its layout as numbers grow, game name
 - `history.test.js`: runs saved to history, list and summary, cap, old/corrupt saves, escaping
 - `pause-foundry.test.js`: pause/resume inputs, foundry only reachable from game over
 - `nova.test.js`: Nova damage, push, whole-screen range, cooldown, inputs
