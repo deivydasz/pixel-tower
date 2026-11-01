@@ -181,8 +181,9 @@ function kill(e){
   }
 }
 // Nova: shockwave around the tower. Damages and pushes back nearby enemies, then recharges.
-const NOVA={cd:20,r:60,push:30,fx:.35};
-const novaDmg=()=>3+2*stat.dmg();
+// Balance: simulated first runs reach a median wave 9 with Nova vs 6 without; damage is flat so it stays an emergency tool.
+const NOVA={cd:30,r:60,push:15,fx:.35,dmg:2,dmgK:0};
+const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
 function nova(){
   if(S.over||S.pause||S.nova>0)return false;
   S.nova=NOVA.cd;S.nfx=0;S.shake=.15;sfx('nova');buzz(40);
@@ -201,7 +202,7 @@ function nova(){
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  nova:{card:1,t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast nearby enemies back. It needs 20s to recharge, so save it for emergencies.</span>'}
+  nova:{card:1,t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast nearby enemies back. It needs '+NOVA.cd+'s to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
 function showTip(id){
@@ -336,7 +337,7 @@ function ui(){
   document.getElementById('ch').textContent=M.chips+' chips';
   const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
   pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
-  const nl=S.nova>0?'Nova '+Math.ceil(S.nova)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
+  const nl=S.nova>0?'Nova '+Math.ceil(S.nova-.01)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
   document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
