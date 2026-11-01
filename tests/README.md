@@ -30,6 +30,7 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 - `menu.test.js`: home menu groups, locked modes, next-unlock hook, Foundry "Upgrade ready!"
 - `polish.test.js`: icons embedded, banner position, no stray canvas text, no DOM writes on idle frames
 - `run-unlocks.test.js`: game over lists what the run unlocked (upgrades, bosses, cores, Bit Theory, research) with a Bit Theory shortcut
+- `feedback.test.js`: purchase flash and floating labels (in-run and Foundry)
 - `gameover.test.js`: game over screen stats, Play again, goal, suggestions, record
 - `layout.test.js`: HUD keeps its layout as numbers grow, game name
 - `history.test.js`: runs saved to history, list and summary, cap, old/corrupt saves, escaping

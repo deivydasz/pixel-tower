@@ -12,7 +12,8 @@ ok(JSON.parse(localStorage.getItem('pixelTowerMeta')).hist.length===1,'history p
 click($('gor'));S.wave=6;die();ok(M.hist.length===2&&M.hist[0].w===6&&M.hist[0].r===1,'newest first, record flagged');
 click($('gom'));click($('hhi'));
 ok(rows().length===2&&cells(rows()[0])[1]==='6'&&rows()[0].classList.contains('rec')&&shown($('hin')),'newest run first, record row highlighted with note');
-ok(cells($('hil').querySelector('.hh')).join('|')==='When|Wave|Killer|Chips|Time|Novas','table has column headers');
+ok(cells($('hil').querySelector('.hh')).join('|')==='When|Wave|Killer|Chips|Time|Nova|Boss','table has column headers');
+ok(cells(rows()[0])[6]==='0','Boss column shows bosses beaten');
 ok(cells(rows()[1]).slice(1).join('|').startsWith('3|Grunt|+4|0:0')&&cells(rows()[1])[5]==='2'&&!rows()[1].classList.contains('rec'),'older run cells: '+cells(rows()[1]).join('|'));
 ok($('his').textContent==='2 runs · best wave 6 · average 4.5','summary line: '+$('his').textContent);
 click($('hic'));
@@ -22,7 +23,8 @@ ok(M.hist.length===HIST_MAX,'history capped at '+HIST_MAX);
 // old saves and odd data
 loadMeta({v:2,chips:1,lv:{dmg:2},best:4,tips:{start:1}});ok(Array.isArray(M.hist)&&M.hist.length===0&&M.v===SAVE_V&&M.lv.rate===0&&M.lv.dmg===2,'v2 save loads with empty history');
 loadMeta({v:3,chips:0,lv:{},hist:'broken'});ok(Array.isArray(M.hist)&&M.hist.length===0,'corrupt history ignored');
-M.hist=[{t:Date.now(),w:2,k:'<img src=x onerror=alert(1)>',c:1,d:65,n:1}];showHistory();
+M.hist=[{t:Date.now(),w:2,k:'<img src=x onerror=alert(1)>',c:1,d:65,n:1},{t:Date.now(),w:30,k:'Brute',c:9,d:300,n:2,b:2}];showHistory();
+ok(cells(rows()[0])[6]==='-'&&cells(rows()[1])[6]==='2','old runs show - for bosses, newer show the count');
 ok(!$('hil').querySelector('img')&&cells(rows()[0])[4]==='1:05'&&cells(rows()[0])[2].includes('<img'),'history text escaped, time formatted');
 ok(!shown($('hin')),'record note hidden when no record rows');
 done();
