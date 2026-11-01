@@ -1,3 +1,4 @@
+play();
 const tip=$('tip'),nb=$('nova');
 step(.1);ok(shown(tip)&&S.tip==='start'&&S.pause&&tip.className==='card','first play: start card shown, game paused');
 ui();ok($('pb').disabled&&$('pb').textContent==='Pause','pause button disabled and says Pause under card');

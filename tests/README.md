@@ -17,6 +17,7 @@ Set `CHROME=/path/to/chrome` if Chrome isn't found automatically.
 ## Writing a test
 ```js
 skipTips();                 // unless you're testing the tips
+play();                     // the game opens on the home menu
 step(2);                    // play 2 seconds
 ok(S.wave===1,'wave 1 started');
 done();                     // always last: records JS errors and reports
@@ -25,6 +26,12 @@ Helpers in `lib.js`: `ok`, `step`, `click`, `key`, `$`, `shown`, `skipTips`, `en
 Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them, so balance changes don't break tests.
 
 ## Suites
+- `home.test.js`: home menu, How to play, menu/foundry/game over navigation
+- `menu.test.js`: home menu groups, locked modes, next-unlock hook, Foundry "Upgrade ready!"
+- `gameover.test.js`: game over screen stats, Play again, goal, suggestions, record
+- `layout.test.js`: HUD keeps its layout as numbers grow, game name
+- `history.test.js`: runs saved to history, list and summary, cap, old/corrupt saves, escaping
+- `background-stop.test.js`: no auto-pause, background catch-up (quiet, capped), pause panel, stop-run confirmation
 - `pause-foundry.test.js`: pause/resume inputs, foundry only reachable from game over
 - `nova.test.js`: Nova damage, push, whole-screen range, cooldown, inputs
 - `best-saves.test.js`: best wave record, loading v0/v1 saves

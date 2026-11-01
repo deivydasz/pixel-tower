@@ -1,4 +1,4 @@
-skipTips();
+skipTips();play();
 const bw=()=>{ui();return $('bw').textContent},goh=()=>$('goh').textContent;
 ok(bw()==='Best -','fresh player: Best -');
 S.wave=3;die();ok(M.best===3&&goh()==='Game over'&&!S.record,'first run sets best 3 without "New record"');
