@@ -38,7 +38,7 @@ button b{display:block;font-weight:400}
 </style>
 </head>
 <body>
-<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><button id="snd" aria-pressed="true">Sound</button></div>
+<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><span id="bw">Best -</span><button id="snd" aria-pressed="true">Sound</button></div>
 <div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
@@ -79,12 +79,13 @@ const stat={
 };
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
 // Save format version. Saves without `v` are v0 (same shape as v1).
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<2){...}.
-const SAVE_V=1;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false};
+// v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<3){...}.
+const SAVE_V=2;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false,best:0,tips:{}};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips)};
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
@@ -209,7 +210,7 @@ function update(dt){
     if(d<8){e.dead=true;e.reached=true;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.2;sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
-  if(S.hp<=0){S.hp=0;S.over=true;save();sfx('over');buzz([60,40,120]);showGO();return}
+  if(S.hp<=0){S.hp=0;S.over=true;S.prevBest=M.best;S.record=M.best>0&&S.wave>M.best;M.best=Math.max(M.best,S.wave);save();sfx('over');buzz([60,40,120]);showGO();return}
   S.flash=Math.max(0,S.flash-dt);
   // tower fire
   S.cd-=dt;
@@ -289,7 +290,7 @@ function draw(){
     g.fillStyle='#e8ecf5';g.textAlign='center';
     g.font='10px "Press Start 2P",monospace';g.fillText('GAME OVER',CX,CY-8);
     g.font='7px "Press Start 2P",monospace';
-    g.fillText('Reached wave '+S.wave,CX,CY+8);
+    g.fillText((S.record?'NEW BEST! ':'')+'Wave '+S.wave,CX,CY+8);
     g.fillText('+'+S.earn+' chips',CX,CY+24);
     g.fillText('Tap to restart',CX,CY+40);
   }
@@ -298,6 +299,7 @@ function ui(){
   document.getElementById('w').textContent='Wave '+Math.max(1,S.wave);
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
+  const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
   pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over;
   const nl=S.nova>0?'Nova '+Math.ceil(S.nova)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
@@ -327,7 +329,8 @@ function fyUI(){
   for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+MI[k]+' · '+c+' chips';fyb[k].disabled=M.chips<c}
 }
 function showGO(){
-  document.getElementById('gop').textContent='You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
+  document.getElementById('goh').textContent=S.record?'New record!':'Game over';
+  document.getElementById('gop').textContent=(S.record?'You beat your best of wave '+S.prevBest+'. ':'')+'You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
   const s=document.getElementById('gos');s.innerHTML='';
   const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
