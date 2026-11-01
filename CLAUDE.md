@@ -20,7 +20,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Support light and dark mode for page chrome.
 - Saved data lives in localStorage under `pixelTowerMeta`. Do not break existing saves when changing the data shape; add new fields with defaults. The save has a version `v` (`SAVE_V` in code); bump it and add a migration step in `loadMeta` when the shape changes.
 - Test by opening `index.html` in a browser (`open index.html` on macOS).
-- Before handing work to me, test it: drive the game in headless Chrome where possible (check for JS errors, simulate key flows) and check the layout at phone widths (390px and 320px). For balance changes, simulate runs and report the numbers.
+- Before handing work to me, test it: run `tests/run.sh` (headless Chrome, see `tests/README.md`) and add or update tests for the change. Check the layout at phone widths with `tests/shot.sh` (390px and 320px). For balance changes, run `tests/balance.sim.js` and report the numbers.
 
 ## Git and deploy
 - Repo: github.com/deivydasz/pixel-tower (private), branch `main`.
