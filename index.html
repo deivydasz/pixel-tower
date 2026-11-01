@@ -770,8 +770,8 @@ novab.onclick=()=>nova();
 addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.repeat)nova()}});
 addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
 // ---- The cat (requested by the developer's daughter). A grey pixel cat drawn inside the game screen:
-// it peeks in from the left/right edge, walks along the bottom edge (sometimes sitting down for a tail swish),
-// or hangs from the top edge under the HP bar. Tap it for "Meow!" and hearts (a tap on the cat does not fire Blast).
+// every 15-30s it peeks in from the left/right edge (blinking), or walks along the bottom edge (sometimes sitting
+// down for a tail swish). Tap it for "Meow!" and hearts (a tap on the cat does not fire Blast).
 // It runs in real time, never pauses the game and is purely decorative. Sprites: O outline, G grey, S stripe,
 // L light, E eye, K pupil, P pink.
 const CAT_PAL={O:'#4a4f55',G:'#9ea4aa',S:'#80868d',L:'#dfe2e5',E:'#7ee8a8',K:'#1b2033',P:'#ff9fb2'};
@@ -783,10 +783,9 @@ const CAT_SPR={
     ['....................','..............O...O.','.O...........OGO.OGO','OSO..........OGGGGGO','.OSO.........OGEGEGO','..OSO........OGGPGGO','...OSOOOOOOOOOGLLLGO','....OGGSGGSGGSGGLLO.','....OLLLLLLLLLLLLLO.','.....OGO.....OGO....','.....OOO.....OOO....']],
   sit:[CAT_HEAD.concat(['..OGGGO..O...','.OGGGGGO.OO..','OGGLLLGGO.O..','OGGLLLGGOOO..','OGLOLOLGO....','.OO.O.OO.....']),
        CAT_HEAD.concat(['..OGGGO......','.OGGGGGO.....','OGGLLLGGO..O.','OGGLLLGGO.OO.','OGLOLOLGOOO..','.OO.O.OO.....'])],
-  peek:[CAT_HEAD.concat(['LL.....LL....']),CAT_BLINK.concat(['LL.....LL....'])],
-  hang:[['OL.........LO','OG.........GO','OG.O.....O.GO','OGOGO...OGOGO','OGOPGOOOGPOGO','.OOGGGGGGGOO.','..OGEGGGEGO..','..OGKGGGKGO..','..OGGGPGGGO..','...OGLLLGO...','...OGGGGGO...','..OGGLLLGGO..','..OGGLLLGGO..','..OGGGGGGGO..','...OGO.OGO...','...OO...OO.O.','.........OO..','........O....']]
+  peek:[CAT_HEAD.concat(['LL.....LL....']),CAT_BLINK.concat(['LL.....LL....'])]
 };
-const cat={kind:null,t:0,dur:0,next:TEST.cat?3:15+Math.random()*25,dir:1,y:0,x:0,meow:0,hearts:[],box:null};
+const cat={kind:null,t:0,dur:0,next:TEST.cat?3:15+Math.random()*15,dir:1,y:0,x:0,meow:0,hearts:[],box:null};
 // draw a sprite at game coords (x,y) top-left, optionally mirrored
 const CS=2;  // each cat pixel = 2x2 game pixels
 const catW=sp=>sp[0].length*CS,catH=sp=>sp.length*CS;
@@ -795,23 +794,22 @@ function catSpr(sp,x,y,flip){const w=sp[0].length;x=Math.round(x);y=Math.round(y
   return {x,y,w:w*CS,h:sp.length*CS}}
 function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.dir=Math.random()<.5?1:-1;
   if(kind==='peek'){cat.dur=4.2;cat.y=50+Math.random()*120}
-  else if(kind==='walk'){cat.dur=11;cat.sit=Math.random()<.6}
-  else {cat.dur=5;cat.x=10+Math.random()*(W-20-catW(CAT_SPR.hang[0]));
-    // hang from the bottom edge of the HP bar (or the boss bar when one is shown): css px -> game px
-    const sc=cv.getBoundingClientRect().width/W||2;cat.top=Math.round(($id('stage').classList.contains('bossup')?38:22)/sc)-2}}
-function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:30+Math.random()*50}
+  else {cat.dur=11;cat.sit=Math.random()<.6}}
+function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:15+Math.random()*15}
 function catTap(){if(!cat.kind||cat.meow)return;cat.meow=1;sfx('meow');buzz(15);
   const b=cat.box||{x:CX,y:CY,w:0};for(let i=0;i<4;i++)cat.hearts.push({x:b.x+b.w/2+(i-1.5)*5,y:b.y,t:-i*.12});
   cat.t=Math.max(cat.t,cat.dur-1.2)}
 function catTick(dt){
   for(const h of cat.hearts){h.t+=dt;h.y-=dt*14}cat.hearts=cat.hearts.filter(h=>h.t<1.2);
-  if(!cat.kind){if(!S.menu&&!S.over&&!document.hidden&&(cat.next-=dt)<=0)catStart(['peek','walk','hang'][Math.floor(Math.random()*3)]);return}
+  if(!cat.kind){if(!S.menu&&!S.over&&!document.hidden&&(cat.next-=dt)<=0)catStart(Math.random()<.5?'peek':'walk');return}
   if((cat.t+=dt)>=cat.dur)catEnd();
 }
+// the peeking cat blinks twice while fully in view
+const catPeekBlink=t=>(t>1.3&&t<1.48)||(t>2.6&&t<2.78);
 function catDraw(){
   for(const h of cat.hearts)if(h.t>0){const x=Math.round(h.x),y=Math.round(h.y);g.fillStyle='#ff6b9a';g.fillRect(x,y,1,1);g.fillRect(x+2,y,1,1);g.fillRect(x-1,y+1,5,1);g.fillRect(x,y+2,3,1);g.fillRect(x+1,y+3,1,1)}
   if(!cat.kind)return;
-  const t=cat.t,d=cat.dur,still=RM.matches,io=still?1:Math.max(0,Math.min(1,t/.6,(d-t)/.6)),blink=(t%3.2)>2.95;
+  const t=cat.t,d=cat.dur,still=RM.matches,io=still?1:Math.max(0,Math.min(1,t/.6,(d-t)/.6)),blink=cat.kind==='peek'?catPeekBlink(t):(t%3.2)>2.95;
   if(cat.kind==='peek'){const sp=CAT_SPR.peek[blink?1:0],w=catW(sp),show=w*.8;
     cat.box=cat.dir>0?catSpr(sp,-w+io*show,cat.y,false):catSpr(sp,W-io*show,cat.y,true)}
   else if(cat.kind==='walk'){
@@ -821,8 +819,6 @@ function catDraw(){
     if(moving){const f=CAT_SPR.walk[Math.floor(t*5)%2];cat.box=catSpr(f,x,H-h-1,cat.dir<0)}
     else {const f=CAT_SPR.sit[Math.floor(t*2.5)%2],fh=catH(f),fw=catW(f),head=blink?CAT_BLINK:CAT_HEAD;
       cat.box=catSpr(head.concat(f.slice(8)),x+(w-fw)/2,H-fh-1,cat.dir<0)}}
-  else {const sp=CAT_SPR.hang[0],h=catH(sp),sway=still?0:Math.round(Math.sin(t*2.6)*2);
-    cat.box=catSpr(sp,cat.x+sway,-h+io*(h+cat.top),false)}
   if(cat.meow&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';
     const tx=Math.min(W-22,Math.max(22,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(tx-21,ty-8,42,10);g.fillStyle='#1b2033';g.fillText('Meow!',tx,ty)}
 }

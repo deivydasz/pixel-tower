@@ -1,5 +1,5 @@
 // The cat lives inside the game screen: peeks from the side edges, walks (and sits) along the bottom,
-// hangs from the top under the HP bar. Tap = Meow + hearts, and the tap does not fire Blast. Never pauses the game.
+// every 15-30s. Tap = Meow + hearts, and the tap does not fire Blast. Never pauses the game.
 skipTips();M.best=30;play();step(1);S.en=[];S.left=99;S.sp=99;
 const tickTo=t=>{while(cat.kind&&cat.t<t)catTick(.05);draw()};
 ok(!cat.kind,'no cat at the start of a run');
@@ -7,12 +7,14 @@ catStart('peek');cat.dir=1;tickTo(1.5);let b=cat.box;
 ok(b&&b.x<0&&b.x+b.w>0&&b.x+b.w<=b.w*0.85,'peek: cat partly in from the left edge of the game screen');
 catStart('peek');cat.dir=-1;tickTo(1.5);b=cat.box;ok(b&&b.x<W&&b.x+b.w>W,'peek: or from the right edge');
 ok(!S.pause&&!S.over,'cat never pauses the game');
-tickTo(99);ok(!cat.kind&&cat.next>=30,'visit ends and the next one is scheduled');
+ok(catPeekBlink(1.35)&&catPeekBlink(2.65)&&!catPeekBlink(2),'peek: blinks twice while fully in view');
+tickTo(99);ok(!cat.kind&&cat.next>=15&&cat.next<=30,'visit ends, next one in 15-30s ('+cat.next.toFixed(1)+'s)');
 catStart('walk');cat.dir=1;cat.sit=true;tickTo(1);b=cat.box;ok(b&&Math.abs(b.y+b.h-(H-1))<=1,'walk: along the bottom edge of the game screen');
 const x1=b.x;tickTo(2);ok(cat.box.x>x1,'walk: moves across');
 tickTo(5.5);ok(cat.box.h===catH(CAT_SPR.sit[0]),'walk: sits down part way');
 tickTo(99);ok(!cat.kind,'walk ends off screen');
-catStart('hang');tickTo(2);b=cat.box;ok(b&&b.y>=0&&b.y<30&&b.y+b.h>30,'hang: hangs from the top, under the HP bar (y='+b.y+')');
+catStart('peek');cat.dir=1;tickTo(1.5);b=cat.box;
+const kinds=new Set();const rnd=Math.random;for(let i=0;i<40;i++){const c={...cat};cat.kind=null;cat.next=0;catTick(.01);kinds.add(cat.kind);Object.assign(cat,c)}ok([...kinds].sort().join()==='peek,walk','only peek and walk visits (no hanging)');
 // tap on the cat meows, shows hearts, and does not fire Blast
 S.nova=0;const r=cv.getBoundingClientRect(),sx=r.width/W;
 cv.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:r.left+(b.x+b.w/2)*sx,clientY:r.top+(b.y+b.h/2)*sx}));
