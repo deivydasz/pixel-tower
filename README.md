@@ -44,7 +44,21 @@ Destroy it before it reaches the tower to earn **1 boss core** and bonus chips (
 | Swarm Queen | Spawns a Runner every 3 seconds while alive |
 | Warden | A shield blocks 75% of bullet damage. Nova breaks it for 8 seconds |
 
-Boss cores are saved and will power pixel research (coming next).
+Boss cores pay for Bit Theory research.
+
+## Bit Theory
+Study the pixels to find their deeper meaning. Bit Theory opens on the home menu once you have beaten a boss.
+Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
+
+| Research | Each level | Max level |
+|---|---|---|
+| Spray and Pray | +1 bullet per shot, fanned out | 4 |
+| Piercing bits | Bullets pass through +1 enemy | 5 |
+| Critical bits | +5% chance of a x3 critical hit | 10 |
+| Nova tech | Nova recharges 15s faster (down to 60s) | 4 |
+| Bit depth | All damage x1.2, stacking | 20 |
+
+Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 
 ## Upgrades
 | Upgrade | In run (pixels) | Foundry (chips, permanent) |
