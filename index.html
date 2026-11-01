@@ -33,11 +33,13 @@ button b{display:block;font-weight:400}
 #leg div{display:flex;flex-direction:column}
 #leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
 #leg .off{opacity:.4}
+#nova{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-width:110px;min-height:40px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
+#nova:disabled{opacity:1;color:#e8ecf5;background:rgba(13,16,25,.75);border-color:#3a4160}
 </style>
 </head>
 <body>
 <div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><button id="snd" aria-pressed="true">Sound</button></div>
-<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div></div>
+<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
@@ -66,7 +68,7 @@ const TYPES=[
 ];
 let S;
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1};S.hp=stat.max();
 }
 const stat={
   dmg:()=>1+S.lv.dmg+.5*M.lv.dmg,
@@ -113,6 +115,7 @@ const SFX={
   hit:()=>tone(150,.18,'triangle',.7,60),
   buy:()=>{tone(520,.07,'square',.15,780);tone(780,.08,'square',.15,1040,.07)},
   wave:()=>[523,659,784].forEach((f,i)=>tone(f,.12,'triangle',.4,0,i*.09)),
+  nova:()=>tone(620,.35,'triangle',.5,70),
   over:()=>[392,311,233].forEach((f,i)=>tone(f,.25,'triangle',.5,0,i*.18))
 };
 const GAP={shot:.05,pick:.06,kill:.03},lastSfx={};
@@ -148,7 +151,7 @@ for(const k in UP){
   };
   ups.appendChild(b);btns[k]=b;
 }
-cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.pause)setPause(false)});
+cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.pause)setPause(false);else nova()});
 
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;
@@ -166,11 +169,29 @@ function kill(e){
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
   }
 }
+// Nova: shockwave around the tower. Damages and pushes back nearby enemies, then recharges.
+const NOVA={cd:20,r:60,push:30,fx:.35};
+const novaDmg=()=>3+2*stat.dmg();
+function nova(){
+  if(S.over||S.pause||S.nova>0)return false;
+  S.nova=NOVA.cd;S.nfx=0;S.shake=.15;sfx('nova');buzz(40);
+  for(const e of S.en){
+    const dx=e.x-CX,dy=e.y-CY,d=Math.hypot(dx,dy)||1;
+    if(d>NOVA.r)continue;
+    e.hp-=novaDmg();e.hit=.12;
+    if(e.hp<=0){e.dead=true;kill(e)}
+    else{e.x+=dx/d*NOVA.push;e.y+=dy/d*NOVA.push}
+  }
+  S.en=S.en.filter(e=>!e.dead);
+  return true;
+}
 function update(dt){
   if(S.pause)return;
   S.bonus=Math.max(0,(S.bonus||0)-dt);
   S.shake=Math.max(0,S.shake-dt);
   if(S.over){S.ot+=dt;return}
+  S.nova=Math.max(0,S.nova-dt);
+  if(S.nfx>=0){S.nfx+=dt;if(S.nfx>NOVA.fx)S.nfx=-1}
   // waves
   if(S.left>0){
     S.sp-=dt;
@@ -247,6 +268,10 @@ function draw(){
   R(CX-3,CY-3,7,7,'#e8ecf5');
   R(CX-1,CY-1,3,3,'#1b2033');
   if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
+  // nova charge arc and blast ring
+  g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
+  g.beginPath();g.arc(CX+.5,CY+.5,10,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/NOVA.cd));g.stroke();
+  if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,8+(NOVA.r-8)*k,0,Math.PI*2);g.stroke();g.lineWidth=1}
   if(S.target){
     const a=Math.atan2(S.target.y-CY,S.target.x-CX);
     R(CX+Math.cos(a)*7-1,CY+Math.sin(a)*7-1,3,3,'#ffd166');
@@ -274,6 +299,7 @@ function ui(){
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
   pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over;
+  const nl=S.nova>0?'Nova '+Math.ceil(S.nova)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
   document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
@@ -325,6 +351,9 @@ const pb=document.getElementById('pb');
 function setPause(on){if(S.over)return;S.pause=on}
 pb.onclick=()=>setPause(!S.pause);
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
+const novab=document.getElementById('nova');
+novab.onclick=()=>nova();
+addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat){e.preventDefault();nova()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 reset();
 let last=performance.now(),acc=0;
