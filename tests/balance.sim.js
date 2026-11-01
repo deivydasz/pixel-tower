@@ -1,13 +1,13 @@
 // Balance simulation, not a pass/fail test. Run: VT=400000 tests/run.sh tests/balance.sim.js
-// A bot buys the cheapest upgrade whenever it can, and fires Nova when 3+ enemies are near,
+// A bot buys the cheapest unlocked upgrade whenever it can (first runs start with only Damage and Tower HP), and fires Nova when 3+ enemies are near,
 // at low HP, or when a shielded Warden is in range. Results vary a few waves / percent between runs.
 skipTips();sfx=()=>{};play();
 function run(meta,useNova){
-  M.lv={dmg:meta,rate:meta,range:meta,hp:meta,armor:meta};reset();S.menu=false;S.pause=false;let novas=0,boss20=null;
+  M.lv={dmg:meta,rate:meta,range:meta,hp:meta,armor:meta,magnet:meta};M.best=meta?99:0;reset();S.menu=false;S.pause=false;let novas=0,boss20=null;
   for(let t=0;t<60*3000&&!S.over;t++){
     const wv=S.wave,b=S.en.find(e=>e.boss);
     update(1/60);
-    const k=Object.keys(UP).sort((a,b)=>cost(a)-cost(b))[0];if(S.px>=cost(k)){S.px-=cost(k);S.lv[k]++;if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10)}
+    const k=openUps().sort((a,b)=>cost(a)-cost(b))[0];if(S.px>=cost(k)){S.px-=cost(k);S.lv[k]++;if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10)}
     if(useNova&&S.nova===0){const near=S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<30).length,wd=S.en.find(e=>e.boss&&e.t.shield&&e.shd<=0&&Math.hypot(e.x-CX,e.y-CY)<stat.range());
       if(near>=3||wd||(near>=1&&S.hp<.5*stat.max()))nova()&&novas++}
     if(b&&wv===20&&boss20===null&&!S.en.includes(b))boss20=b.hp<=0;

@@ -12,16 +12,30 @@
 html{height:100%;margin:0}
 body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-#hud{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;width:var(--mw,360px)}
+#hud{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
 #hud{font-size:8px}
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
 #ups,#fyl{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
-#fy,#go,#home,#how,#hi{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#fy,#go,#home,#how,#hi,#bt{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#howh,#hih{font-size:11px}
+#bth{font-size:16px;color:#c4a7ff;text-shadow:3px 3px 0 var(--bd)}
+#bt p{margin:0;font-size:8px;line-height:1.8;text-align:center;width:min(360px,92vw)}
+#btw{color:#d9a400}
+#btq{width:min(360px,92vw);box-sizing:border-box;border-color:#c4a7ff}
+#btq b{background:#c4a7ff}
+#btl{display:grid;gap:6px;width:min(360px,92vw)}
+#btl button{font-size:8px;line-height:1.7}
+#btl b{display:flex;justify-content:space-between;font-weight:400;font-size:9px}
+#btl small{display:block;opacity:.75}
+#btl .now{border-color:#c4a7ff;border-style:dashed}
+#btl .lkd b span:first-child{display:flex;align-items:center;gap:6px}
+#btl small.met{color:#2fae6a;opacity:1}
+@media (prefers-color-scheme:dark){#btl small.met{color:#6ee7a0}}
+#btc{min-width:140px;min-height:44px;text-align:center}
 #goh{font-size:18px;color:#ff6b6b;text-shadow:3px 3px 0 var(--bd);text-transform:uppercase}
 #goh.rec{color:#ffd166}
 #go #gop{text-align:center}
@@ -31,7 +45,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #hm button,#gm>button{text-align:center;min-height:48px}
 #gm #gof,#gm #gom{grid-column:span 3}
 #hm #hplay,#gm #gor{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
-#hm #hfy,#hm #hhi{grid-column:span 3}
+#hm #hfy,#hm #hhi,#hm #hbt{grid-column:span 2;padding:6px 2px}
+#hm #hbtn.rdy{color:#d9a400;opacity:1}
+#hm #hbt svg{display:block;margin:0 auto 2px}
 #hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm #hfyn.rdy{color:#d9a400;opacity:1}
@@ -62,6 +78,12 @@ button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
 #ups button:last-child:nth-child(odd){grid-column:1/-1}
+#ups button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lw{display:flex;align-items:center;gap:5px}
+.lkup svg{flex:none;width:9px;height:10px}
+#fyl .lkup b{display:flex;align-items:center;gap:5px}
+#fyl button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gos button{font-size:8px}
 #stage{position:relative}
 #bb{position:absolute;left:4px;right:4px;top:22px;height:12px;background:#3a4160;border:2px solid #0d1019;pointer-events:none;display:none}
 #bbf{height:100%;background:#ff6b6b}
@@ -112,17 +134,20 @@ button b{display:block;font-weight:400}
 <button id="gof">Foundry</button><button id="gom">Main menu</button></div></div>
 <div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
-<div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hhi">History</button>
+<div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button>
 <div class="hg">Unlocks</div><span id="hlk" style="display:contents"></span>
 <button id="hhow">How to play</button></div></div>
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
-<p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game: damage, fire rate, range, tower HP and the pixel absorber (armor).</p>
+<p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Pixel absorber (armor) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the screen, the NOVA button or Space to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: NOVA breaks the shield for a few seconds.</p>
+<p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, faster Nova and stacking damage. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
+<div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
+<div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
@@ -136,53 +161,80 @@ function fit(){
 }
 addEventListener('resize',fit);fit();
 
+// Upgrades (in-run for pixels, Foundry for chips). w = best wave needed to unlock; reaching it mid-run unlocks it right away.
 const UP={
-  dmg:{n:'Damage',base:10},
-  rate:{n:'Fire rate',base:15},
-  range:{n:'Range',base:12},
-  hp:{n:'Tower HP',base:20},
-  armor:{n:'Pixel absorber',base:25}
+  dmg:{n:'Damage',base:10,w:0},
+  hp:{n:'Tower HP',base:20,w:0},
+  rate:{n:'Fire rate',base:15,w:5},
+  range:{n:'Range',base:12,w:8},
+  armor:{n:'Pixel absorber',base:25,w:12},
+  magnet:{n:'Pixel magnet',base:30,w:16}
 };
+const upOpen=k=>Math.max(M.best,S&&!S.menu&&!S.over?S.wave:0)>=UP[k].w;
+const openUps=()=>Object.keys(UP).filter(upOpen);
 const TYPES=[
   {min:1,sp:18,hp:1,c:'#ff6b6b',s:5,px:3,d:1,n:'Grunt',up:'rate'},
   {min:3,sp:34,hp:.5,c:'#ffd166',s:3,px:2,d:1,n:'Runner',up:'range'},
   {min:5,sp:11,hp:4,c:'#b388ff',s:7,px:8,d:3,n:'Tank',up:'armor'}
 ];
 let S;
-// Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels.
-// Ignored on the live site.
+// Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
+// ?cores=5&chips=500 tops up the save, ?fast=1 makes Bit Theory research 60x faster. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
-  const q=new URLSearchParams(search),w=Math.floor(+q.get('wave')),p=Math.floor(+q.get('px'));
-  return {wave:w>1&&w<=1000?w:0,px:p>0&&p<=1e6?p:0};
+  const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),fast:q.get('fast')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
 }
 const stat={
-  dmg:()=>1+S.lv.dmg+.5*M.lv.dmg,
+  dmg:()=>(1+S.lv.dmg+.5*M.lv.dmg)*Math.pow(1.2,M.res.depth),
   rate:()=>1+.4*S.lv.rate+.2*M.lv.rate,
   range:()=>50+8*S.lv.range+4*M.lv.range,
   max:()=>20+10*S.lv.hp+5*M.lv.hp,
-  armor:()=>.5*S.lv.armor+.25*M.lv.armor
+  armor:()=>.5*S.lv.armor+.25*M.lv.armor,
+  // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
+  magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*(M.lv.magnet||0)
 };
+const MAGNET={run:.15,meta:.1};
+const critChance=()=>.05*M.res.crit;
+const novaCd=()=>Math.max(60,NOVA.cd-15*M.res.nova);
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
+// Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
+// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: 1 core + 1 per 2 levels, chips 25 x 1.6^level.
+// req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
+const BITS={
+  crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit',req:{}},
+  pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy',req:{}},
+  spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out',req:{res:{pierce:2},bk:3}},
+  nova:{n:'Nova tech',max:4,t:20,d:'Nova recharges 15s faster',req:{best:35,bk:2}},
+  depth:{n:'Bit depth',max:20,t:30,d:'All damage x1.2 (stacks)',req:{res:{crit:3},bk:5}}
+};
+const BIT_KEYS=Object.keys(BITS);
+const resMin=(k,lv)=>Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
+const resCost=(k,lv)=>({cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))});
+const clock={now:()=>Date.now()};
 // Save format version. Saves without `v` are v0 (same shape as v1).
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
 // v3 adds `hist`: the last HIST_MAX runs, newest first: {t:time ms, w:wave, k:killer, c:chips earned, d:seconds, n:novas used, r:1 if new record}.
 // v4 adds `cores` (boss cores, spent on research later) and `bk` (bosses beaten); history entries gain `b` (bosses beaten that run).
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<5){...}.
-const SAVE_V=4,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0};
+// v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<6){...}.
+const SAVE_V=5,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null};
+  for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
+if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
+if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
@@ -231,7 +283,8 @@ sndUI();
 
 const ehp=t=>Math.max(1,Math.round(2*Math.pow(1.12,Math.max(1,S.wave))*t.hp));
 const edmg=t=>Math.max(.2,t.d-stat.armor());
-const fmt=n=>+n.toFixed(2)+'';
+// Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
+const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFixed(1):Math.round(n))};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   const d=document.createElement('div');
   d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
@@ -242,7 +295,7 @@ for(const k in UP){
   const b=document.createElement('button');
   b.onclick=()=>{
     const c=cost(k);
-    if(S.over||S.px<c)return;
+    if(S.over||S.px<c||!upOpen(k))return;
     S.px-=c;S.lv[k]++;sfx('buy');
     if(S.toast>0){S.toast=0;closeTip()}
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
@@ -253,7 +306,7 @@ cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.p
 
 // Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
 // letting it reach the tower deals heavy damage and gives nothing. hpK multiplies the wave's base enemy HP.
-// Balance (40 bot runs each): the wave 20 Brute is beaten by ~33% of Foundry lv3 bots, ~53% lv4, ~65% lv6.
+// Balance (40 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~35% at lv3, ~48% lv4, ~80% lv6.
 const BOSSES=[
   {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:2.8,d:10,px:30,up:'dmg'},
   {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:2,d:8,px:30,up:'range',spawn:3},
@@ -266,6 +319,7 @@ const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
 const bossChips=w=>5+Math.floor(w/10);
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
+  for(const k in UP)if(UP[k].w===S.wave&&M.best<S.wave){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
   if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' incoming';sfx('boss')}
 }
 function spawn(){
@@ -282,7 +336,8 @@ function spawn(){
 function kill(e){
   sfx('kill');
   if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
-  for(let i=0;i<e.t.px;i++){
+  const np=e.t.px*(1+stat.magnet()),n=Math.floor(np)+(Math.random()<np%1?1:0);
+  for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,v=20+Math.random()*30;
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
   }
@@ -293,7 +348,7 @@ const NOVA={cd:120,r:160,push:10,fx:.5,dmg:4,dmgK:0};
 const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
 function nova(){
   if(S.over||S.pause||S.nova>0)return false;
-  S.nova=NOVA.cd;S.nfx=0;S.novas++;S.shake=.15;sfx('nova');buzz(40);
+  S.nova=novaCd();S.nfx=0;S.novas++;S.shake=.15;sfx('nova');buzz(40);
   for(const e of S.en){
     const dx=e.x-CX,dy=e.y-CY,d=Math.hypot(dx,dy)||1;
     if(d>NOVA.r)continue;
@@ -311,7 +366,7 @@ const TIPS={
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
   boss:{card:1,t:'<b>Boss!</b><span>Destroy it before it reaches the tower to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with NOVA to break the shield for '+BOSS.shieldDown+'s.</span>'},
-  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+(NOVA.cd>=60&&NOVA.cd%60===0?NOVA.cd/60+' minute'+(NOVA.cd===60?'':'s'):NOVA.cd+'s')+' to recharge, so save it for emergencies.</span>'}
+  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
 function showTip(id){
@@ -330,7 +385,7 @@ function tipsCheck(){
   if(bo&&!M.tips.boss)return showTip('boss');
   if(bo&&bo.t.shield&&!M.tips.warden)return showTip('warden');
   if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
-  if(!M.tips.buy&&S.px>=Math.min(...Object.keys(UP).map(cost)))return showTip('buy');
+  if(!M.tips.buy&&S.px>=Math.min(...openUps().map(cost)))return showTip('buy');
 }
 // Ends the run (tower destroyed, or stopped by the player): records best and history, shows game over.
 function endRun(stopped){
@@ -379,15 +434,18 @@ function update(dt){
   S.target=target;
   if(target&&S.cd<=0){
     const d=Math.hypot(target.x-CX,target.y-CY);
-    S.pr.push({x:CX,y:CY,vx:(target.x-CX)/d*130,vy:(target.y-CY)/d*130,life:1.5});
+    const a0=Math.atan2(target.y-CY,target.x-CX),n=1+M.res.spray;
+    for(let i=0;i<n;i++){const a=a0+(i-(n-1)/2)*.14;
+      S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:M.res.pierce,hits:[],crit:Math.random()<critChance()})}
     S.cd=1/stat.rate();sfx('shot');
   }
   // projectiles
   for(const p of S.pr){
     p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
     for(const e of S.en){
-      if(!e.dead&&Math.abs(p.x-e.x)<e.t.s/2+1&&Math.abs(p.y-e.y)<e.t.s/2+1){
-        e.hp-=stat.dmg()*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hit=.08;p.life=0;
+      if(!e.dead&&Math.abs(p.x-e.x)<e.t.s/2+1&&Math.abs(p.y-e.y)<e.t.s/2+1&&!(p.hits&&p.hits.includes(e))){
+        e.hp-=stat.dmg()*(p.crit?3:1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hit=.08;
+        if(p.hits)p.hits.push(e);if(p.pierce>0)p.pierce--;else p.life=0;
         if(e.hp<=0){e.dead=true;kill(e)}
         break;
       }
@@ -423,7 +481,7 @@ function draw(){
       if(e.t.shield&&e.shd<=0){g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(e.x)+.5,Math.round(e.y)+.5,s,0,Math.PI*2);g.stroke()}}
     else R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c)}
   // projectiles
-  for(const p of S.pr)R(p.x-1,p.y-1,2,2,'#fff');
+  for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
   // tower
   R(CX-5,CY-5,11,11,S.flash>0?'#ff6b6b':'#8fa3d6');
   R(CX-3,CY-3,7,7,'#e8ecf5');
@@ -431,7 +489,7 @@ function draw(){
   if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
   // nova charge arc and blast ring
   g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
-  g.beginPath();g.arc(CX+.5,CY+.5,10,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/NOVA.cd));g.stroke();
+  g.beginPath();g.arc(CX+.5,CY+.5,10,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
   if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,8+(NOVA.r-8)*k,0,Math.PI*2);g.stroke();g.lineWidth=1}
   if(S.target){
     const a=Math.atan2(S.target.y-CY,S.target.x-CX);
@@ -459,35 +517,43 @@ function ui(){
   document.getElementById('ch').textContent=M.chips+' chips';
   const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
   const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
+  checkResearch();
+  if(document.getElementById('home').style.display==='flex'&&M.rq)hbtTile();
+  if(document.getElementById('bt').style.display==='flex')btTick();
   pb.textContent=S.pause&&!S.tip?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
   const nl=S.nova>0?'Nova '+fmtTime(Math.ceil(S.nova-.01)):'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const bo=!S.over&&S.en.find(e=>e.boss);document.getElementById('stage').classList.toggle('bossup',!!bo);document.getElementById('bb').style.display=bo?'block':'none';
   if(bo){document.getElementById('bbf').style.width=(100*Math.max(0,bo.hp)/bo.max)+'%';document.getElementById('bbt').textContent=bo.t.n.toUpperCase()+' '+Math.ceil(Math.max(0,bo.hp))+(bo.t.shield?(bo.shd>0?' EXPOSED':' SHIELD'):'')}
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
-  document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
+  document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+fmt(m);
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.className=on?'':'off';
     r.lastChild.textContent=on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min;
   });
-  const info={dmg:'Dmg '+stat.dmg(),rate:stat.rate().toFixed(1)+'/s',range:stat.range()+' px',hp:'HP '+stat.max(),armor:'Absorbs '+stat.armor().toFixed(2)};
+  const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:'Range '+fmt(stat.range()),hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor()),magnet:'+'+fmt(100*stat.magnet())+'% pixels'};
   for(const k in UP){
     const c=cost(k);
-    btns[k].innerHTML='<b>'+UP[k].n+'</b>'+info[k]+' · '+c+' px';
-    btns[k].disabled=S.over||S.px<c;
+    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+c+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';
+    if(btns[k].innerHTML!==h)btns[k].innerHTML=h;btns[k].classList.toggle('lkup',!op);
+    btns[k].disabled=S.over||!op||S.px<c;
   }
 }
 const fy=document.getElementById('fy'),fyl=document.getElementById('fyl'),fyh=document.getElementById('fyh'),fyb={};
-const MI={dmg:'+0.5 damage',rate:'+0.2 shots/s',range:'+4 range',hp:'+5 max HP',armor:'+0.25 absorb'};
+// Stat every run starts with at Foundry level `lv` (before in-run upgrades; damage includes Bit depth).
+const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv,magnet:100*MAGNET.meta*lv})[k];
+const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
+const nowNext=k=>'Now '+fmt(baseStat(k,M.lv[k]))+' > '+fmt(baseStat(k,M.lv[k]+1))+UNIT[k];
 for(const k in UP){
   const b=document.createElement('button');
-  b.onclick=()=>{const c=mcost(k);if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
+  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
   fyh.textContent='Pixel foundry: '+M.chips+' chips';
-  for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+MI[k]+' · '+c+' chips';fyb[k].disabled=M.chips<c}
+  for(const k in UP){const c=mcost(k),op=upOpen(k);fyb[k].classList.toggle('lkup',!op);
+    fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+c+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
 }
 function showGO(){
   const goh=document.getElementById('goh');goh.textContent=S.record?'New record!':'Game over';goh.className=S.record?'rec':'';
@@ -500,13 +566,13 @@ function showGO(){
   goalUI('goalt','goalb');
   document.getElementById('gsl').textContent='Suggested upgrades · you have '+M.chips+' chips';
   const s=document.getElementById('gos');s.innerHTML='';
-  const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
+  const ks=openUps().sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
-  else if(kt)pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
+  else if(kt&&upOpen(kt.up))pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
   else pick.push({k:ks[1],why:'Next cheapest'});
   pick.forEach(({k,why})=>{
     const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+MI[k]+'<br>'+c+' chips';
+    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+c+' chips';
     b.disabled=M.chips<c;
     b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
     s.appendChild(b);
@@ -527,17 +593,18 @@ function goalUI(tid,bid){
   hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
 }
 function homeUI(){
+  checkResearch();hbtTile();
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=M.best>=m.w;
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
   goalUI('hookt','hookb');
-  const rdy=Object.keys(UP).some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
+  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
 }
 function showHome(){
   homeUI();
   S.menu=true;S.pause=true;closeTip();
   document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+M.chips+' chips'+(M.cores?' · '+M.cores+' cores':''):'Defend the tower from waves of pixel monsters.';
-  show('go',0);show('fy',0);show('how',0);show('hi',0);show('home',1);
+  show('go',0);show('fy',0);show('how',0);show('hi',0);show('bt',0);show('home',1);
 }
 function openFoundry(from){fyFrom=from;show(from,0);fyUI();show('fy',1)}
 document.getElementById('hplay').onclick=()=>{show('home',0);reset()};
@@ -557,6 +624,57 @@ function showHistory(){
   show('home',0);show('hi',1);document.getElementById('hil').scrollTop=0;
 }
 document.getElementById('hhi').onclick=showHistory;
+// ---- Bit Theory screen and timers
+const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
+const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Nova',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg'})[k];
+const resUnlocked=()=>M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
+// Requirement list for a research: [{t:label, have, need}], all must have >= need.
+function resReqs(k){const r=BITS[k].req,out=[];
+  for(const x in r.res||{})out.push({t:BITS[x].n+' Lv '+r.res[x],have:M.res[x],need:r.res[x]});
+  if(r.bk)out.push({t:r.bk+' bosses beaten',have:M.bk,need:r.bk});
+  if(r.best)out.push({t:'Best wave '+r.best,have:M.best,need:r.best});
+  return out}
+const resOpen=k=>resReqs(k).every(q=>q.have>=q.need);
+const resCanAfford=k=>{const lv=M.res[k];if(lv>=BITS[k].max||!resOpen(k))return false;const c=resCost(k,lv);return M.cores>=c.cores&&M.chips>=c.chips};
+function startResearch(k){
+  if(M.rq||!resCanAfford(k))return false;
+  const lv=M.res[k],c=resCost(k,lv);M.cores-=c.cores;M.chips-=c.chips;
+  M.rq={k,end:clock.now()+resMin(k,lv)*60000/(TEST.fast?60:1)};save();sfx('buy');return true;
+}
+function checkResearch(){
+  if(!M.rq||clock.now()<M.rq.end)return false;
+  const k=M.rq.k;M.res[k]=Math.min(BITS[k].max,M.res[k]+1);M.rq=null;save();
+  if(S&&!S.menu&&!S.over){S.bonus=2.5;S.bt1='BIT THEORY';S.bt=BITS[k].n+' Lv '+M.res[k];sfx('wave')}
+  if(document.getElementById('bt').style.display==='flex')btUI();
+  return true;
+}
+function btUI(){
+  document.getElementById('btw').textContent='You have '+M.cores+' core'+(M.cores===1?'':'s')+' · '+M.chips+' chips';
+  document.getElementById('btl').innerHTML=BIT_KEYS.map(k=>{
+    const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
+    if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
+      '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
+    const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+c.chips+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
+    return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
+      '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
+  }).join('');
+  document.getElementById('btl').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(startResearch(b.dataset.k))btUI()});
+  btTick();
+}
+function btTick(){
+  const q=document.getElementById('btq');q.style.display=M.rq?'block':'none';if(!M.rq)return;
+  const r=BITS[M.rq.k],total=resMin(M.rq.k,M.res[M.rq.k])*60/(TEST.fast?60:1),left=(M.rq.end-clock.now())/1000;
+  document.getElementById('btqt').textContent='Studying '+r.n+' Lv '+(M.res[M.rq.k]+1)+' · '+fmtDur(left)+' left';
+  document.getElementById('btqb').style.width=Math.max(0,Math.min(100,100*(1-left/total)))+'%';
+}
+function hbtTile(){
+  const b=document.getElementById('hbt'),n=document.getElementById('hbtn'),open=resUnlocked();b.disabled=!open;
+  b.innerHTML=(open?'':LOCK_SVG)+'Bit Theory';b.appendChild(n);
+  const rdy=open&&!M.rq&&BIT_KEYS.some(resCanAfford);
+  n.textContent=!open?'Beat a boss':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
+}
+document.getElementById('hbt').onclick=()=>{if(!resUnlocked())return;show('home',0);btUI();show('bt',1)};
+document.getElementById('btc').onclick=showHome;
 document.getElementById('hic').onclick=showHome;
 document.getElementById('hhow').onclick=()=>{show('home',0);show('how',1)};
 document.getElementById('howc').onclick=showHome;

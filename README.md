@@ -44,16 +44,33 @@ Destroy it before it reaches the tower to earn **1 boss core** and bonus chips (
 | Swarm Queen | Spawns a Runner every 3 seconds while alive |
 | Warden | A shield blocks 75% of bullet damage. Nova breaks it for 8 seconds |
 
-Boss cores are saved and will power pixel research (coming next).
+Boss cores pay for Bit Theory research.
+
+## Bit Theory
+Study the pixels to find their deeper meaning. Bit Theory opens on the home menu once you have beaten a boss.
+Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
+
+| Research | Each level | Max level | Available when |
+|---|---|---|---|
+| Critical bits | +5% chance of a x3 critical hit | 10 | right away |
+| Piercing bits | Bullets pass through +1 enemy | 5 | right away |
+| Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
+| Nova tech | Nova recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
+| Bit depth | All damage x1.2, stacking | 20 | Critical bits Lv 3 and 5 bosses beaten |
+
+Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 
 ## Upgrades
-| Upgrade | In run (pixels) | Foundry (chips, permanent) |
-|---|---|---|
-| Damage | +1 damage | +0.5 damage |
-| Fire rate | +0.4 shots/s | +0.2 shots/s |
-| Range | +8 range | +4 range |
-| Tower HP | +10 max HP (and heals 10) | +5 max HP |
-| Pixel absorber | +0.5 armor per hit | +0.25 armor per hit |
+You start with Damage and Tower HP. The others unlock when you first reach their wave, straight away even mid-run, and stay unlocked in runs and in the Foundry.
+
+| Upgrade | Unlocks at | In run (pixels) | Foundry (chips, permanent) |
+|---|---|---|---|
+| Damage | start | +1 damage | +0.5 damage |
+| Tower HP | start | +10 max HP (and heals 10) | +5 max HP |
+| Fire rate | wave 5 | +0.4 shots/s | +0.2 shots/s |
+| Range | wave 8 | +8 range | +4 range |
+| Pixel absorber | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
+| Pixel magnet | wave 16 | +15% pixels per kill | +10% pixels per kill |
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
 After a run, the game over screen suggests two Foundry upgrades: the cheapest one, and the one that best counters what killed you.
