@@ -50,13 +50,13 @@ Boss cores pay for Bit Theory research.
 Study the pixels to find their deeper meaning. Bit Theory opens on the home menu once you have beaten a boss.
 Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
 
-| Research | Each level | Max level |
-|---|---|---|
-| Spray and Pray | +1 bullet per shot, fanned out | 4 |
-| Piercing bits | Bullets pass through +1 enemy | 5 |
-| Critical bits | +5% chance of a x3 critical hit | 10 |
-| Nova tech | Nova recharges 15s faster (down to 60s) | 4 |
-| Bit depth | All damage x1.2, stacking | 20 |
+| Research | Each level | Max level | Available when |
+|---|---|---|---|
+| Critical bits | +5% chance of a x3 critical hit | 10 | right away |
+| Piercing bits | Bullets pass through +1 enemy | 5 | right away |
+| Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
+| Nova tech | Nova recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
+| Bit depth | All damage x1.2, stacking | 20 | Critical bits Lv 3 and 5 bosses beaten |
 
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 

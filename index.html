@@ -32,6 +32,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #btl b{display:flex;justify-content:space-between;font-weight:400;font-size:9px}
 #btl small{display:block;opacity:.75}
 #btl .now{border-color:#c4a7ff;border-style:dashed}
+#btl .lkd b span:first-child{display:flex;align-items:center;gap:6px}
+#btl small.met{color:#2fae6a;opacity:1}
+@media (prefers-color-scheme:dark){#btl small.met{color:#6ee7a0}}
 #btc{min-width:140px;min-height:44px;text-align:center}
 #goh{font-size:18px;color:#ff6b6b;text-shadow:3px 3px 0 var(--bd);text-transform:uppercase}
 #goh.rec{color:#ffd166}
@@ -191,12 +194,13 @@ const novaCd=()=>Math.max(60,NOVA.cd-15*M.res.nova);
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
 // t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: 1 core + 1 per 2 levels, chips 25 x 1.6^level.
+// req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
 const BITS={
-  spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out'},
-  pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy'},
-  crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit'},
-  nova:{n:'Nova tech',max:4,t:20,d:'Nova recharges 15s faster'},
-  depth:{n:'Bit depth',max:20,t:30,d:'All damage x1.2 (stacks)'}
+  crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit',req:{}},
+  pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy',req:{}},
+  spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out',req:{res:{pierce:2},bk:3}},
+  nova:{n:'Nova tech',max:4,t:20,d:'Nova recharges 15s faster',req:{best:35,bk:2}},
+  depth:{n:'Bit depth',max:20,t:30,d:'All damage x1.2 (stacks)',req:{res:{crit:3},bk:5}}
 };
 const BIT_KEYS=Object.keys(BITS);
 const resMin=(k,lv)=>Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
@@ -607,7 +611,14 @@ document.getElementById('hhi').onclick=showHistory;
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
 const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Nova',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg'})[k];
 const resUnlocked=()=>M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
-const resCanAfford=k=>{const lv=M.res[k];if(lv>=BITS[k].max)return false;const c=resCost(k,lv);return M.cores>=c.cores&&M.chips>=c.chips};
+// Requirement list for a research: [{t:label, have, need}], all must have >= need.
+function resReqs(k){const r=BITS[k].req,out=[];
+  for(const x in r.res||{})out.push({t:BITS[x].n+' Lv '+r.res[x],have:M.res[x],need:r.res[x]});
+  if(r.bk)out.push({t:r.bk+' bosses beaten',have:M.bk,need:r.bk});
+  if(r.best)out.push({t:'Best wave '+r.best,have:M.best,need:r.best});
+  return out}
+const resOpen=k=>resReqs(k).every(q=>q.have>=q.need);
+const resCanAfford=k=>{const lv=M.res[k];if(lv>=BITS[k].max||!resOpen(k))return false;const c=resCost(k,lv);return M.cores>=c.cores&&M.chips>=c.chips};
 function startResearch(k){
   if(M.rq||!resCanAfford(k))return false;
   const lv=M.res[k],c=resCost(k,lv);M.cores-=c.cores;M.chips-=c.chips;
@@ -624,6 +635,8 @@ function btUI(){
   document.getElementById('btw').textContent='You have '+M.cores+' core'+(M.cores===1?'':'s')+' · '+M.chips+' chips';
   document.getElementById('btl').innerHTML=BIT_KEYS.map(k=>{
     const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
+    if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
+      '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
     const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+c.chips+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
