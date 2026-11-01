@@ -14,7 +14,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Pixel foundry: spend chips on permanent upgrades to the same five skills. Saved in localStorage.
 - Game over menu: shows what killed the player, Restart and Go to foundry buttons, and two suggested upgrades (cheapest, and one matched to the killer).
 - Waves keep getting stronger (count and HP scale per wave).
-- Home screen before the first run and between runs: Play, Foundry, History, How to play. Game over has Restart, Foundry and Main menu.
+- Home screen before the first run and between runs: Play, a next-unlock goal card, Progress (Foundry, History), Coming soon (locked: Boss rush wave 25, Daily run wave 50, Tower skins wave 75; unlocked by best wave, say "Soon" until built), How to play. Game over has Restart, Foundry and Main menu.
 - History: every finished run is saved (last 50: date, wave, killer, chips, duration, Novas used, record) and shown from the home menu.
 
 ## Technical rules

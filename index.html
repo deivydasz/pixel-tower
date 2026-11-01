@@ -18,14 +18,26 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
-#ups,#fyl,#gos,#gob,#hm{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
+#ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
 #fy,#go,#home,#how,#hi{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#goh,#howh,#hih{font-size:11px}
 #homeh{font-size:20px;line-height:1.3;text-align:center;color:#5ec8ff;text-shadow:3px 3px 0 var(--bd)}
+#hm{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+#hm>*{grid-column:span 6}
 #hm button{text-align:center;min-height:48px}
-#hm #hhow{grid-column:1/-1}
-#hm #hplay{grid-column:1/-1;background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:11px}
+#hm #hplay{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
+#hm #hfy,#hm #hhi{grid-column:span 3}
+#hm .hg{font-size:7px;opacity:.7;margin-top:6px}
+#hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
+#hm #hfyn.rdy{color:#d9a400;opacity:1}
+#hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
+#hm .lk:disabled{opacity:.45}
+#hm .lk svg{display:block;margin:0 auto 4px}
+#hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px}
+#hook{border:2px solid #ffd166;padding:8px;font-size:8px;line-height:1.7;text-align:left}
+#hook i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
+#hook b{display:block;height:100%;background:#ffd166;width:0}
 #home p,#how p{text-align:center}
 #how p{text-align:left}
 #hi p{margin:0;font-size:8px;text-align:center;width:min(360px,92vw)}
@@ -70,7 +82,11 @@ button b{display:block;font-weight:400}
 <div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button><button id="gom">Main menu</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
-<div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button><button id="hfy">Foundry</button><button id="hhi">History</button><button id="hhow">How to play</button></div></div>
+<div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button>
+<div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
+<div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hhi">History</button>
+<div class="hg">Coming soon</div><span id="hlk" style="display:contents"></span>
+<button id="hhow">How to play</button></div></div>
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game: damage, fire rate, range, tower HP and the pixel absorber (armor).</p>
@@ -418,7 +434,20 @@ function showGO(){
 // Screens: home menu (on load and between runs), game over, foundry, how to play.
 const show=(id,on)=>{document.getElementById(id).style.display=on?'flex':'none'};
 let fyFrom='go';
+// Upcoming modes shown locked on the home menu. Reaching the wave unlocks them (they say "Soon" until built).
+// Thresholds are deliberately far (new players reach ~wave 8; Foundry lv3 in everything ~wave 29) because the modes aren't built yet.
+const LOCKED=[{n:'Boss rush',w:25},{n:'Daily run',w:50},{n:'Tower skins',w:75}];
+const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h1v2h1v5H0V3h1V1h1zM2 1v2h3V1z" fill-rule="evenodd"/></svg>';
+function homeUI(){
+  document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=M.best>=m.w;
+    return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
+  const next=LOCKED.find(m=>M.best<m.w),hb=document.getElementById('hookb');
+  document.getElementById('hookt').textContent=next?'Next unlock: '+next.n+'. Reach wave '+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
+  hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
+  const rdy=Object.keys(UP).some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
+}
 function showHome(){
+  homeUI();
   S.menu=true;S.pause=true;closeTip();
   document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+M.chips+' chips':'Defend the tower from waves of pixel monsters.';
   show('go',0);show('fy',0);show('how',0);show('hi',0);show('home',1);
