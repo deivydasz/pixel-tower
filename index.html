@@ -266,7 +266,8 @@ sndUI();
 
 const ehp=t=>Math.max(1,Math.round(2*Math.pow(1.12,Math.max(1,S.wave))*t.hp));
 const edmg=t=>Math.max(.2,t.d-stat.armor());
-const fmt=n=>+n.toFixed(2)+'';
+// Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
+const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFixed(1):Math.round(n))};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   const d=document.createElement('div');
   d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
@@ -506,13 +507,13 @@ function ui(){
   if(bo){document.getElementById('bbf').style.width=(100*Math.max(0,bo.hp)/bo.max)+'%';document.getElementById('bbt').textContent=bo.t.n.toUpperCase()+' '+Math.ceil(Math.max(0,bo.hp))+(bo.t.shield?(bo.shd>0?' EXPOSED':' SHIELD'):'')}
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
-  document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
+  document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+fmt(m);
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.className=on?'':'off';
     r.lastChild.textContent=on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min;
   });
-  const info={dmg:'Dmg '+stat.dmg(),rate:stat.rate().toFixed(1)+'/s',range:stat.range()+' px',hp:'HP '+stat.max(),armor:'Absorbs '+stat.armor().toFixed(2)};
+  const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:fmt(stat.range())+' px',hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor())};
   for(const k in UP){
     const c=cost(k);
     btns[k].innerHTML='<b>'+UP[k].n+'</b>'+info[k]+' · '+c+' px';
@@ -520,7 +521,10 @@ function ui(){
   }
 }
 const fy=document.getElementById('fy'),fyl=document.getElementById('fyl'),fyh=document.getElementById('fyh'),fyb={};
-const MI={dmg:'+0.5 damage',rate:'+0.2 shots/s',range:'+4 range',hp:'+5 max HP',armor:'+0.25 absorb'};
+// Stat every run starts with at Foundry level `lv` (before in-run upgrades; damage includes Bit depth).
+const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv})[k];
+const UNIT={dmg:' damage',rate:'/s',range:' range',hp:' HP',armor:' absorb'};
+const nowNext=k=>'Now '+fmt(baseStat(k,M.lv[k]))+' > '+fmt(baseStat(k,M.lv[k]+1))+UNIT[k];
 for(const k in UP){
   const b=document.createElement('button');
   b.onclick=()=>{const c=mcost(k);if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
@@ -528,7 +532,7 @@ for(const k in UP){
 }
 function fyUI(){
   fyh.textContent='Pixel foundry: '+M.chips+' chips';
-  for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+MI[k]+' · '+c+' chips';fyb[k].disabled=M.chips<c}
+  for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+nowNext(k)+'<br>'+c+' chips';fyb[k].disabled=M.chips<c}
 }
 function showGO(){
   const goh=document.getElementById('goh');goh.textContent=S.record?'New record!':'Game over';goh.className=S.record?'rec':'';
@@ -547,7 +551,7 @@ function showGO(){
   else pick.push({k:ks[1],why:'Next cheapest'});
   pick.forEach(({k,why})=>{
     const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+MI[k]+'<br>'+c+' chips';
+    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+nowNext(k)+'<br>'+c+' chips';
     b.disabled=M.chips<c;
     b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
     s.appendChild(b);
