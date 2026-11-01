@@ -18,7 +18,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Pixel look: low-res internal canvas scaled up, `image-rendering: pixelated`.
 - Must work on desktop and phones: touch-friendly buttons, no horizontal scroll, page padding, safe-area insets.
 - Support light and dark mode for page chrome.
-- Saved data lives in localStorage under `pixelTowerMeta`. Do not break existing saves when changing the data shape; add new fields with defaults.
+- Saved data lives in localStorage under `pixelTowerMeta`. Do not break existing saves when changing the data shape; add new fields with defaults. The save has a version `v` (`SAVE_V` in code); bump it and add a migration step in `loadMeta` when the shape changes.
 - Test by opening `index.html` in a browser (`open index.html` on macOS).
 
 ## Git and deploy
