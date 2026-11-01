@@ -34,14 +34,22 @@ button b{display:block;font-weight:400}
 #leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
 #leg .off{opacity:.4}
 #nova{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-width:110px;min-height:40px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
+#tip{position:absolute;left:10px;right:10px;display:none;flex-direction:column;gap:8px;padding:10px;background:#0d1019;color:#e8ecf5;border:2px solid #ffd166;font-size:8px;line-height:1.8}
+#tip.card{top:50%;transform:translateY(-50%)}
+#tip.toast{bottom:58px;pointer-events:none}
+#tip b{color:#ffd166;font-weight:400}
+#tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
+#nova.hint{animation:pulse .8s steps(2) infinite}
+@keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
+#got{display:none;color:#ffd166}
 #nova:disabled{opacity:1;color:#e8ecf5;background:rgba(13,16,25,.75);border-color:#3a4160}
 </style>
 </head>
 <body>
 <div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><span id="bw">Best -</span><button id="snd" aria-pressed="true">Sound</button></div>
-<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button></div>
+<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
-<div id="go"><div id="goh">Game over</div><p id="gop"></p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
+<div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
 const W=180,H=240,CX=90,CY=120;
@@ -69,6 +77,7 @@ const TYPES=[
 let S;
 function reset(){
   S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1};S.hp=stat.max();
+  closeTip();
 }
 const stat={
   dmg:()=>1+S.lv.dmg+.5*M.lv.dmg,
@@ -148,6 +157,7 @@ for(const k in UP){
     const c=cost(k);
     if(S.over||S.px<c)return;
     S.px-=c;S.lv[k]++;sfx('buy');
+    if(S.toast>0){S.toast=0;closeTip()}
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
   };
   ups.appendChild(b);btns[k]=b;
@@ -186,8 +196,33 @@ function nova(){
   S.en=S.en.filter(e=>!e.dead);
   return true;
 }
+// First-play tips. Each is shown once per player (remembered in M.tips).
+// Cards pause the game until "Got it"; toasts show briefly without pausing.
+const TIPS={
+  start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
+  buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
+  nova:{card:1,t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast nearby enemies back. It needs 20s to recharge, so save it for emergencies.</span>'}
+};
+const tipEl=document.getElementById('tip');
+function showTip(id){
+  M.tips[id]=1;save();const T=TIPS[id];
+  tipEl.innerHTML=T.t+(T.card?'<button id="tipok">Got it</button>':'');
+  tipEl.className=T.card?'card':'toast';tipEl.style.display='flex';
+  if(T.card){S.tip=id;S.pause=true;document.getElementById('tipok').onclick=closeTip}
+  else S.toast=5;
+  novab.classList.toggle('hint',id==='nova');
+}
+function closeTip(){tipEl.style.display='none';novab.classList.remove('hint');if(S.tip){S.tip=null;S.pause=false}}
+function tipsCheck(){
+  if(S.tip||S.over)return;
+  if(!M.tips.start)return showTip('start');
+  if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
+  if(!M.tips.buy&&S.px>=Math.min(...Object.keys(UP).map(cost)))return showTip('buy');
+}
 function update(dt){
   if(S.pause)return;
+  tipsCheck();if(S.pause)return;
+  if(S.toast>0&&(S.toast-=dt)<=0)closeTip();
   S.bonus=Math.max(0,(S.bonus||0)-dt);
   S.shake=Math.max(0,S.shake-dt);
   if(S.over){S.ot+=dt;return}
@@ -279,7 +314,7 @@ function draw(){
   }
   g.restore();
   if(S.bonus>0&&!S.over){g.fillStyle='#ffd166';g.textAlign='center';g.font='7px "Press Start 2P",monospace';g.fillText('Wave '+S.wave+' clear',CX,28);g.fillText(S.bt,CX,40)}
-  if(S.pause&&!S.over){
+  if(S.pause&&!S.over&&!S.tip){
     g.fillStyle='rgba(13,16,25,.7)';g.fillRect(0,0,W,H);
     g.fillStyle='#e8ecf5';g.textAlign='center';
     g.font='10px "Press Start 2P",monospace';g.fillText('PAUSED',CX,CY-4);
@@ -300,7 +335,7 @@ function ui(){
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
   const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
-  pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over;
+  pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
   const nl=S.nova>0?'Nova '+Math.ceil(S.nova)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
@@ -330,6 +365,8 @@ function fyUI(){
 }
 function showGO(){
   document.getElementById('goh').textContent=S.record?'New record!':'Game over';
+  if(!M.tips.foundry){M.tips.foundry=1;S.goTip=true;save()}
+  document.getElementById('got').style.display=S.goTip?'block':'none';
   document.getElementById('gop').textContent=(S.record?'You beat your best of wave '+S.prevBest+'. ':'')+'You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
   const s=document.getElementById('gos');s.innerHTML='';
   const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
@@ -351,7 +388,7 @@ document.getElementById('gof').onclick=()=>{document.getElementById('go').style.
 document.getElementById('fyc').onclick=()=>{fy.style.display='none';showGO()};
 // Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
 const pb=document.getElementById('pb');
-function setPause(on){if(S.over)return;S.pause=on}
+function setPause(on){if(S.over||S.tip)return;S.pause=on}
 pb.onclick=()=>setPause(!S.pause);
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
 const novab=document.getElementById('nova');
