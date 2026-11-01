@@ -1,4 +1,4 @@
-skipTips();
+skipTips();play();
 const nb=$('nova');
 step(1);ui();ok(nb.textContent==='NOVA'&&!nb.disabled,'nova ready at start');
 S.en=[];S.left=0;

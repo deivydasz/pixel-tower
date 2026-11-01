@@ -1,4 +1,4 @@
-skipTips();
+skipTips();play();
 ok(!$('fb'),'no Foundry button in HUD during play');
 step(3);ui();ok(S.wave>=1&&!S.pause,'game running');
 click($('pb'));ui();ok(S.pause&&$('pb').textContent==='Resume','Pause button pauses, label Resume');

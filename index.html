@@ -18,16 +18,22 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #hud .hs{display:flex;flex-wrap:wrap;gap:4px 10px}
 #hud .hb{display:flex;gap:6px;margin-left:auto}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
-#ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
-#fy,#go{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-#fy p,#go p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
-#fyh,#goh{font-size:11px}
-#fyl,#gos,#gob,#fy p,#go p{width:min(360px,92vw)}
+#ups,#fyl,#gos,#gob,#hm{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
+#fy,#go,#home,#how{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
+#fyh,#goh,#howh{font-size:11px}
+#homeh{font-size:20px;line-height:1.3;text-align:center;color:#5ec8ff;text-shadow:3px 3px 0 var(--bd)}
+#hm button{text-align:center;min-height:48px}
+#hm #hplay{grid-column:1/-1;background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:11px}
+#home p,#how p{text-align:center}
+#how p{text-align:left}
+#howc,#fyc{min-width:140px;min-height:44px;text-align:center}
+#fyl,#gos,#gob,#hm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
 button{font:inherit;color:var(--fg);background:var(--btn);border:2px solid var(--bd);padding:8px 6px;text-align:left;cursor:pointer;line-height:1.6}
 button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
-#ups button:last-child:nth-child(odd){grid-column:1/-1}
+#ups button:last-child:nth-child(odd),#gob button:last-child:nth-child(odd){grid-column:1/-1}
 #stage{position:relative}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
@@ -52,7 +58,15 @@ button b{display:block;font-weight:400}
 <div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
 <div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
-<div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
+<div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button><button id="gom">Main menu</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
+<div id="home"><div id="homeh">PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button><button id="hfy">Foundry</button><button id="hhi" hidden>History</button><button id="hhow">How to play</button></div></div>
+<div id="how"><div id="howh">How to play</div>
+<p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
+<p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game: damage, fire rate, range, tower HP and the pixel absorber (armor).</p>
+<p>Tap the screen, the NOVA button or Space to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
+<p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts.</p>
+<p>Pause with the Pause button, P or Esc.</p>
+<button id="howc">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
 const W=180,H=240,CX=90,CY=120;
@@ -386,13 +400,27 @@ function showGO(){
   });
   document.getElementById('go').style.display='flex';
 }
-document.getElementById('gor').onclick=()=>{document.getElementById('go').style.display='none';reset()};
-document.getElementById('gof').onclick=()=>{document.getElementById('go').style.display='none';fyUI();fy.style.display='flex'};
-// Foundry is only reachable from the game over menu, between runs.
-document.getElementById('fyc').onclick=()=>{fy.style.display='none';showGO()};
+// Screens: home menu (on load and between runs), game over, foundry, how to play.
+const show=(id,on)=>{document.getElementById(id).style.display=on?'flex':'none'};
+let fyFrom='go';
+function showHome(){
+  S.menu=true;S.pause=true;closeTip();
+  document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+M.chips+' chips':'Defend the tower from waves of pixel monsters.';
+  show('go',0);show('fy',0);show('how',0);show('home',1);
+}
+function openFoundry(from){fyFrom=from;show(from,0);fyUI();show('fy',1)}
+document.getElementById('hplay').onclick=()=>{show('home',0);reset()};
+document.getElementById('hfy').onclick=()=>openFoundry('home');
+document.getElementById('hhow').onclick=()=>{show('home',0);show('how',1)};
+document.getElementById('howc').onclick=showHome;
+document.getElementById('gom').onclick=showHome;
+document.getElementById('gor').onclick=()=>{show('go',0);reset()};
+document.getElementById('gof').onclick=()=>openFoundry('go');
+// Foundry is only reachable between runs: from the home menu or the game over menu.
+document.getElementById('fyc').onclick=()=>{show('fy',0);if(fyFrom==='home')showHome();else showGO()};
 // Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
 const pb=document.getElementById('pb');
-function setPause(on){if(S.over||S.tip)return;S.pause=on}
+function setPause(on){if(S.over||S.tip||S.menu)return;S.pause=on}
 pb.onclick=()=>setPause(!S.pause);
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
 const novab=document.getElementById('nova');
@@ -401,7 +429,7 @@ novab.onclick=()=>nova();
 addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.repeat)nova()}});
 addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
-reset();
+reset();showHome();
 let last=performance.now(),acc=0;
 function loop(t){
   acc+=Math.min(.25,(t-last)/1000);last=t;

@@ -1,6 +1,6 @@
 // Balance simulation, not a pass/fail test. Run: VT=150000 tests/run.sh tests/balance.sim.js
 // A bot buys the cheapest upgrade whenever it can and fires Nova when 3+ enemies are near (or 1+ at low HP).
-skipTips();sfx=()=>{};
+skipTips();play();sfx=()=>{};
 function run(buy,useNova,meta){
   M.lv={dmg:meta,rate:meta,range:meta,hp:meta,armor:meta};reset();let novas=0;
   for(let t=0;t<60*1500&&!S.over;t++){
