@@ -227,8 +227,8 @@ function kill(e){
   }
 }
 // Nova: shockwave from the tower across the whole screen. Damages every enemy and pushes them back, then recharges.
-// Balance: simulated first runs reach a median wave 8 with Nova vs 6 without; damage is flat so it stays an emergency tool.
-const NOVA={cd:40,r:160,push:10,fx:.5,dmg:4,dmgK:0};
+// Balance: with a 2 minute cooldown, simulated first runs reach a median wave ~6 with or without Nova (used ~once a run); flat damage keeps it an emergency tool.
+const NOVA={cd:120,r:160,push:10,fx:.5,dmg:4,dmgK:0};
 const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
 function nova(){
   if(S.over||S.pause||S.nova>0)return false;
@@ -248,7 +248,7 @@ function nova(){
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+NOVA.cd+'s to recharge, so save it for emergencies.</span>'}
+  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+(NOVA.cd>=60&&NOVA.cd%60===0?NOVA.cd/60+' minute'+(NOVA.cd===60?'':'s'):NOVA.cd+'s')+' to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
 function showTip(id){
@@ -385,7 +385,7 @@ function ui(){
   document.getElementById('ch').textContent=M.chips+' chips';
   const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
   pb.textContent=S.pause&&!S.tip?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
-  const nl=S.nova>0?'Nova '+Math.ceil(S.nova-.01)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
+  const nl=S.nova>0?'Nova '+fmtTime(Math.ceil(S.nova-.01)):'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
   document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
