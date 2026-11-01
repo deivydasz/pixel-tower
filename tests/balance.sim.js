@@ -10,7 +10,7 @@ function run(meta,useNova){
     const k=openUps().sort((a,b)=>cost(a)-cost(b))[0];if(S.px>=cost(k)){S.px-=cost(k);S.lv[k]++;if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10)}
     if(useNova&&S.nova===0){const near=S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<30).length,wd=S.en.find(e=>e.boss&&e.t.shield&&e.shd<=0&&Math.hypot(e.x-CX,e.y-CY)<stat.range());
       if(near>=3||wd||(near>=1&&S.hp<.5*stat.max()))nova()&&novas++}
-    if(b&&wv===20&&boss20===null&&!S.en.includes(b))boss20=b.hp<=0;
+    if(b&&wv===20&&boss20===null&&(!S.en.includes(b)||S.over))boss20=b.hp<=0;
   }
   return {w:S.wave,novas,boss20};
 }
