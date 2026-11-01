@@ -1,0 +1,26 @@
+name: Preview
+# Every push to a feature/* branch is served at https://preview.idlepixeltower.duckdns.org
+# (one slot: the most recently pushed branch). Main/live deploys are separate (deploy.yml).
+on:
+  push:
+    branches: ['feature/**']
+  workflow_dispatch:
+concurrency:
+  group: preview
+  cancel-in-progress: true
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy branch to preview over SSH
+        env:
+          KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          HOST: ${{ secrets.SERVER_HOST }}
+          SRV_USER: ${{ secrets.SERVER_USER }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "$KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_ed25519 "$SRV_USER@$HOST" "preview $BRANCH"
+          echo "Preview: https://preview.idlepixeltower.duckdns.org ($BRANCH)" >> "$GITHUB_STEP_SUMMARY"
