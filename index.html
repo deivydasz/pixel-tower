@@ -588,7 +588,8 @@ const fy=document.getElementById('fy'),fyl=document.getElementById('fyl'),fyh=do
 // Stat every run starts with at Foundry level `lv` (before in-run upgrades; damage includes Bit depth).
 const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv,magnet:100*MAGNET.meta*lv})[k];
 const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
-const nowNext=k=>'Now '+fmt(baseStat(k,M.lv[k]))+' > '+fmt(baseStat(k,M.lv[k]+1))+UNIT[k];
+const fmtU=(k,v)=>(k==='magnet'?'+':'')+fmt(v)+UNIT[k];
+const nowNext=k=>fmtU(k,baseStat(k,M.lv[k]))+' > '+fmtU(k,baseStat(k,M.lv[k]+1));  // e.g. "2.5 > 3", "2.4/s > 2.6/s"
 for(const k in UP){
   const b=document.createElement('button');
   b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI();flashBtn(b)};
