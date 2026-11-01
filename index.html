@@ -69,8 +69,11 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #how p{text-align:left}
 #hi p{margin:0;font-size:8px;text-align:center;width:min(360px,92vw)}
 #hil{width:min(360px,92vw);max-height:60vh;overflow-y:auto;border:2px solid var(--bd);font-size:7px;line-height:1.6}
-#hil .hr{display:grid;grid-template-columns:1.25fr .8fr 1.2fr .9fr .9fr .9fr;gap:4px;padding:5px 6px;border-top:1px solid rgba(128,128,128,.35);align-items:center}
+#hil .hr{display:grid;grid-template-columns:1.2fr .7fr 1.3fr .8fr .9fr .6fr .6fr;gap:4px;padding:5px 6px;border-top:1px solid rgba(128,128,128,.35);align-items:center}
 #hil .hr span:not(:first-child){text-align:right}
+#hil .hr span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hil .hr span:first-child{white-space:normal}
+@media (max-width:380px){#hil .hr{grid-template-columns:1.2fr .7fr 1.2fr .8fr .9fr .6fr}#hil .hr span:nth-child(6){display:none}}
 #hil .hh{position:sticky;top:0;border-top:0;background:var(--bd);color:var(--bg)}
 #hil .rec{background:rgba(255,209,102,.18);box-shadow:inset 3px 0 #ffd166}
 #hil .hr b{font-weight:400;font-size:9px}
@@ -81,6 +84,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #fyl,#hm,#gm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
 button{font:inherit;color:var(--fg);background:var(--btn);border:2px solid var(--bd);padding:8px 6px;text-align:left;cursor:pointer;line-height:1.6}
 button:disabled{opacity:.4;cursor:default}
+@keyframes bought{0%{background:#6ee7a0;color:#0d1019}100%{}}
+button.bought{animation:bought .35s steps(3)}
+@media (prefers-reduced-motion:reduce){button.bought{animation:none}}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
 #ups button:last-child:nth-child(odd){grid-column:1/-1}
@@ -198,7 +204,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -303,13 +309,16 @@ const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
   leg.appendChild(d);return d;
 });
+// Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
+const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px'};
+function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList.add('bought')}
 const ups=document.getElementById('ups'),btns={};
 for(const k in UP){
   const b=document.createElement('button');
   b.onclick=()=>{
     const c=cost(k);
     if(S.over||S.px<c||!upOpen(k))return;
-    S.px-=c;S.lv[k]++;sfx('buy');
+    S.px-=c;S.lv[k]++;sfx('buy');flashBtn(b);S.ft.push({t:GAIN[k],life:1});
     if(S.toast>0){S.toast=0;closeTip()}
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
   };
@@ -414,6 +423,7 @@ function update(dt){
   if(S.toast>0&&(S.toast-=dt)<=0)closeTip();
   S.bonus=Math.max(0,(S.bonus||0)-dt);
   S.shake=Math.max(0,S.shake-dt);
+  for(const f of S.ft)f.life-=dt;S.ft=S.ft.filter(f=>f.life>0);
   if(S.over){S.ot+=dt;return}
   S.time+=dt;
   S.nova=Math.max(0,S.nova-dt);
@@ -497,6 +507,9 @@ function draw(){
     if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
       if(e.t.shield&&e.shd<=0){g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(e.x)+.5,Math.round(e.y)+.5,s,0,Math.PI*2);g.stroke()}}
     else R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c)}
+  // floating purchase labels, in the free space below the tower
+  if(S.ft.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';
+    S.ft.forEach((f,i)=>{g.fillStyle='rgba(110,231,160,'+Math.min(1,f.life*2)+')';g.fillText(f.t,CX,Math.round(CY+24+i*9-(1-f.life)*8))})}
   // projectiles
   for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
   // tower
@@ -566,7 +579,7 @@ const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
 const nowNext=k=>'Now '+fmt(baseStat(k,M.lv[k]))+' > '+fmt(baseStat(k,M.lv[k]+1))+UNIT[k];
 for(const k in UP){
   const b=document.createElement('button');
-  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
+  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI();flashBtn(b)};
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
@@ -639,11 +652,11 @@ function showHistory(){
   const h=M.hist,avg=h.length?h.reduce((a,r)=>a+r.w,0)/h.length:0;
   document.getElementById('his').textContent=h.length?h.length+(h.length===1?' run':' runs')+' · best wave '+M.best+' · average '+(+avg.toFixed(1)):'';
   document.getElementById('hin').style.display=h.some(r=>r.r)?'block':'none';
-  const head='<div class="hr hh"><span>When</span><span>Wave</span><span>Killer</span><span>Chips</span><span>Time</span><span>Novas</span></div>';
+  const head='<div class="hr hh"><span>When</span><span>Wave</span><span>Killer</span><span>Chips</span><span>Time</span><span>Nova</span><span>Boss</span></div>';
   document.getElementById('hil').innerHTML=h.length?head+h.map(r=>{
     const d=new Date(r.t),day=d.toLocaleDateString(undefined,{month:'short',day:'numeric'}),tm=d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-    return '<div class="hr'+(r.r?' rec':'')+'"><span>'+esc(day)+'<small>'+esc(tm)+'</small></span><span><b>'+(r.w|0)+'</b></span><span>'+esc(r.k||'-')+'</span>'+
-      '<span>+'+(r.c|0)+'</span><span>'+fmtTime(r.d|0)+'</span><span>'+(r.n|0)+'</span></div>';
+    return '<div class="hr'+(r.r?' rec':'')+'"><span>'+esc(day)+'<small>'+esc(tm)+'</small></span><span><b>'+(r.w|0)+'</b></span><span>'+esc((r.k||'-').replace('Swarm Queen','Queen'))+'</span>'+
+      '<span>+'+(r.c|0)+'</span><span>'+fmtTime(r.d|0)+'</span><span>'+(r.n|0)+'</span><span>'+(r.b==null?'-':r.b|0)+'</span></div>';
   }).join(''):'<p>No runs yet. Press Play!</p>';
   show('home',0);show('hi',1);document.getElementById('hil').scrollTop=0;
 }
