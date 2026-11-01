@@ -14,7 +14,8 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Pixel foundry: spend chips on permanent upgrades to the same five skills. Saved in localStorage.
 - Game over menu: shows what killed the player, Restart and Go to foundry buttons, and two suggested upgrades (cheapest, and one matched to the killer).
 - Waves keep getting stronger (count and HP scale per wave).
-- Home screen before the first run and between runs: Play, a next-unlock goal card, Progress (Foundry, History), Coming soon (locked: Boss rush wave 25, Daily run wave 50, Tower skins wave 75; unlocked by best wave, say "Soon" until built), How to play. Game over has Restart, Foundry and Main menu.
+- Home screen before the first run and between runs: Play, a next-unlock goal card, Progress (Foundry, History), Unlocks (Bosses tracker from wave 20; locked Daily run wave 50 and Tower skins wave 75, "Soon" until built), How to play.
+- Bosses: waves 20/40/60/80, then every 10 from 100. Brute, Swarm Queen (spawns Runners), Warden (shield, Nova breaks it). Kill = 1 boss core + chips; escape = heavy damage. Cores are for the coming research loop (name still open, something about finding deeper meaning in pixels). Game over has Restart, Foundry and Main menu.
 - The run keeps going when the tab is hidden (no auto-pause; missed time is simulated on return, up to 30 min, silently). Pausing is manual: Pause opens a panel with Resume and Stop run; Stop run asks for confirmation, then ends the run like a death (saved to History as "Stopped").
 - History: every finished run is saved (last 50: date, wave, killer, chips, duration, Novas used, record) and shown from the home menu.
 

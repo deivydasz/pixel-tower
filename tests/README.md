@@ -34,6 +34,8 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 - `background-stop.test.js`: no auto-pause, background catch-up (quiet, capped), pause panel, stop-run confirmation
 - `pause-foundry.test.js`: pause/resume inputs, foundry only reachable from game over
 - `nova.test.js`: Nova damage, push, whole-screen range, cooldown, inputs
+- `bosses.test.js`: boss schedule and rotation, rewards, escapes, Warden shield, Queen spawns, boss bar, saves
 - `best-saves.test.js`: best wave record, loading v0/v1 saves
+- `teststart.test.js`: preview-only ?wave= / ?px= shortcut is ignored on the live site
 - `tips.test.js`: first-play tips, pausing, shown once
 - `balance.sim.js`: bot runs to compare wave reached (results vary about ±2 waves between runs)
