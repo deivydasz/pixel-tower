@@ -315,14 +315,15 @@ for(const k in UP){
 cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.pause)setPause(false);else nova()});
 
 // Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
-// letting it reach the tower deals heavy damage and gives nothing. hpK multiplies the wave's base enemy HP.
-// Balance (40 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~35% at lv3, ~48% lv4, ~80% lv6.
+// a boss that reaches the tower stays and hits it every BOSS.hitEvery seconds until one of them is destroyed. hpK multiplies the wave's base enemy HP.
+// Balance (30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
+// The fight at the tower is a damage race, so results change sharply between Foundry levels: the first boss is a wall to grow past.
 const BOSSES=[
-  {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:2.8,d:10,px:30,up:'dmg'},
-  {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:2,d:8,px:30,up:'range',spawn:3},
-  {n:'Warden',c:'#7dd3fc',s:12,sp:6,hpK:1.7,d:10,px:30,up:'dmg',shield:.25}
+  {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:15,d:12,px:30,up:'dmg'},
+  {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:10.5,d:10,px:30,up:'range',spawn:3},
+  {n:'Warden',c:'#7dd3fc',s:12,sp:6,hpK:9,d:12,px:30,up:'dmg',shield:.25}
 ];
-const BOSS={first:20,every:20,fastFrom:100,fastEvery:10,shieldDown:8,push:.3};
+const BOSS={first:20,every:20,fastFrom:100,fastEvery:10,shieldDown:8,push:.3,hitEvery:1};
 const isBossWave=w=>w>=BOSS.first&&(w<BOSS.fastFrom?w%BOSS.every===0:w%BOSS.fastEvery===0);
 function bossFor(w){let i=0;for(let x=BOSS.first;x<=w;x++)if(isBossWave(x))i++;return BOSSES[(i-1)%BOSSES.length]}
 const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
@@ -374,7 +375,7 @@ function nova(){
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  boss:{card:1,t:'<b>Boss!</b><span>Destroy it before it reaches the tower to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
+  boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with NOVA to break the shield for '+BOSS.shieldDown+'s.</span>'},
   nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };
@@ -425,11 +426,14 @@ function update(dt){
   }
   // enemies
   for(const e of S.en.slice()){
-    const dx=CX-e.x,dy=CY-e.y,d=Math.hypot(dx,dy);
-    e.x+=dx/d*e.t.sp*dt;e.y+=dy/d*e.t.sp*dt;
+    const dx=CX-e.x,dy=CY-e.y,d=Math.hypot(dx,dy),stop=e.boss?e.t.s/2+7:0;
+    // bosses stop at the tower and keep hitting until they or the tower are destroyed (no escapes)
+    if(d>stop){const m=Math.min(d-stop,e.t.sp*dt);e.x+=dx/d*m;e.y+=dy/d*m}
     e.hit=Math.max(0,e.hit-dt);
-    if(e.boss){e.shd=Math.max(0,e.shd-dt);if(e.t.spawn&&(e.st-=dt)<=0){e.st=e.t.spawn;const r=TYPES[1];S.en.push({x:e.x,y:e.y,t:r,hp:ehp(r),hit:0})}}
-    if(d<8){e.dead=true;e.reached=true;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.2;sfx('hit');buzz(30)}
+    if(e.boss){e.shd=Math.max(0,e.shd-dt);if(e.t.spawn&&(e.st-=dt)<=0){e.st=e.t.spawn;const r=TYPES[1];S.en.push({x:e.x,y:e.y,t:r,hp:ehp(r),hit:0})}
+      if(d<=stop+.5){if(!e.at){e.at=1;e.atk=0;S.bonus=2;S.bt1='BOSS ATTACKS!';S.bt='Destroy it before it destroys you';sfx('boss')}
+        if((e.atk-=dt)<=0){e.atk=BOSS.hitEvery;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.25;sfx('hit');buzz(40)}}}
+    else if(d<8){e.dead=true;e.reached=true;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.2;sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
   if(S.hp<=0){S.hp=0;endRun(false);return}
@@ -571,7 +575,7 @@ function showGO(){
   if(!M.tips.foundry){M.tips.foundry=1;S.goTip=true;save()}
   document.getElementById('got').style.display=S.goTip?'block':'none';
   const kn=S.stopped?'Stopped':S.killer?S.killer.n:'enemy';
-  document.getElementById('gop').textContent=S.record?'You beat your best of wave '+S.prevBest+'!':S.stopped?'You stopped the run on wave '+S.wave+'.':'Killed by a '+kn+' on wave '+S.wave+'.';
+  document.getElementById('gop').textContent=S.record?'You beat your best of wave '+S.prevBest+' by '+(S.wave-S.prevBest)+' wave'+(S.wave-S.prevBest===1?'':'s')+'!':S.stopped?'You stopped the run on wave '+S.wave+'.':'Killed by a '+kn+' on wave '+S.wave+'.';
   const cell=(l,v)=>'<div><small>'+l+'</small>'+v+'</div>';
   const nl=runNews(),gb=document.getElementById('gbt'),bo=resUnlocked();
   document.getElementById('gnl').innerHTML=nl.items.map(t=>'<li>'+t+'</li>').join('');

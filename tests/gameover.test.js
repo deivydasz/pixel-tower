@@ -11,5 +11,6 @@ ok($('gos').querySelectorAll('button').length===2,'two suggested upgrades');
 const c0=M.chips,b=[...$('gos').querySelectorAll('button')].find(x=>!x.disabled);
 if(b){b.click();ok(M.chips<c0&&$('gsl').textContent.includes(M.chips+' chips'),'buying a suggestion updates chips')}else ok(true,'no affordable suggestion (skipped)');
 click($('gor'));ok(!shown($('go'))&&!S.over&&S.wave===0,'Play again starts a new run');
-S.wave=9;die();ok($('goh').textContent==='New record!'&&$('goh').className==='rec'&&$('gop').textContent==='You beat your best of wave 4!','record header and reason');
+S.wave=9;die();ok($('goh').textContent==='New record!'&&$('goh').className==='rec'&&$('gop').textContent==='You beat your best of wave 4 by 5 waves!','record header and reason');
+click($('gor'));S.wave=10;die();ok($('gop').textContent==='You beat your best of wave 9 by 1 wave!','singular: by 1 wave');
 done();

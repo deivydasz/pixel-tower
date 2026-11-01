@@ -18,10 +18,14 @@ ok(S.bt1==='BOSS DOWN!'&&JSON.parse(localStorage.getItem('pixelTowerMeta')).core
 ui();ok(!shown($('bb')),'boss bar hidden after kill');
 // only one boss per wave
 step(3);ok(S.en.filter(e=>e.boss).length===0,'no second boss in the same wave');
-// a boss reaching the tower
-S.en=[];S.hp=stat.max();const t=bossFor(40);const escaper={x:CX+5,y:CY,t,hp:999,max:999,hit:0,boss:1,shd:0,st:99};S.en.push(escaper);
-const hp0=S.hp,k1=M.cores;step(.05);
-ok(Math.abs(hp0-S.hp-Math.max(.2,t.d-stat.armor()))<.01&&M.cores===k1&&S.killer===t,'boss reaching tower deals '+t.d+' and gives no core');
+// a boss reaching the tower stays and keeps hitting (no escapes)
+S.en=[];S.left=99;S.sp=99;S.hp=1e6;S.lv.hp=0;const t=bossFor(80);const atk={x:CX+30,y:CY,t,hp:1e9,max:1e9,hit:0,boss:1,shd:0,st:99};S.en.push(atk);S.pr=[];S.cd=99;
+const hp0=S.hp;step(8);
+ok(S.en.includes(atk)&&Math.abs(Math.hypot(atk.x-CX,atk.y-CY)-(t.s/2+7))<.6,'boss stops at the tower instead of vanishing');
+const hits=Math.round((hp0-S.hp)/Math.max(.2,t.d-stat.armor()));
+ok(hits>=2&&S.killer===t,'boss keeps hitting the tower ('+hits+' hits)');
+ok(S.bt1==='BOSS ATTACKS!','BOSS ATTACKS! banner when it reaches the tower');
+const k1=M.cores;atk.hp=1;S.cd=0;step(.5);ok(!S.en.includes(atk)&&M.cores===k1+1,'killing it at the tower still gives the core');
 // Warden shield
 S.en=[];const wt=bossFor(60);const w={x:CX+30,y:CY,t:wt,hp:1000,max:1000,hit:0,boss:1,shd:0,st:0};S.en.push(w);
 step(1/60);ok(S.tip==='warden'&&S.pause&&$('tip').textContent.includes('NOVA'),'first Warden shows shield tip');click($('tipok'));ui();ok($('bbt').textContent==='WARDEN 1000 SHIELD','boss bar shows shield up: '+$('bbt').textContent);w.hp=1000;
@@ -34,6 +38,6 @@ ui();ok($('bbt').textContent.endsWith('EXPOSED'),'boss bar shows shield is down'
 S.en=[];const qt=bossFor(40);const q={x:CX+100,y:CY,t:qt,hp:1e6,max:1e6,hit:0,boss:1,shd:0,st:qt.spawn};S.en.push(q);
 step(qt.spawn+.05);ok(S.en.some(e=>e.t===TYPES[1]),'Swarm Queen spawns a Runner every '+qt.spawn+'s');
 // history and saves
-S.en=[];die();ok(M.hist[0].b===1,'history records bosses beaten this run');
+S.en=[];die();ok(M.hist[0].b===2,'history records bosses beaten this run');
 loadMeta({v:3,chips:2,lv:{},best:30,hist:[]});ok(M.cores===0&&M.bk===0&&M.v===SAVE_V,'v3 save loads with 0 cores');
 done();

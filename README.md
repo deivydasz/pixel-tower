@@ -36,7 +36,7 @@ The legend at the top right of the game shows each enemy's current HP and the da
 
 ### Bosses
 A boss arrives at waves 20, 40, 60 and 80, then every 10 waves from wave 100, together with that wave's normal enemies.
-Destroy it before it reaches the tower to earn **1 boss core** and bonus chips (5 + 1 per 10 waves). If it reaches the tower it deals heavy damage and you get nothing.
+Bosses never give up: one that reaches the tower stays there and hits it every second until either the boss or the tower is destroyed. Destroy it to earn **1 boss core** and bonus chips (5 + 1 per 10 waves). The first boss is a real wall: in simulations it takes about Foundry level 4 in every upgrade to beat it reliably.
 
 | Boss | Trait |
 |---|---|
