@@ -43,7 +43,10 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #hm,#gm{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 #hm>*,#gm>*{grid-column:span 6}
 #hm button,#gm>button{text-align:center;min-height:48px}
-#gm #gof,#gm #gom{grid-column:span 3}
+#gm #gof,#gm #gom,#gm #gbt{grid-column:span 2;padding:6px 2px;font-size:8px}
+#gm #gbt svg{display:block;margin:0 auto 2px}
+#gm #gbt.hl{border-color:#c4a7ff;box-shadow:0 0 0 2px #c4a7ff}
+#gm #gbt small{display:block;font-size:7px;color:#c4a7ff}
 #hm #hplay,#gm #gor{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
 #hm #hfy,#hm #hhi,#hm #hbt{grid-column:span 2;padding:6px 2px}
 #hm #hbtn.rdy{color:#d9a400;opacity:1}
@@ -113,6 +116,10 @@ button b{display:block;font-weight:400}
 #nova.hint{animation:pulse .8s steps(2) infinite}
 @keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
 #got{display:none;color:#d9a400}
+#gnew{width:min(360px,92vw);box-sizing:border-box;border:2px solid #c4a7ff;padding:8px;font-size:8px;line-height:1.7;display:none}
+#gnew .nt{color:#c4a7ff;font-size:9px}
+#gnl{margin:6px 0 0;padding-left:14px}
+#gnl li{margin:2px 0}
 #gst{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--bd);background:var(--btn)}
 #gst div{padding:6px 8px;font-size:11px;border:1px solid rgba(128,128,128,.25)}
 #gst small{display:block;font-size:7px;opacity:.7;margin-bottom:3px}
@@ -126,12 +133,13 @@ button b{display:block;font-weight:400}
 <div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p>
+<div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
 <div id="gm"><div id="gst"></div>
 <button id="gor">Play again</button>
 <div id="goal" class="goal"><span id="goalt"></span><i><b id="goalb"></b></i></div>
 <p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p>
 <div class="hg" id="gsl"></div><div id="gos"></div>
-<button id="gof">Foundry</button><button id="gom">Main menu</button></div></div>
+<button id="gof">Foundry</button><button id="gbt">Bit Theory</button><button id="gom">Main menu</button></div></div>
 <div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
 <div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button>
@@ -191,6 +199,8 @@ function reset(){
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
+  // progress snapshot, compared at game over to list what this run unlocked
+  S.start={best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
 }
 const stat={
   dmg:()=>(1+S.lv.dmg+.5*M.lv.dmg)*Math.pow(1.2,M.res.depth),
@@ -556,12 +566,17 @@ function fyUI(){
     fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+c+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
 }
 function showGO(){
+  checkResearch();
   const goh=document.getElementById('goh');goh.textContent=S.record?'New record!':'Game over';goh.className=S.record?'rec':'';
   if(!M.tips.foundry){M.tips.foundry=1;S.goTip=true;save()}
   document.getElementById('got').style.display=S.goTip?'block':'none';
   const kn=S.stopped?'Stopped':S.killer?S.killer.n:'enemy';
   document.getElementById('gop').textContent=S.record?'You beat your best of wave '+S.prevBest+'!':S.stopped?'You stopped the run on wave '+S.wave+'.':'Killed by a '+kn+' on wave '+S.wave+'.';
   const cell=(l,v)=>'<div><small>'+l+'</small>'+v+'</div>';
+  const nl=runNews(),gb=document.getElementById('gbt'),bo=resUnlocked();
+  document.getElementById('gnl').innerHTML=nl.items.map(t=>'<li>'+t+'</li>').join('');
+  document.getElementById('gnew').style.display=nl.items.length?'block':'none';
+  gb.disabled=!bo;gb.className=bo&&nl.bt?'hl':'';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory'+(bo&&nl.bt?'<small>New!</small>':'');
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+S.earn)+cell('Time',fmtTime(Math.round(S.time)))+cell('Novas',S.novas)+cell('Best',M.best);
   goalUI('goalt','goalb');
   document.getElementById('gsl').textContent='Suggested upgrades · you have '+M.chips+' chips';
@@ -673,8 +688,24 @@ function hbtTile(){
   const rdy=open&&!M.rq&&BIT_KEYS.some(resCanAfford);
   n.textContent=!open?'Beat a boss':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
 }
-document.getElementById('hbt').onclick=()=>{if(!resUnlocked())return;show('home',0);btUI();show('bt',1)};
-document.getElementById('btc').onclick=showHome;
+// What this run unlocked (game over card). bt: show the "Open Bit Theory" button.
+function runNews(){
+  const a=S.start;if(!a)return {items:[],bt:false};
+  const items=[],w=S.wave;
+  for(const k in UP)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
+  for(const m of LOCKED)if(m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
+  const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
+  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
+  const opened=BIT_KEYS.filter(k=>!a.open.includes(k)&&resOpen(k));
+  if(!btNew)for(const k of opened)items.push(BITS[k].n+' can now be studied');
+  for(const k of BIT_KEYS)if(M.res[k]>a.res[k])items.push(BITS[k].n+' Lv '+M.res[k]+' finished');
+  return {items,bt:btNew||opened.length>0||(resUnlocked()&&!M.rq&&BIT_KEYS.some(resCanAfford)&&cg>0)};
+}
+let btFrom='home';
+function openBT(from){btFrom=from;show(from,0);btUI();show('bt',1)}
+document.getElementById('gbt').onclick=()=>{if(resUnlocked())openBT('go')};
+document.getElementById('hbt').onclick=()=>{if(resUnlocked())openBT('home')};
+document.getElementById('btc').onclick=()=>{show('bt',0);if(btFrom==='go')showGO();else showHome()};
 document.getElementById('hic').onclick=showHome;
 document.getElementById('hhow').onclick=()=>{show('home',0);show('how',1)};
 document.getElementById('howc').onclick=showHome;
