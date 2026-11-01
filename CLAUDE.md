@@ -1,0 +1,34 @@
+# Pixel Tower
+
+A very simple single-tower defence game in pixel style, for web and mobile browsers.
+The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canvas 2D). No build step, no dependencies.
+
+## Game design (decided)
+- One tower in the middle of the screen. Enemies attack from all sides.
+- Enemies: Grunt (basic), Runner (fast, from wave 3), Tank (slow, tough, from wave 5).
+- Killed enemies burst into pixels that fly to the tower. Pixels are the in-run currency.
+- In-run upgrades (cost pixels): Damage, Fire rate, Range, Tower HP, Pixel absorber (flat armor per hit).
+- Each cleared wave gives pixels and pixel chips. Chips are the between-runs currency.
+- Pixel foundry: spend chips on permanent upgrades to the same five skills. Saved in localStorage.
+- Game over menu: shows what killed the player, Restart and Go to foundry buttons, and two suggested upgrades (cheapest, and one matched to the killer).
+- Waves keep getting stronger (count and HP scale per wave).
+
+## Technical rules
+- Keep it a single `index.html` unless I explicitly ask to split it up.
+- Pixel look: low-res internal canvas scaled up, `image-rendering: pixelated`.
+- Must work on desktop and phones: touch-friendly buttons, no horizontal scroll, page padding, safe-area insets.
+- Support light and dark mode for page chrome.
+- Saved data lives in localStorage under `pixelTowerMeta`. Do not break existing saves when changing the data shape; add new fields with defaults.
+- Test by opening `index.html` in a browser (`open index.html` on macOS).
+
+## Git and deploy
+- Repo: github.com/deivydasz/pixel-tower (private), branch `main`.
+- Pushing to `main` auto-deploys to my server via a GitHub Action (`.github/workflows/deploy.yml`), so a push to `main` is a live release.
+- NEVER push to `main` without asking me first. Work on a branch named like `feature/short-name` and commit there.
+- Commit messages: short, imperative, one line (e.g. "Add boss wave every 10 waves").
+- Before asking to push, summarise what changed and how I can test it.
+
+## How I work
+- I give direction and confirm; you propose and implement. Keep changes small and focused, one feature per commit.
+- Ask me when a design choice is genuinely open (numbers and balance can be proposed with reasoning, I will tune them).
+- Do not add libraries, build tools or a backend without asking first.
