@@ -9,9 +9,9 @@
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB80lEQVR42u3csQ3CMBBA0exBkx2yE40XSZchGCGTpGEGClrqywLIkRwZjHnW7y3Zr7JOHi7jJL1tcASCQ3AIDsEhOASH4BAcgkNwSHAIDsEhOASH4BAcgkN/iiNSKs7hwgEHHHDAAYfgEByCQ3AIDsEhOFS32K6Z4IADDsEhOASH4IADDjjggAMOOOAwYNzAFWaX6XM44BAcgkNwCA444IADDjjggAMOOASH4BAcgkNwSHAIDsEhOATHUcvt/nPBAQcccMABBxxwwAEHHHDAAQcccMABBxxwfALH4/n6SnDAAQcccMABBxxwwAEHHHDAAQcccMABBxyt4zizLxxwwAEHHHDAAQcccMABBxxwwAEHHHDAAQcccMABBxxwwAEHHHDAAQcccMABBxxwwAEHHAaM4YADDjjggAMOOOCAAw444IADDjjggAMOOMqK7DqDwye1cMABBxxwwAEHHHDAAQcccMABBxxwwAFHz8/ngkNwCA7BITgEh+CQ4BAcgqOf1jkqBQcccMABBxxwCA7BITgEh+CAA45aOCKl4oCAAw444IADDjjggAMOOOCAAw444IADDjjgEBxwwAEHHHDAAQcccMABBxxwwAEHHHDAYcBY7QWH4BAcgkNwCA7BITgEh+AQHBIcgkNwCA7BITgEh+BQt+2A41nOJAZm5gAAAABJRU5ErkJggg==">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--mw:max(var(--w,360px),min(360px,calc(100vw - 40px)));--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5}}
-:root[data-theme="dark"]{--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5}
+:root{--mw:max(var(--w,360px),min(360px,calc(100vw - 40px)));--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;--gold:#7a5900;--violet:#5b3cc4;--dim:.6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5;--gold:#ffd166;--violet:#c4a7ff;--dim:.45}}
+:root[data-theme="dark"]{--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5;--gold:#ffd166;--violet:#c4a7ff;--dim:.45}
 html{height:100%;margin:0}
 body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -25,9 +25,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #fy,#go,#home,#how,#hi,#bt{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#howh,#hih{font-size:11px}
-#bth{font-size:16px;color:#c4a7ff;text-shadow:3px 3px 0 var(--bd)}
+#bth{font-size:16px;color:var(--violet);text-shadow:3px 3px 0 var(--bd)}
 #bt p{margin:0;font-size:8px;line-height:1.8;text-align:center;width:min(360px,92vw)}
-#btw{color:#d9a400}
+#btw{color:var(--gold)}
 #btq{width:min(360px,92vw);box-sizing:border-box;border-color:#c4a7ff}
 #btq b{background:#c4a7ff}
 #btl{display:grid;gap:6px;width:min(360px,92vw)}
@@ -49,16 +49,16 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #gm #gof,#gm #gom,#gm #gbt{grid-column:span 2;padding:6px 2px;font-size:8px}
 #gm #gbt svg{display:block;margin:0 auto 2px}
 #gm #gbt.hl{border-color:#c4a7ff;box-shadow:0 0 0 2px #c4a7ff}
-#gm #gbt small{display:block;font-size:7px;color:#c4a7ff}
+#gm #gbt small{display:block;font-size:7px;color:var(--violet)}
 #hm #hplay,#gm #gor{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
 #hm #hfy,#hm #hhi,#hm #hbt{grid-column:span 2;padding:6px 2px}
-#hm #hbtn.rdy{color:#d9a400;opacity:1}
+#hm #hbtn.rdy{color:var(--gold);opacity:1}
 #hm #hbt svg{display:block;margin:0 auto 2px}
 #hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
-#hm #hfyn.rdy{color:#d9a400;opacity:1}
+#hm #hfyn.rdy{color:var(--gold);opacity:1}
 #hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
-#hm .lk:disabled{opacity:.45}
+#hm .lk:disabled{opacity:var(--dim,.45)}
 #hm .lk.tr:disabled{opacity:1;border-color:#ff8c42}
 #hm .lk svg{display:block;margin:0 auto 4px}
 #hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px}
@@ -79,11 +79,11 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #hil .hr b{font-weight:400;font-size:9px}
 #hil small{display:block;opacity:.7}
 #hil p{margin:0;padding:10px;text-align:center}
-#hin{color:#d9a400}
+#hin{color:var(--gold)}
 #howc,#fyc,#hic{min-width:140px;min-height:44px;text-align:center}
 #fyl,#hm,#gm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
 button{font:inherit;color:var(--fg);background:var(--btn);border:2px solid var(--bd);padding:8px 6px;text-align:left;cursor:pointer;line-height:1.6}
-button:disabled{opacity:.4;cursor:default}
+button:disabled{opacity:var(--dim,.45);cursor:default}
 @keyframes bought{0%{background:#6ee7a0;color:#0d1019}100%{}}
 button.bought{animation:bought .35s steps(3)}
 @media (prefers-reduced-motion:reduce){button.bought{animation:none}}
@@ -124,9 +124,9 @@ button b{display:block;font-weight:400}
 #tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
 #nova.hint{animation:pulse .8s steps(2) infinite}
 @keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
-#got{display:none;color:#d9a400}
+#got{display:none;color:var(--gold)}
 #gnew{width:min(360px,92vw);box-sizing:border-box;border:2px solid #c4a7ff;padding:8px;font-size:8px;line-height:1.7;display:none}
-#gnew .nt{color:#c4a7ff;font-size:9px}
+#gnew .nt{color:var(--violet);font-size:9px}
 #gnl{margin:6px 0 0;padding-left:14px}
 #gnl li{margin:2px 0}
 #gst{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--bd);background:var(--btn)}
@@ -302,6 +302,8 @@ sndUI();
 
 const ehp=t=>Math.max(1,Math.round(2*Math.pow(1.12,Math.max(1,S.wave))*t.hp));
 const edmg=t=>Math.max(.2,t.d-stat.armor());
+// Compact counts for chips/pixels: 9999, 12.3k, 456k, 1.23M.
+const big=n=>{n=Math.floor(n);return n<1e4?String(n):n<1e6?(+(n/1e3).toFixed(n<1e5?1:0))+'k':(+(n/1e6).toFixed(n<1e7?2:1))+'M'};
 // Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
 const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFixed(1):Math.round(n))};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
@@ -545,8 +547,8 @@ function setDis(el,v){v=!!v;if(el.disabled!==v)el.disabled=v}
 function setH(el,v){if(el._h!==v){el._h=v;el.innerHTML=v}}  // only ui() writes these buttons
 function ui(){
   setT($id('w'),'Wave '+Math.max(1,S.wave));
-  setT($id('px'),S.px+' px');
-  setT($id('ch'),M.chips+' chips');
+  setT($id('px'),big(S.px)+' px');
+  setT($id('ch'),big(M.chips)+' chips');
   const bw=Math.max(M.best,S.over?0:S.wave);setT($id('bw'),'Best '+(bw||'-'));
   const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
   checkResearch();
@@ -567,7 +569,7 @@ function ui(){
   const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:'Range '+fmt(stat.range()),hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor()),magnet:'+'+fmt(100*stat.magnet())+'% pixels'};
   for(const k in UP){
     const c=cost(k);
-    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+c+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';
+    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';
     setH(btns[k],h);btns[k].classList.toggle('lkup',!op);
     setDis(btns[k],S.over||!op||S.px<c);
   }
@@ -583,9 +585,9 @@ for(const k in UP){
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
-  fyh.textContent='Pixel foundry: '+M.chips+' chips';
+  fyh.textContent='Pixel foundry: '+big(M.chips)+' chips';
   for(const k in UP){const c=mcost(k),op=upOpen(k);fyb[k].classList.toggle('lkup',!op);
-    fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+c+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
+    fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+big(c)+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
 }
 function showGO(){
   checkResearch();
@@ -599,9 +601,9 @@ function showGO(){
   document.getElementById('gnl').innerHTML=nl.items.map(t=>'<li>'+t+'</li>').join('');
   document.getElementById('gnew').style.display=nl.items.length?'block':'none';
   gb.disabled=!bo;gb.className=bo&&nl.bt?'hl':'';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory'+(bo&&nl.bt?'<small>New!</small>':'');
-  document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+S.earn)+cell('Time',fmtTime(Math.round(S.time)))+cell('Novas',S.novas)+cell('Best',M.best);
+  document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.earn))+cell('Time',fmtTime(Math.round(S.time)))+cell('Novas',S.novas)+cell('Best',M.best);
   goalUI('goalt','goalb');
-  document.getElementById('gsl').textContent='Suggested upgrades · you have '+M.chips+' chips';
+  document.getElementById('gsl').textContent='Suggested upgrades · you have '+big(M.chips)+' chips';
   const s=document.getElementById('gos');s.innerHTML='';
   const ks=openUps().sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
@@ -609,7 +611,7 @@ function showGO(){
   else pick.push({k:ks[1],why:'Next cheapest'});
   pick.forEach(({k,why})=>{
     const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+c+' chips';
+    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+big(c)+' chips';
     b.disabled=M.chips<c;
     b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
     s.appendChild(b);
@@ -635,12 +637,12 @@ function homeUI(){
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
   goalUI('hookt','hookb');
-  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
+  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':big(M.chips)+' chips';fn.className=rdy?'rdy':'';
 }
 function showHome(){
   homeUI();
   S.menu=true;S.pause=true;closeTip();
-  document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+M.chips+' chips'+(M.cores?' · '+M.cores+' cores':''):'Defend the tower from waves of pixel monsters.';
+  document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+big(M.chips)+' chips'+(M.cores?' · '+M.cores+' core'+(M.cores===1?'':'s'):''):'Defend the tower from waves of pixel monsters.';
   show('go',0);show('fy',0);show('how',0);show('hi',0);show('bt',0);show('home',1);
 }
 function openFoundry(from){fyFrom=from;show(from,0);fyUI();show('fy',1)}
@@ -686,12 +688,12 @@ function checkResearch(){
   return true;
 }
 function btUI(){
-  document.getElementById('btw').textContent='You have '+M.cores+' core'+(M.cores===1?'':'s')+' · '+M.chips+' chips';
+  document.getElementById('btw').textContent='You have '+M.cores+' core'+(M.cores===1?'':'s')+' · '+big(M.chips)+' chips';
   document.getElementById('btl').innerHTML=BIT_KEYS.map(k=>{
     const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
     if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
-    const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+c.chips+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
+    const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
   }).join('');
