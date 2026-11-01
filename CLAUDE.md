@@ -26,6 +26,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Repo: github.com/deivydasz/pixel-tower (private), branch `main`.
 - Pushing to `main` auto-deploys to my server via a GitHub Action (`.github/workflows/deploy.yml`), so a push to `main` is a live release.
 - Live site: https://idlepixeltower.duckdns.org (DigitalOcean Droplet, nginx, Let's Encrypt). The Droplet also runs a Rails app outside nginx; only touch the `pixel-tower` nginx config.
+- Preview: pushing any `feature/*` branch deploys it to https://preview.idlepixeltower.duckdns.org (`.github/workflows/preview.yml`, separate saves from live, one slot = last pushed branch). After pushing a branch, check the Preview run and tell me to try it there before I say "push".
 - NEVER push to `main` without asking me first. Work on a branch named like `feature/short-name` and commit there.
 - Commit messages: short, imperative, one line (e.g. "Add boss wave every 10 waves").
 - Release flow: push the branch, open a PR, then merge it into `main` with a merge commit (`gh pr merge --merge`, no squash or fast-forward) so every feature stays traceable in history. Then check the deploy run with `gh run watch`.
