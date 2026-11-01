@@ -104,11 +104,12 @@ button b{display:block;font-weight:400}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
 #hpt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;text-shadow:1px 1px 0 #0d1019}
-#leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none}
+#leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
+#leg.fade{opacity:.2}
 #leg div{display:flex;flex-direction:column}
 #leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
 #leg .off{opacity:.4}
-#nova{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-width:110px;min-height:40px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
+#nova{position:absolute;right:6px;bottom:6px;min-width:76px;min-height:38px;padding:4px 8px;font-size:8px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
 #tip{position:absolute;left:10px;right:10px;display:none;flex-direction:column;gap:8px;padding:10px;background:#0d1019;color:#e8ecf5;border:2px solid #ffd166;font-size:8px;line-height:1.8}
 #tip.card{top:50%;transform:translateY(-50%)}
 .pnl{position:absolute;left:10px;right:10px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;padding:12px;background:#0d1019;color:#e8ecf5;border:2px solid #e8ecf5;font-size:8px;line-height:1.8;text-align:center}
@@ -134,7 +135,7 @@ button b{display:block;font-weight:400}
 #gst small{display:block;font-size:7px;opacity:.7;margin-bottom:3px}
 #gos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 #gos button{font-size:8px}
-#nova:disabled{opacity:1;color:#e8ecf5;background:rgba(13,16,25,.75);border-color:#3a4160}
+#nova:disabled{opacity:1;color:rgba(232,236,245,.8);background:rgba(13,16,25,.45);border-color:rgba(58,65,96,.8)}
 </style>
 </head>
 <body>
@@ -306,6 +307,7 @@ const edmg=t=>Math.max(.2,t.d-stat.armor());
 const big=n=>{n=Math.floor(n);return n<1e4?String(n):n<1e6?(+(n/1e3).toFixed(n<1e5?1:0))+'k':(+(n/1e6).toFixed(n<1e7?2:1))+'M'};
 // Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
 const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFixed(1):Math.round(n))};
+const legBox={n:0,x0:0,x1:0,y0:0,y1:0};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   const d=document.createElement('div');
   d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
@@ -561,6 +563,10 @@ function ui(){
   const m=stat.max(),hp=Math.max(0,S.hp);
   setW($id('hpf'),100*hp/m);
   setT($id('hpt'),'HP '+fmt(Math.ceil(hp*10)/10)+'/'+fmt(m));
+  // fade the legend while an enemy is underneath it (legend box measured in canvas units every 20 frames)
+  if(!(legBox.n++%20)){const lr=leg.getBoundingClientRect(),cr=cv.getBoundingClientRect(),sc=cr.width/W||1;
+    legBox.x0=(lr.left-cr.left)/sc-3;legBox.x1=(lr.right-cr.left)/sc+3;legBox.y0=(lr.top-cr.top)/sc-3;legBox.y1=(lr.bottom-cr.top)/sc+3}
+  leg.classList.toggle('fade',!S.over&&S.en.some(e=>e.x>legBox.x0&&e.x<legBox.x1&&e.y>legBox.y0&&e.y<legBox.y1));
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.classList.toggle('off',!on);

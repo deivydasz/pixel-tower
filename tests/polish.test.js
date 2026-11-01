@@ -16,5 +16,11 @@ setTimeout(()=>{
   const c2=[];g.fillText=(t,x,y)=>c2.push(t);S.bonus=0;die();draw();g.fillText=ft;
   ok(!c2.some(t=>/GAME OVER|Tap to restart/.test(t)),'no stray canvas game over text');
   const w=S.wave;click($('c'));ok(S.over&&S.wave===w,'tapping the canvas behind game over does nothing');
+  // legend fades while an enemy is under it
+  click($('gor'));S.en=[];S.left=99;S.sp=99;legBox.n=0;ui();ok(!leg.classList.contains('fade'),'legend solid with no enemy under it');
+  enemy((legBox.x0+legBox.x1)/2-CX,(legBox.y0+legBox.y1)/2-CY,0,99);ui();ok(leg.classList.contains('fade'),'legend fades with an enemy under it');
+  S.en=[];ui();ok(!leg.classList.contains('fade'),'legend returns when the enemy leaves');
+  // NOVA button sits in the bottom-right corner, not over the middle
+  const nr=$('nova').getBoundingClientRect(),cr=$('c').getBoundingClientRect();ok(nr.right>cr.right-12&&nr.left>cr.left+cr.width/2,'NOVA button in the bottom-right corner');
   done();
 },0);
