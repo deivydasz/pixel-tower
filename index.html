@@ -6,14 +6,15 @@
 <title>Pixel Tower</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--mw:max(var(--w,360px),min(360px,92vw));--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--mw:max(var(--w,360px),min(360px,calc(100vw - 40px)));--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5}}
 :root[data-theme="dark"]{--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5}
-html,body{height:100%;margin:0}
+html{height:100%;margin:0}
+body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #hud{display:flex;justify-content:space-between;align-items:center;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
-canvas{image-rendering:pixelated;background:#1b2033;display:block}
+canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
 #ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
 #fy,#go{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
@@ -23,6 +24,7 @@ button{font:inherit;color:var(--fg);background:var(--btn);border:2px solid var(-
 button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
+#ups button:last-child:nth-child(odd){grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -36,7 +38,7 @@ const W=180,H=240,CX=90,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 cv.width=W;cv.height=H;
 function fit(){
-  const raw=Math.min(innerWidth/W,(innerHeight-170)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
+  const raw=Math.min((innerWidth-48)/W,(innerHeight-250)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
   cv.style.width=W*s+'px';cv.style.height=H*s+'px';
   document.documentElement.style.setProperty('--w',W*s+'px');
 }
