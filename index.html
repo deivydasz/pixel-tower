@@ -316,6 +316,9 @@ const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
 // Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
 const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px'};
 function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList.add('bought')}
+// stat value per upgrade, and how it is labelled on the in-run buttons
+const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet()};
+const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%'};  // the button title names the stat
 const ups=document.getElementById('ups'),btns={};
 for(const k in UP){
   const b=document.createElement('button');
@@ -572,7 +575,8 @@ function ui(){
     r.classList.toggle('off',!on);
     setT(r.lastChild,on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min);
   });
-  const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:'Range '+fmt(stat.range()),hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor()),magnet:'+'+fmt(100*stat.magnet())+'% pixels'};
+  // each button shows the stat now > after buying one more level, e.g. "2 > 3" under "Damage"
+  const info={};for(const k in UP){const now=STATV[k]();S.lv[k]++;const nx=STATV[k]();S.lv[k]--;info[k]=STATL[k](now)+' > '+STATL[k](nx)}
   for(const k in UP){
     const c=cost(k);
     const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';

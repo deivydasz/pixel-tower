@@ -5,7 +5,7 @@ M.best=5;M.chips=10;M.cores=1;showHome();ok($('hst').textContent.endsWith('· 1 
 M.chips=123456;showHome();ok($('hst').textContent.includes('123k chips'),'home shows compact chips');M.chips=0;
 skipTips();play();S.lv.dmg=3;M.lv.dmg=3;M.lv.armor=7;ui();
 const dmgBtn=[...document.querySelectorAll('#ups button')][0].innerText;
-ok(/Dmg \d+(\.\d{1,2})?\n/.test(dmgBtn),'in-run damage button rounded: '+dmgBtn.replace(/\n/g,' / '));
+ok(/\n\d+(\.\d{1,2})? > \d+(\.\d{1,2})?\n/.test(dmgBtn),'in-run damage button rounded: '+dmgBtn.replace(/\n/g,' / '));
 M.res.depth=3;ui();ok(!/\d\.\d{3}/.test($('ups').innerText),'no long decimals with Bit depth: '+[...document.querySelectorAll('#ups button')][0].innerText.replace(/\n/g,' / '));
 M.res.depth=0;M.chips=500;M.best=20;die();click($('gof'));
 const fd=$('fyl').querySelector('button').textContent;
