@@ -1,0 +1,17 @@
+const tip=$('tip'),nb=$('nova');
+step(.1);ok(shown(tip)&&S.tip==='start'&&S.pause&&tip.className==='card','first play: start card shown, game paused');
+ui();ok($('pb').disabled&&$('pb').textContent==='Pause','pause button disabled and says Pause under card');
+click($('c'));ok(S.pause&&S.nova===0,'tapping canvas under card does nothing');
+click($('tipok'));ok(!shown(tip)&&!S.pause&&!S.tip,'Got it closes card and resumes');
+S.px=100;step(.1);ok(shown(tip)&&tip.className==='toast'&&!S.pause,'buy toast shows without pausing');
+ui();document.querySelector('#ups button').click();ok(!shown(tip),'buying an upgrade dismisses toast');
+S.en=[];S.left=99;S.sp=99;for(let i=0;i<3;i++)enemy(20,i*3,2,99);
+step(.05);ok(shown(tip)&&S.tip==='nova'&&S.pause&&nb.classList.contains('hint'),'crowded: nova card, paused, button pulses');
+ok($('tipok').textContent==='Fire NOVA','nova card button says Fire NOVA');
+click($('tipok'));ok(!S.pause&&!nb.classList.contains('hint')&&S.nova>NOVA.cd-1,'Fire NOVA closes card and fires nova');
+ok(M.tips.start&&M.tips.buy&&M.tips.nova,'tips remembered in save');
+die();ok(shown($('got')),'first game over: foundry tip shown');
+click($('gof'));click($('fyc'));ok(shown($('got')),'foundry tip still shown after visiting foundry');
+click($('gor'));step(1);ok(!shown(tip)&&!S.pause,'second run: no start card');
+die();ok(!shown($('got')),'second game over: no foundry tip');
+done();

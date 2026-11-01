@@ -1,0 +1,15 @@
+skipTips();
+ok(!$('fb'),'no Foundry button in HUD during play');
+step(3);ui();ok(S.wave>=1&&!S.pause,'game running');
+click($('pb'));ui();ok(S.pause&&$('pb').textContent==='Resume','Pause button pauses, label Resume');
+const snap=JSON.stringify(S.en.map(e=>[e.x,e.y]));step(2);
+ok(JSON.stringify(S.en.map(e=>[e.x,e.y]))===snap,'nothing moves while paused');
+click($('c'));ok(!S.pause,'tap canvas resumes');
+key('p');ok(S.pause,'P key pauses');
+key('Escape');ok(!S.pause,'Escape resumes');
+die();ui();ok(S.over&&$('pb').disabled,'game over, pause disabled');
+ok(shown($('go')),'game over menu shown');
+click($('gof'));ok(shown($('fy')),'foundry opens from game over');
+click($('fyc'));ok(!shown($('fy'))&&shown($('go')),'Back returns to game over menu');
+click($('gor'));ok(!S.over&&!S.pause&&S.wave===0,'Restart starts new run');
+done();
