@@ -9,7 +9,7 @@ ok(!btn_('crit').disabled&&!btn_('pierce').disabled,'Critical and Piercing bits 
 ok(btn_('spray').classList.contains('lkd')&&btn_('spray').textContent.includes('Piercing bits Lv 2 (0/2)')&&btn_('spray').textContent.includes('3 bosses beaten (1/3)'),'Spray and Pray locked, shows its requirements with progress');
 ok(btn_('nova').textContent.includes('Best wave 35 (0/35)')&&btn_('depth').textContent.includes('Critical bits Lv 3 (0/3)')&&btn_('depth').textContent.includes('5 bosses beaten (1/5)'),'Nova tech and Bit depth show requirements');
 ok(btn_('spray').querySelector('small.met')===null&&!resCanAfford('spray')&&!startResearch('spray'),'locked research cannot be started');
-M.bk=2;M.best=40;click($('btc'));click($('hbt'));ok(!btn_('nova').classList.contains('lkd')&&!btn_('nova').disabled&&btn_('nova').textContent.includes('core'),'Nova tech opens at best wave 35 + 2 bosses (shows cost)');
+M.bk=2;M.best=40;click($('btc'));click($('hbt'));ok(!btn_('nova').classList.contains('lkd')&&!btn_('nova').disabled&&btn_('nova').textContent.includes('core'),'Blast tech opens at best wave 35 + 2 bosses (shows cost)');
 M.bk=1;M.best=0;click($('btc'));click($('hbt'));
 ok($('btl').querySelectorAll('button').length===BIT_KEYS.length&&!shown($('btq')),'lists all researches, nothing running');
 ok(btn('crit').textContent.includes('1 core · 25 chips · 15m 00s'),'shows cost and time: '+btn('crit').lastChild.textContent);

@@ -12,7 +12,7 @@ ok(JSON.parse(localStorage.getItem('pixelTowerMeta')).hist.length===1,'history p
 click($('gor'));S.wave=6;die();ok(M.hist.length===2&&M.hist[0].w===6&&M.hist[0].r===1,'newest first, record flagged');
 click($('gom'));click($('hhi'));
 ok(rows().length===2&&cells(rows()[0])[1]==='6'&&rows()[0].classList.contains('rec')&&shown($('hin')),'newest run first, record row highlighted with note');
-ok(cells($('hil').querySelector('.hh')).join('|')==='When|Wave|Killer|Chips|Time|Nova|Boss','table has column headers');
+ok(cells($('hil').querySelector('.hh')).join('|')==='When|Wave|Killer|Chips|Time|Blast|Boss','table has column headers');
 ok(cells(rows()[0])[6]==='0','Boss column shows bosses beaten');
 ok(cells(rows()[1]).slice(1).join('|').startsWith('3|Grunt|+4|0:0')&&cells(rows()[1])[5]==='2'&&!rows()[1].classList.contains('rec'),'older run cells: '+cells(rows()[1]).join('|'));
 ok($('his').textContent==='2 runs · best wave 6 · average 4.5','summary line: '+$('his').textContent);

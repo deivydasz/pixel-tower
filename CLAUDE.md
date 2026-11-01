@@ -9,16 +9,17 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - One tower in the middle of the screen. Enemies attack from all sides.
 - Enemies: Grunt (basic), Runner (fast, from wave 3), Tank (slow, tough, from wave 5).
 - Killed enemies burst into pixels that fly to the tower. Pixels are the in-run currency.
-- In-run upgrades (cost pixels): six stats. Damage and Tower HP from the start; Fire rate (wave 5), Range (8), Pixel absorber (12, flat armor per hit), Pixel magnet (16, more pixels per kill) unlock by best wave, mid-run too. Healing upgrades were tried and made the tower immortal in simulations, so avoid them.
+- Player-facing names: the screen-wide ability is **Blast** (code still calls it `nova`), the armor upgrade is **Dmg sponge** (code key `armor`).
+- In-run upgrades (cost pixels): six stats. Damage and Tower HP from the start; Fire rate (wave 5), Range (8), Dmg sponge (12, flat armor per hit), Pixel magnet (16, more pixels per kill) unlock by best wave, mid-run too. Healing upgrades were tried and made the tower immortal in simulations, so avoid them.
 - Each cleared wave gives pixels and pixel chips. Chips are the between-runs currency.
 - Pixel foundry: spend chips on permanent upgrades to the same six skills (same unlocks). Saved in localStorage.
 - Game over menu: header and reason, an "Unlocked this run" card (new upgrades, bosses, cores, Bit Theory, research now available or finished; hidden if nothing new), run stats, Play again, next-unlock goal, two suggested upgrades (cheapest, and one matched to the killer), then Foundry · Bit Theory · Main menu. Bit Theory is highlighted with "New!" when the run unlocked something for it.
 - Waves keep getting stronger (count and HP scale per wave).
 - Home screen before the first run and between runs: Play, a next-unlock goal card, Progress (Foundry, History), Unlocks (Bosses tracker from wave 20; locked Daily run wave 50 and Tower skins wave 75, "Soon" until built), How to play.
-- Bosses: waves 20/40/60/80, then every 10 from 100. Brute, Swarm Queen (spawns Runners), Warden (shield, Nova breaks it). No escapes: a boss at the tower keeps hitting every second until it or the tower dies. Kill = 1 boss core + chips. Cores pay for Bit Theory.
-- Bit Theory (research, "finding the deeper meaning in pixels"): one timed study at a time in real time (keeps running while closed), paid with cores + chips. Spray and Pray, Piercing bits, Critical bits, Nova tech, Bit depth (x1.2 damage per level, the long-term multiplier). Unlocks after the first boss. Researches have requirements (bosses beaten, best wave, other research levels): Critical and Piercing first, then Spray and Pray, Nova tech, Bit depth. Data in `BITS` in index.html. Game over has Restart, Foundry and Main menu.
+- Bosses: waves 20/40/60/80, then every 10 from 100. Brute, Swarm Queen (spawns Runners), Warden (shield, Blast breaks it). No escapes: a boss at the tower keeps hitting every second until it or the tower dies. Kill = 1 boss core + chips. Cores pay for Bit Theory.
+- Bit Theory (research, "finding the deeper meaning in pixels"): one timed study at a time in real time (keeps running while closed), paid with cores + chips. Spray and Pray, Piercing bits, Critical bits, Blast tech, Bit depth (x1.2 damage per level, the long-term multiplier). Unlocks after the first boss. Researches have requirements (bosses beaten, best wave, other research levels): Critical and Piercing first, then Spray and Pray, Blast tech, Bit depth. Data in `BITS` in index.html. Game over has Restart, Foundry and Main menu.
 - The run keeps going when the tab is hidden (no auto-pause; missed time is simulated on return, up to 30 min, silently). Pausing is manual: Pause opens a panel with Resume and Stop run; Stop run asks for confirmation, then ends the run like a death (saved to History as "Stopped").
-- History: every finished run is saved (last 50: date, wave, killer, chips, duration, Novas used, record) and shown from the home menu.
+- History: every finished run is saved (last 50: date, wave, killer, chips, duration, Blasts used, record) and shown from the home menu.
 
 ## Technical rules
 - Keep it a single `index.html` unless I explicitly ask to split it up.
