@@ -18,26 +18,30 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
-#ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
-#fy,#go,#home,#how,#hi{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#ups,#fyl{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
+#fy,#go,#home,#how,#hi{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
-#fyh,#goh,#howh,#hih{font-size:11px}
+#fyh,#howh,#hih{font-size:11px}
+#goh{font-size:18px;color:#ff6b6b;text-shadow:3px 3px 0 var(--bd);text-transform:uppercase}
+#goh.rec{color:#ffd166}
+#go #gop{text-align:center}
 #homeh{font-size:20px;line-height:1.3;text-align:center;color:#5ec8ff;text-shadow:3px 3px 0 var(--bd)}
-#hm{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-#hm>*{grid-column:span 6}
-#hm button{text-align:center;min-height:48px}
-#hm #hplay{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
+#hm,#gm{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+#hm>*,#gm>*{grid-column:span 6}
+#hm button,#gm>button{text-align:center;min-height:48px}
+#gm #gof,#gm #gom{grid-column:span 3}
+#hm #hplay,#gm #gor{background:#5ec8ff;color:#0d1019;border-color:#0d1019;font-size:12px;min-height:56px}
 #hm #hfy,#hm #hhi{grid-column:span 3}
-#hm .hg{font-size:7px;opacity:.7;margin-top:6px}
+#hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm #hfyn.rdy{color:#d9a400;opacity:1}
 #hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
 #hm .lk:disabled{opacity:.45}
 #hm .lk svg{display:block;margin:0 auto 4px}
 #hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px}
-#hook{border:2px solid #ffd166;padding:8px;font-size:8px;line-height:1.7;text-align:left}
-#hook i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
-#hook b{display:block;height:100%;background:#ffd166;width:0}
+#hook,.goal{border:2px solid #ffd166;padding:8px;font-size:8px;line-height:1.7;text-align:left}
+#hook i,.goal i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
+#hook b,.goal b{display:block;height:100%;background:#ffd166;width:0}
 #home p,#how p{text-align:center}
 #how p{text-align:left}
 #hi p{margin:0;font-size:8px;text-align:center;width:min(360px,92vw)}
@@ -51,12 +55,12 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #hil p{margin:0;padding:10px;text-align:center}
 #hin{color:#d9a400}
 #howc,#fyc,#hic{min-width:140px;min-height:44px;text-align:center}
-#fyl,#gos,#gob,#hm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
+#fyl,#hm,#gm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
 button{font:inherit;color:var(--fg);background:var(--btn);border:2px solid var(--bd);padding:8px 6px;text-align:left;cursor:pointer;line-height:1.6}
 button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
-#ups button:last-child:nth-child(odd),#gob button:last-child:nth-child(odd){grid-column:1/-1}
+#ups button:last-child:nth-child(odd){grid-column:1/-1}
 #stage{position:relative}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
@@ -73,7 +77,12 @@ button b{display:block;font-weight:400}
 #tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
 #nova.hint{animation:pulse .8s steps(2) infinite}
 @keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
-#got{display:none;color:#ffd166}
+#got{display:none;color:#d9a400}
+#gst{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--bd);background:var(--btn)}
+#gst div{padding:6px 8px;font-size:11px;border:1px solid rgba(128,128,128,.25)}
+#gst small{display:block;font-size:7px;opacity:.7;margin-bottom:3px}
+#gos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#gos button{font-size:8px}
 #nova:disabled{opacity:1;color:#e8ecf5;background:rgba(13,16,25,.75);border-color:#3a4160}
 </style>
 </head>
@@ -81,7 +90,13 @@ button b{display:block;font-weight:400}
 <div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
 <div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
-<div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button><button id="gom">Main menu</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
+<div id="go"><div id="goh">Game over</div><p id="gop"></p>
+<div id="gm"><div id="gst"></div>
+<button id="gor">Play again</button>
+<div id="goal" class="goal"><span id="goalt"></span><i><b id="goalb"></b></i></div>
+<p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p>
+<div class="hg" id="gsl"></div><div id="gos"></div>
+<button id="gof">Foundry</button><button id="gom">Main menu</button></div></div>
 <div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
 <div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hhi">History</button>
@@ -413,10 +428,15 @@ function fyUI(){
   for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+MI[k]+' · '+c+' chips';fyb[k].disabled=M.chips<c}
 }
 function showGO(){
-  document.getElementById('goh').textContent=S.record?'New record!':'Game over';
+  const goh=document.getElementById('goh');goh.textContent=S.record?'New record!':'Game over';goh.className=S.record?'rec':'';
   if(!M.tips.foundry){M.tips.foundry=1;S.goTip=true;save()}
   document.getElementById('got').style.display=S.goTip?'block':'none';
-  document.getElementById('gop').textContent=(S.record?'You beat your best of wave '+S.prevBest+'. ':'')+'You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
+  const kn=S.killer?S.killer.n:'enemy';
+  document.getElementById('gop').textContent=S.record?'You beat your best of wave '+S.prevBest+'!':'Killed by a '+kn+' on wave '+S.wave+'.';
+  const cell=(l,v)=>'<div><small>'+l+'</small>'+v+'</div>';
+  document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+S.earn)+cell('Time',fmtTime(Math.round(S.time)))+cell('Novas',S.novas)+cell('Best',M.best);
+  goalUI('goalt','goalb');
+  document.getElementById('gsl').textContent='Suggested upgrades · you have '+M.chips+' chips';
   const s=document.getElementById('gos');s.innerHTML='';
   const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
@@ -424,7 +444,7 @@ function showGO(){
   else pick.push({k:ks[1],why:'Next cheapest'});
   pick.forEach(({k,why})=>{
     const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+MI[k]+' · '+c+' chips';
+    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+MI[k]+'<br>'+c+' chips';
     b.disabled=M.chips<c;
     b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
     s.appendChild(b);
@@ -438,12 +458,16 @@ let fyFrom='go';
 // Thresholds are deliberately far (new players reach ~wave 8; Foundry lv3 in everything ~wave 29) because the modes aren't built yet.
 const LOCKED=[{n:'Boss rush',w:25},{n:'Daily run',w:50},{n:'Tower skins',w:75}];
 const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h1v2h1v5H0V3h1V1h1zM2 1v2h3V1z" fill-rule="evenodd"/></svg>';
+// Next-unlock goal card (home menu and game over): text plus progress bar toward the next locked mode.
+function goalUI(tid,bid){
+  const next=LOCKED.find(m=>M.best<m.w),hb=document.getElementById(bid);
+  document.getElementById(tid).textContent=next?'Next unlock: '+next.n+'. Reach wave '+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
+  hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
+}
 function homeUI(){
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=M.best>=m.w;
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
-  const next=LOCKED.find(m=>M.best<m.w),hb=document.getElementById('hookb');
-  document.getElementById('hookt').textContent=next?'Next unlock: '+next.n+'. Reach wave '+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
-  hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
+  goalUI('hookt','hookb');
   const rdy=Object.keys(UP).some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
 }
 function showHome(){
