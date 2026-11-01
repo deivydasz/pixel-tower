@@ -12,7 +12,7 @@
 html{height:100%;margin:0}
 body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-#hud{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;width:var(--mw,360px)}
+#hud{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
 #hud{font-size:8px}
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
@@ -78,6 +78,12 @@ button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
 #ups button:last-child:nth-child(odd){grid-column:1/-1}
+#ups button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lw{display:flex;align-items:center;gap:5px}
+.lkup svg{flex:none;width:9px;height:10px}
+#fyl .lkup b{display:flex;align-items:center;gap:5px}
+#fyl button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gos button{font-size:8px}
 #stage{position:relative}
 #bb{position:absolute;left:4px;right:4px;top:22px;height:12px;background:#3a4160;border:2px solid #0d1019;pointer-events:none;display:none}
 #bbf{height:100%;background:#ff6b6b}
@@ -133,7 +139,7 @@ button b{display:block;font-weight:400}
 <button id="hhow">How to play</button></div></div>
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
-<p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game: damage, fire rate, range, tower HP and the pixel absorber (armor).</p>
+<p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Pixel absorber (armor) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the screen, the NOVA button or Space to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: NOVA breaks the shield for a few seconds.</p>
 <p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, faster Nova and stacking damage. Research keeps running while the game is closed.</p>
@@ -155,13 +161,17 @@ function fit(){
 }
 addEventListener('resize',fit);fit();
 
+// Upgrades (in-run for pixels, Foundry for chips). w = best wave needed to unlock; reaching it mid-run unlocks it right away.
 const UP={
-  dmg:{n:'Damage',base:10},
-  rate:{n:'Fire rate',base:15},
-  range:{n:'Range',base:12},
-  hp:{n:'Tower HP',base:20},
-  armor:{n:'Pixel absorber',base:25}
+  dmg:{n:'Damage',base:10,w:0},
+  hp:{n:'Tower HP',base:20,w:0},
+  rate:{n:'Fire rate',base:15,w:5},
+  range:{n:'Range',base:12,w:8},
+  armor:{n:'Pixel absorber',base:25,w:12},
+  magnet:{n:'Pixel magnet',base:30,w:16}
 };
+const upOpen=k=>Math.max(M.best,S&&!S.menu&&!S.over?S.wave:0)>=UP[k].w;
+const openUps=()=>Object.keys(UP).filter(upOpen);
 const TYPES=[
   {min:1,sp:18,hp:1,c:'#ff6b6b',s:5,px:3,d:1,n:'Grunt',up:'rate'},
   {min:3,sp:34,hp:.5,c:'#ffd166',s:3,px:2,d:1,n:'Runner',up:'range'},
@@ -177,7 +187,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -187,8 +197,11 @@ const stat={
   rate:()=>1+.4*S.lv.rate+.2*M.lv.rate,
   range:()=>50+8*S.lv.range+4*M.lv.range,
   max:()=>20+10*S.lv.hp+5*M.lv.hp,
-  armor:()=>.5*S.lv.armor+.25*M.lv.armor
+  armor:()=>.5*S.lv.armor+.25*M.lv.armor,
+  // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
+  magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*(M.lv.magnet||0)
 };
+const MAGNET={run:.15,meta:.1};
 const critChance=()=>.05*M.res.crit;
 const novaCd=()=>Math.max(60,NOVA.cd-15*M.res.nova);
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
@@ -210,13 +223,13 @@ const clock={now:()=>Date.now()};
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
 // v3 adds `hist`: the last HIST_MAX runs, newest first: {t:time ms, w:wave, k:killer, c:chips earned, d:seconds, n:novas used, r:1 if new record}.
 // v4 adds `cores` (boss cores, spent on research later) and `bk` (bosses beaten); history entries gain `b` (bosses beaten that run).
-// v5 adds `res` (Bit Theory levels) and `rq` (running study {k, end: ms timestamp} or null).
+// v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
 // When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<6){...}.
 const SAVE_V=5,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null};
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
@@ -282,7 +295,7 @@ for(const k in UP){
   const b=document.createElement('button');
   b.onclick=()=>{
     const c=cost(k);
-    if(S.over||S.px<c)return;
+    if(S.over||S.px<c||!upOpen(k))return;
     S.px-=c;S.lv[k]++;sfx('buy');
     if(S.toast>0){S.toast=0;closeTip()}
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
@@ -293,7 +306,7 @@ cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.p
 
 // Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
 // letting it reach the tower deals heavy damage and gives nothing. hpK multiplies the wave's base enemy HP.
-// Balance (40 bot runs each): the wave 20 Brute is beaten by ~33% of Foundry lv3 bots, ~53% lv4, ~65% lv6.
+// Balance (40 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~35% at lv3, ~48% lv4, ~80% lv6.
 const BOSSES=[
   {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:2.8,d:10,px:30,up:'dmg'},
   {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:2,d:8,px:30,up:'range',spawn:3},
@@ -306,6 +319,7 @@ const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
 const bossChips=w=>5+Math.floor(w/10);
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
+  for(const k in UP)if(UP[k].w===S.wave&&M.best<S.wave){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
   if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' incoming';sfx('boss')}
 }
 function spawn(){
@@ -322,7 +336,8 @@ function spawn(){
 function kill(e){
   sfx('kill');
   if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
-  for(let i=0;i<e.t.px;i++){
+  const np=e.t.px*(1+stat.magnet()),n=Math.floor(np)+(Math.random()<np%1?1:0);
+  for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,v=20+Math.random()*30;
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
   }
@@ -370,7 +385,7 @@ function tipsCheck(){
   if(bo&&!M.tips.boss)return showTip('boss');
   if(bo&&bo.t.shield&&!M.tips.warden)return showTip('warden');
   if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
-  if(!M.tips.buy&&S.px>=Math.min(...Object.keys(UP).map(cost)))return showTip('buy');
+  if(!M.tips.buy&&S.px>=Math.min(...openUps().map(cost)))return showTip('buy');
 }
 // Ends the run (tower destroyed, or stopped by the player): records best and history, shows game over.
 function endRun(stopped){
@@ -517,26 +532,28 @@ function ui(){
     r.className=on?'':'off';
     r.lastChild.textContent=on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min;
   });
-  const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:fmt(stat.range())+' px',hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor())};
+  const info={dmg:'Dmg '+fmt(stat.dmg()),rate:fmt(stat.rate())+'/s',range:'Range '+fmt(stat.range()),hp:'HP '+fmt(stat.max()),armor:'Absorbs '+fmt(stat.armor()),magnet:'+'+fmt(100*stat.magnet())+'% pixels'};
   for(const k in UP){
     const c=cost(k);
-    btns[k].innerHTML='<b>'+UP[k].n+'</b>'+info[k]+' · '+c+' px';
-    btns[k].disabled=S.over||S.px<c;
+    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+c+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';
+    if(btns[k].innerHTML!==h)btns[k].innerHTML=h;btns[k].classList.toggle('lkup',!op);
+    btns[k].disabled=S.over||!op||S.px<c;
   }
 }
 const fy=document.getElementById('fy'),fyl=document.getElementById('fyl'),fyh=document.getElementById('fyh'),fyb={};
 // Stat every run starts with at Foundry level `lv` (before in-run upgrades; damage includes Bit depth).
-const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv})[k];
-const UNIT={dmg:' damage',rate:'/s',range:' range',hp:' HP',armor:' absorb'};
+const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv,magnet:100*MAGNET.meta*lv})[k];
+const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
 const nowNext=k=>'Now '+fmt(baseStat(k,M.lv[k]))+' > '+fmt(baseStat(k,M.lv[k]+1))+UNIT[k];
 for(const k in UP){
   const b=document.createElement('button');
-  b.onclick=()=>{const c=mcost(k);if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
+  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI()};
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
   fyh.textContent='Pixel foundry: '+M.chips+' chips';
-  for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+nowNext(k)+'<br>'+c+' chips';fyb[k].disabled=M.chips<c}
+  for(const k in UP){const c=mcost(k),op=upOpen(k);fyb[k].classList.toggle('lkup',!op);
+    fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+c+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
 }
 function showGO(){
   const goh=document.getElementById('goh');goh.textContent=S.record?'New record!':'Game over';goh.className=S.record?'rec':'';
@@ -549,13 +566,13 @@ function showGO(){
   goalUI('goalt','goalb');
   document.getElementById('gsl').textContent='Suggested upgrades · you have '+M.chips+' chips';
   const s=document.getElementById('gos');s.innerHTML='';
-  const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
+  const ks=openUps().sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
-  else if(kt)pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
+  else if(kt&&upOpen(kt.up))pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
   else pick.push({k:ks[1],why:'Next cheapest'});
   pick.forEach(({k,why})=>{
     const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+why+'<br>'+nowNext(k)+'<br>'+c+' chips';
+    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+c+' chips';
     b.disabled=M.chips<c;
     b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
     s.appendChild(b);
@@ -581,7 +598,7 @@ function homeUI(){
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
   goalUI('hookt','hookb');
-  const rdy=Object.keys(UP).some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
+  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':M.chips+' chips';fn.className=rdy?'rdy':'';
 }
 function showHome(){
   homeUI();
