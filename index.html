@@ -14,6 +14,9 @@ body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #hud{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 6px;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
+#hud{font-size:8px}
+#hud .hs{display:flex;flex-wrap:wrap;gap:4px 10px}
+#hud .hb{display:flex;gap:6px;margin-left:auto}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
 #ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
 #fy,#go{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
@@ -46,7 +49,7 @@ button b{display:block;font-weight:400}
 </style>
 </head>
 <body>
-<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><span id="bw">Best -</span><button id="snd" aria-pressed="true">Sound</button></div>
+<div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
 <div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
@@ -202,14 +205,14 @@ function nova(){
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  nova:{card:1,t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast nearby enemies back. It needs '+NOVA.cd+'s to recharge, so save it for emergencies.</span>'}
+  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast nearby enemies back. It needs '+NOVA.cd+'s to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
 function showTip(id){
   M.tips[id]=1;save();const T=TIPS[id];
-  tipEl.innerHTML=T.t+(T.card?'<button id="tipok">Got it</button>':'');
+  tipEl.innerHTML=T.t+(T.card?'<button id="tipok">'+(T.btn||'Got it')+'</button>':'');
   tipEl.className=T.card?'card':'toast';tipEl.style.display='flex';
-  if(T.card){S.tip=id;S.pause=true;document.getElementById('tipok').onclick=closeTip}
+  if(T.card){S.tip=id;S.pause=true;document.getElementById('tipok').onclick=()=>{closeTip();if(id==='nova')nova()}}
   else S.toast=5;
   novab.classList.toggle('hint',id==='nova');
 }
@@ -336,7 +339,7 @@ function ui(){
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
   const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
-  pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
+  pb.textContent=S.pause&&!S.tip?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
   const nl=S.nova>0?'Nova '+Math.ceil(S.nova-.01)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
@@ -394,7 +397,9 @@ pb.onclick=()=>setPause(!S.pause);
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
 const novab=document.getElementById('nova');
 novab.onclick=()=>nova();
-addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat){e.preventDefault();nova()}});
+// Space always means Nova; preventDefault stops it also re-clicking a focused button.
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.repeat)nova()}});
+addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 reset();
 let last=performance.now(),acc=0;
