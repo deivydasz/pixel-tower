@@ -3,7 +3,7 @@ skipTips();M.best=4;M.chips=5;play();step(2);S.wave=3;S.earn=4;S.left=99;S.sp=99
 const cells=()=>[...$('gst').children].map(c=>c.firstChild.textContent+'='+c.lastChild.textContent).join('|');
 ok(shown($('go'))&&$('goh').textContent==='Game over'&&$('goh').className==='','game over header');
 ok($('gop').textContent==='Killed by a Grunt on wave 3.','reason line');
-ok(/^Wave=3\|Killer=Grunt\|Chips=\+4\|Time=0:0\d\|Novas=0\|Best=4$/.test(cells()),'stats card: '+cells());
+ok(/^Wave=3\|Killer=Grunt\|Chips=\+4\|Time=0:0\d\|Blasts=0\|Best=4$/.test(cells()),'stats card: '+cells());
 ok($('gor').textContent==='Play again','primary button says Play again');
 ok($('goalt').textContent.includes('wave '+LOCKED[0].w),'next-unlock goal shown: '+$('goalt').textContent);
 ok($('gsl').textContent==='Suggested upgrades · you have '+M.chips+' chips','suggestions label shows chips');

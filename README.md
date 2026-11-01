@@ -9,13 +9,13 @@ One tower stands in the middle of the screen and enemies come from every side, w
 - Your tower aims and shoots by itself at the nearest enemy in range.
 - Destroyed enemies burst into **pixels** that fly to the tower. Spend pixels on upgrades during the run.
 - Clearing a wave gives bonus pixels and **pixel chips**. Chips stay between runs and buy permanent boosts in the **Foundry**.
-- When enemies close in, fire **Nova**. It hits everything on screen but takes 2 minutes to recharge.
+- When enemies close in, fire a **Blast**. It hits everything on screen but takes 2 minutes to recharge.
 - The run ends when the tower's HP reaches zero, or when you stop it yourself.
 
 ### Controls
 | Action | Touch / mouse | Keyboard |
 |---|---|---|
-| Fire Nova | Tap the play area or the NOVA button | Space |
+| Fire Blast | Tap the play area or the BLAST button | Space |
 | Pause | Pause button | P or Esc |
 | Resume | Resume, or tap the play area | P or Esc |
 | Stop the run | Pause, then Stop run, then confirm | |
@@ -42,7 +42,7 @@ Bosses never give up: one that reaches the tower stays there and hits it every s
 |---|---|
 | Brute | Very tough and slow |
 | Swarm Queen | Spawns a Runner every 3 seconds while alive |
-| Warden | A shield blocks 75% of bullet damage. Nova breaks it for 8 seconds |
+| Warden | A shield blocks 75% of bullet damage. Blast breaks it for 8 seconds |
 
 Boss cores pay for Bit Theory research.
 
@@ -55,7 +55,7 @@ Each research level costs boss cores and chips and takes **real time**: about 10
 | Critical bits | +5% chance of a x3 critical hit | 10 | right away |
 | Piercing bits | Bullets pass through +1 enemy | 5 | right away |
 | Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
-| Nova tech | Nova recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
+| Blast tech | Blast recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
 | Bit depth | All damage x1.2, stacking | 20 | Critical bits Lv 3 and 5 bosses beaten |
 
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
@@ -69,7 +69,7 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 | Tower HP | start | +10 max HP (and heals 10) | +5 max HP |
 | Fire rate | wave 5 | +0.4 shots/s | +0.2 shots/s |
 | Range | wave 8 | +8 range | +4 range |
-| Pixel absorber | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
+| Dmg sponge | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
 | Pixel magnet | wave 16 | +15% pixels per kill | +10% pixels per kill |
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
@@ -78,9 +78,10 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 ## Progression
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
 - **Best wave** is shown in the HUD and on the menu. Beating it shows "New record!".
-- **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Novas used.
+- **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
-- New players get a few one-time tips: the basics, buying an upgrade, using Nova and the Foundry.
+- A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it.
+- New players get a few one-time tips: the basics, buying an upgrade, using Blast and the Foundry.
 
 Progress is saved in your browser (`localStorage`, key `pixelTowerMeta`). It is separate for each address, so the live site and the preview have their own saves. Clearing site data resets it.
 

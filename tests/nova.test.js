@@ -1,6 +1,6 @@
 skipTips();play();
 const nb=$('nova');
-step(1);ui();ok(nb.textContent==='NOVA'&&!nb.disabled,'nova ready at start');
+step(1);ui();ok(nb.textContent==='BLAST'&&!nb.disabled,'Blast ready at start (button says BLAST)');
 S.en=[];S.left=0;
 const weak=enemy(20,0,0,1),tough=enemy(0,-40,2,100),far=enemy(90,0,0,99),corner=enemy(-88,-118,0,1);
 const px0=S.pt.length;
@@ -10,9 +10,9 @@ ok(S.en.includes(tough)&&Math.abs(Math.hypot(tough.x-CX,tough.y-CY)-(40+NOVA.pus
 ok(far.hp===99-novaDmg()&&far.x>CX+90,'enemy near screen edge hit and pushed');
 ok(!S.en.includes(corner),'enemy in far corner hit');
 ok(!nova(),'cannot fire again while charging');ui();
-ok(nb.disabled&&nb.textContent==='Nova '+fmtTime(NOVA.cd),'button shows countdown');
-S.en=[];step(10);ui();ok(nb.textContent==='Nova '+fmtTime(NOVA.cd-10),'countdown after 10s: '+nb.textContent);
-S.nova=1;step(1.1);ui();ok(!nb.disabled&&nb.textContent==='NOVA','ready again after cooldown');
+ok(nb.disabled&&nb.textContent==='Blast '+fmtTime(NOVA.cd),'button shows countdown');
+S.en=[];step(10);ui();ok(nb.textContent==='Blast '+fmtTime(NOVA.cd-10),'countdown after 10s: '+nb.textContent);
+S.nova=1;step(1.1);ui();ok(!nb.disabled&&nb.textContent==='BLAST','ready again after cooldown');
 S.pause=true;ok(!nova(),'nova blocked while paused');S.pause=false;
 click($('c'));ok(S.nova>NOVA.cd-1,'tapping canvas fires nova');
 S.nova=0;key(' ','Space');ok(S.nova>NOVA.cd-1,'Space fires nova');

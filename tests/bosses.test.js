@@ -28,7 +28,7 @@ ok(S.bt1==='BOSS ATTACKS!','BOSS ATTACKS! banner when it reaches the tower');
 const k1=M.cores;atk.hp=1;S.cd=0;step(.5);ok(!S.en.includes(atk)&&M.cores===k1+1,'killing it at the tower still gives the core');
 // Warden shield
 S.en=[];const wt=bossFor(60);const w={x:CX+30,y:CY,t:wt,hp:1000,max:1000,hit:0,boss:1,shd:0,st:0};S.en.push(w);
-step(1/60);ok(S.tip==='warden'&&S.pause&&$('tip').textContent.includes('NOVA'),'first Warden shows shield tip');click($('tipok'));ui();ok($('bbt').textContent==='WARDEN 1000 SHIELD','boss bar shows shield up: '+$('bbt').textContent);w.hp=1000;
+step(1/60);ok(S.tip==='warden'&&S.pause&&$('tip').textContent.includes('BLAST'),'first Warden shows shield tip (mentions BLAST)');click($('tipok'));ui();ok($('bbt').textContent==='WARDEN 1000 SHIELD','boss bar shows shield up: '+$('bbt').textContent);w.hp=1000;
 S.pr=[{x:w.x,y:w.y,vx:0,vy:0,life:1}];step(1/60);
 ok(Math.abs(1000-w.hp-stat.dmg()*wt.shield)<.01,'Warden shield cuts bullet damage to '+wt.shield*100+'%');
 S.nova=0;const h1=w.hp;nova();ok(w.shd===BOSS.shieldDown&&w.hp===h1-novaDmg(),'Nova breaks the shield for '+BOSS.shieldDown+'s');

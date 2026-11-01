@@ -8,7 +8,7 @@ S.px=100;step(.1);ok(shown(tip)&&tip.className==='toast'&&!S.pause,'buy toast sh
 ui();document.querySelector('#ups button').click();ok(!shown(tip),'buying an upgrade dismisses toast');
 S.en=[];S.left=99;S.sp=99;for(let i=0;i<3;i++)enemy(20,i*3,2,99);
 step(.05);ok(shown(tip)&&S.tip==='nova'&&S.pause&&nb.classList.contains('hint'),'crowded: nova card, paused, button pulses');
-ok($('tipok').textContent==='Fire NOVA','nova card button says Fire NOVA');
+ok($('tipok').textContent==='Fire BLAST','overwhelmed card button says Fire BLAST');
 click($('tipok'));ok(!S.pause&&!nb.classList.contains('hint')&&S.nova>NOVA.cd-1,'Fire NOVA closes card and fires nova');
 ok(M.tips.start&&M.tips.buy&&M.tips.nova,'tips remembered in save');
 die();ok(shown($('got')),'first game over: foundry tip shown');

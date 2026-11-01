@@ -22,6 +22,7 @@ const fb=[...$('fyl').querySelectorAll('button')],fi=k=>fb[Object.keys(UP).index
 ok(!fi('dmg').disabled&&!fi('rate').disabled&&!fi('range').disabled,'Foundry: unlocked by best wave 9 (dmg, hp, rate, range)');
 ok(fi('armor').disabled&&fi('armor').textContent.includes('Reach wave 12')&&fi('magnet').disabled,'Foundry: absorber and magnet locked');
 fi('armor').onclick();ok(M.lv.armor===0,'locked Foundry upgrade cannot be bought');
-click($('fyc'));ok([...$('gos').querySelectorAll('button')].every(x=>!/Pixel absorber|Pixel magnet/.test(x.textContent)),'suggestions only include unlocked upgrades');
+click($('fyc'));ok([...$('gos').querySelectorAll('button')].every(x=>!/Dmg sponge|Pixel magnet/.test(x.textContent)),'suggestions only include unlocked upgrades');
 loadMeta({v:4,chips:1,lv:{dmg:2}});ok(M.lv.magnet===0&&M.lv.dmg===2,'older saves get Pixel magnet level 0');
+ok(UP.armor.n==='Dmg sponge'&&BITS.nova.n==='Blast tech','renamed: Dmg sponge, Blast tech');
 done();
