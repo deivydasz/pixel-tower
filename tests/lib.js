@@ -10,7 +10,7 @@ const shown=el=>getComputedStyle(el).display!=='none';
 // The game opens on the home menu; press Play to start a run.
 function play(){click($('hplay'))}
 // Mark all first-play tips as seen so they don't pause the game.
-function skipTips(){M.tips={start:1,buy:1,nova:1,foundry:1}}
+function skipTips(){M.tips={start:1,buy:1,nova:1,foundry:1,boss:1,warden:1}}
 function enemy(dx,dy,type,hp){const e={x:CX+dx,y:CY+dy,t:TYPES[type],hp,hit:0};S.en.push(e);return e}
 // Make the tower die on the next frame.
 function die(){S.hp=.1;enemy(3,0,0,5);step(.1)}

@@ -5,7 +5,7 @@ ok(shown($('go'))&&$('goh').textContent==='Game over'&&$('goh').className==='','
 ok($('gop').textContent==='Killed by a Grunt on wave 3.','reason line');
 ok(/^Wave=3\|Killer=Grunt\|Chips=\+4\|Time=0:0\d\|Novas=0\|Best=4$/.test(cells()),'stats card: '+cells());
 ok($('gor').textContent==='Play again','primary button says Play again');
-ok($('goalt').textContent.startsWith('Next unlock: '+LOCKED[0].n),'next-unlock goal shown');
+ok($('goalt').textContent.includes('wave '+LOCKED[0].w),'next-unlock goal shown: '+$('goalt').textContent);
 ok($('gsl').textContent==='Suggested upgrades · you have '+M.chips+' chips','suggestions label shows chips');
 ok($('gos').querySelectorAll('button').length===2,'two suggested upgrades');
 const c0=M.chips,b=[...$('gos').querySelectorAll('button')].find(x=>!x.disabled);

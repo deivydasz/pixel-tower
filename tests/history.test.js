@@ -20,7 +20,7 @@ click($('hic'));
 for(let i=0;i<HIST_MAX+5;i++){play();S.wave=1;die()}
 ok(M.hist.length===HIST_MAX,'history capped at '+HIST_MAX);
 // old saves and odd data
-loadMeta({v:2,chips:1,lv:{dmg:2},best:4,tips:{start:1}});ok(Array.isArray(M.hist)&&M.hist.length===0&&M.v===3&&M.lv.rate===0&&M.lv.dmg===2,'v2 save loads with empty history');
+loadMeta({v:2,chips:1,lv:{dmg:2},best:4,tips:{start:1}});ok(Array.isArray(M.hist)&&M.hist.length===0&&M.v===SAVE_V&&M.lv.rate===0&&M.lv.dmg===2,'v2 save loads with empty history');
 loadMeta({v:3,chips:0,lv:{},hist:'broken'});ok(Array.isArray(M.hist)&&M.hist.length===0,'corrupt history ignored');
 M.hist=[{t:Date.now(),w:2,k:'<img src=x onerror=alert(1)>',c:1,d:65,n:1}];showHistory();
 ok(!$('hil').querySelector('img')&&cells(rows()[0])[4]==='1:05'&&cells(rows()[0])[2].includes('<img'),'history text escaped, time formatted');

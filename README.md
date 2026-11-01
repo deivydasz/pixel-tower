@@ -34,6 +34,18 @@ Waves get bigger and tougher: wave *n* has 4 + 2*n* enemies, and their HP grows 
 
 The legend at the top right of the game shows each enemy's current HP and the damage it will do after your armor.
 
+### Bosses
+A boss arrives at waves 20, 40, 60 and 80, then every 10 waves from wave 100, together with that wave's normal enemies.
+Destroy it before it reaches the tower to earn **1 boss core** and bonus chips (5 + 1 per 10 waves). If it reaches the tower it deals heavy damage and you get nothing.
+
+| Boss | Trait |
+|---|---|
+| Brute | Very tough and slow |
+| Swarm Queen | Spawns a Runner every 3 seconds while alive |
+| Warden | A shield blocks 75% of bullet damage. Nova breaks it for 8 seconds |
+
+Boss cores are saved and will power pixel research (coming next).
+
 ## Upgrades
 | Upgrade | In run (pixels) | Foundry (chips, permanent) |
 |---|---|---|
@@ -50,7 +62,7 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
 - **Best wave** is shown in the HUD and on the menu. Beating it shows "New record!".
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Novas used.
-- **Coming soon:** Boss rush, Daily run and Tower skins unlock at best wave 25, 50 and 75. The next-unlock card on the menu tracks your progress.
+- **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
 - New players get a few one-time tips: the basics, buying an upgrade, using Nova and the Foundry.
 
 Progress is saved in your browser (`localStorage`, key `pixelTowerMeta`). It is separate for each address, so the live site and the preview have their own saves. Clearing site data resets it.
