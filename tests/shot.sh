@@ -18,6 +18,6 @@ extra=open(lib).read()+"\n"+(open(setup).read() if setup else "")+"\nui();draw()
 open(out,'w').write(s.replace("</body>","<script>\n"+extra+"\n</script>\n</body>",1))
 PY
 echo "<body style='margin:0;background:#888'><iframe src='page.html' style='border:0;width:${WD}px;height:${HT}px'></iframe></body>" > "$TMP/wrap.html"
-"$CH" --headless=new --disable-gpu --no-first-run --no-sandbox --user-data-dir="$TMP/prof" --window-size=$((WD>500?WD:500)),$HT \
+"$CH" --headless=new --disable-gpu --no-first-run --no-sandbox ${CHROME_FLAGS:-} --user-data-dir="$TMP/prof" --window-size=$((WD>500?WD:500)),$HT \
   --virtual-time-budget=4000 --screenshot="$(cd "$(dirname "$OUT")" && pwd)/$(basename "$OUT")" "file://$TMP/wrap.html" >/dev/null 2>&1
 echo "saved $OUT (${WD}x${HT})"
