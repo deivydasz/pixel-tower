@@ -76,8 +76,15 @@ const stat={
   armor:()=>.5*S.lv.armor+.25*M.lv.armor
 };
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
-let M={chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false};
-try{const m=JSON.parse(localStorage.getItem('pixelTowerMeta'));if(m&&m.lv)M={chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute}}catch(e){}
+// Save format version. Saves without `v` are v0 (same shape as v1).
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<2){...}.
+const SAVE_V=1;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false};
+function loadMeta(m){
+  if(!m||!m.lv)return;
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute};
+}
+try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
