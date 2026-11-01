@@ -36,11 +36,11 @@ button b{display:block;font-weight:400}
 </style>
 </head>
 <body>
-<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="fb">Foundry</button><span id="ch">0 chips</span><button id="snd" aria-pressed="true">Sound</button></div>
+<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="pb">Pause</button><span id="ch">0 chips</span><button id="snd" aria-pressed="true">Sound</button></div>
 <div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
-<div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back to game</button></div>
+<div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
 const W=180,H=240,CX=90,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
@@ -148,7 +148,7 @@ for(const k in UP){
   };
   ups.appendChild(b);btns[k]=b;
 }
-cv.addEventListener('pointerdown',()=>{if(S.over&&S.ot>.6)reset()});
+cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.pause)setPause(false)});
 
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;
@@ -253,6 +253,12 @@ function draw(){
   }
   g.restore();
   if(S.bonus>0&&!S.over){g.fillStyle='#ffd166';g.textAlign='center';g.font='7px "Press Start 2P",monospace';g.fillText('Wave '+S.wave+' clear',CX,28);g.fillText(S.bt,CX,40)}
+  if(S.pause&&!S.over){
+    g.fillStyle='rgba(13,16,25,.7)';g.fillRect(0,0,W,H);
+    g.fillStyle='#e8ecf5';g.textAlign='center';
+    g.font='10px "Press Start 2P",monospace';g.fillText('PAUSED',CX,CY-4);
+    g.font='7px "Press Start 2P",monospace';g.fillText('Tap to resume',CX,CY+12);
+  }
   if(S.over){
     g.fillStyle='rgba(13,16,25,.8)';g.fillRect(0,0,W,H);
     g.fillStyle='#e8ecf5';g.textAlign='center';
@@ -267,6 +273,7 @@ function ui(){
   document.getElementById('w').textContent='Wave '+Math.max(1,S.wave);
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
+  pb.textContent=S.pause?'Resume':'Pause';pb.disabled=S.over;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
   document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
@@ -310,9 +317,15 @@ function showGO(){
   document.getElementById('go').style.display='flex';
 }
 document.getElementById('gor').onclick=()=>{document.getElementById('go').style.display='none';reset()};
-document.getElementById('gof').onclick=()=>{document.getElementById('go').style.display='none';S.pause=true;fyUI();fy.style.display='flex'};
-document.getElementById('fb').onclick=()=>{S.pause=true;fyUI();fy.style.display='flex'};
-document.getElementById('fyc').onclick=()=>{S.pause=false;fy.style.display='none';if(S.over)showGO()};
+document.getElementById('gof').onclick=()=>{document.getElementById('go').style.display='none';fyUI();fy.style.display='flex'};
+// Foundry is only reachable from the game over menu, between runs.
+document.getElementById('fyc').onclick=()=>{fy.style.display='none';showGO()};
+// Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
+const pb=document.getElementById('pb');
+function setPause(on){if(S.over)return;S.pause=on}
+pb.onclick=()=>setPause(!S.pause);
+addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 reset();
 let last=performance.now(),acc=0;
 function loop(t){
