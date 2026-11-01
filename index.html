@@ -14,6 +14,9 @@ body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #hud{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 6px;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
+#hud{font-size:8px}
+#hud .hs{display:flex;flex-wrap:wrap;gap:4px 10px}
+#hud .hb{display:flex;gap:6px;margin-left:auto}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
 #ups,#fyl,#gos,#gob{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
 #fy,#go{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
@@ -33,14 +36,24 @@ button b{display:block;font-weight:400}
 #leg div{display:flex;flex-direction:column}
 #leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
 #leg .off{opacity:.4}
+#nova{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-width:110px;min-height:40px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
+#tip{position:absolute;left:10px;right:10px;display:none;flex-direction:column;gap:8px;padding:10px;background:#0d1019;color:#e8ecf5;border:2px solid #ffd166;font-size:8px;line-height:1.8}
+#tip.card{top:50%;transform:translateY(-50%)}
+#tip.toast{bottom:58px;pointer-events:none}
+#tip b{color:#ffd166;font-weight:400}
+#tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
+#nova.hint{animation:pulse .8s steps(2) infinite}
+@keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
+#got{display:none;color:#ffd166}
+#nova:disabled{opacity:1;color:#e8ecf5;background:rgba(13,16,25,.75);border-color:#3a4160}
 </style>
 </head>
 <body>
-<div id="hud"><span id="w">Wave 1</span><span id="px">0 px</span><button id="fb">Foundry</button><span id="ch">0 chips</span><button id="snd" aria-pressed="true">Sound</button></div>
-<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div></div>
+<div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
+<div id="stage"><canvas id="c" aria-label="Tower defence game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">NOVA</button><div id="tip" role="status"></div></div>
 <div id="ups"></div>
-<div id="go"><div id="goh">Game over</div><p id="gop"></p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
-<div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back to game</button></div>
+<div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p><div id="gob"><button id="gor">Restart</button><button id="gof">Go to foundry</button></div><p>Suggested upgrades:</p><div id="gos"></div></div>
+<div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
 const W=180,H=240,CX=90,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
@@ -66,7 +79,8 @@ const TYPES=[
 ];
 let S;
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1};S.hp=stat.max();
+  closeTip();
 }
 const stat={
   dmg:()=>1+S.lv.dmg+.5*M.lv.dmg,
@@ -77,12 +91,13 @@ const stat={
 };
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
 // Save format version. Saves without `v` are v0 (same shape as v1).
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<2){...}.
-const SAVE_V=1;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false};
+// v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<3){...}.
+const SAVE_V=2;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},mute:false,best:0,tips:{}};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign(M.lv,m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips)};
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
@@ -113,6 +128,7 @@ const SFX={
   hit:()=>tone(150,.18,'triangle',.7,60),
   buy:()=>{tone(520,.07,'square',.15,780);tone(780,.08,'square',.15,1040,.07)},
   wave:()=>[523,659,784].forEach((f,i)=>tone(f,.12,'triangle',.4,0,i*.09)),
+  nova:()=>tone(620,.35,'triangle',.5,70),
   over:()=>[392,311,233].forEach((f,i)=>tone(f,.25,'triangle',.5,0,i*.18))
 };
 const GAP={shot:.05,pick:.06,kill:.03},lastSfx={};
@@ -144,11 +160,12 @@ for(const k in UP){
     const c=cost(k);
     if(S.over||S.px<c)return;
     S.px-=c;S.lv[k]++;sfx('buy');
+    if(S.toast>0){S.toast=0;closeTip()}
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
   };
   ups.appendChild(b);btns[k]=b;
 }
-cv.addEventListener('pointerdown',()=>{if(S.over&&S.ot>.6)reset()});
+cv.addEventListener('pointerdown',()=>{if(S.over){if(S.ot>.6)reset()}else if(S.pause)setPause(false);else nova()});
 
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;
@@ -166,11 +183,55 @@ function kill(e){
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
   }
 }
+// Nova: shockwave from the tower across the whole screen. Damages every enemy and pushes them back, then recharges.
+// Balance: simulated first runs reach a median wave 8 with Nova vs 6 without; damage is flat so it stays an emergency tool.
+const NOVA={cd:40,r:160,push:10,fx:.5,dmg:4,dmgK:0};
+const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
+function nova(){
+  if(S.over||S.pause||S.nova>0)return false;
+  S.nova=NOVA.cd;S.nfx=0;S.shake=.15;sfx('nova');buzz(40);
+  for(const e of S.en){
+    const dx=e.x-CX,dy=e.y-CY,d=Math.hypot(dx,dy)||1;
+    if(d>NOVA.r)continue;
+    e.hp-=novaDmg();e.hit=.12;
+    if(e.hp<=0){e.dead=true;kill(e)}
+    else{e.x+=dx/d*NOVA.push;e.y+=dy/d*NOVA.push}
+  }
+  S.en=S.en.filter(e=>!e.dead);
+  return true;
+}
+// First-play tips. Each is shown once per player (remembered in M.tips).
+// Cards pause the game until "Got it"; toasts show briefly without pausing.
+const TIPS={
+  start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
+  buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
+  nova:{card:1,btn:'Fire NOVA',t:'<b>Overwhelmed?</b><span>Tap NOVA (or anywhere on the screen) to blast every enemy on screen. It needs '+NOVA.cd+'s to recharge, so save it for emergencies.</span>'}
+};
+const tipEl=document.getElementById('tip');
+function showTip(id){
+  M.tips[id]=1;save();const T=TIPS[id];
+  tipEl.innerHTML=T.t+(T.card?'<button id="tipok">'+(T.btn||'Got it')+'</button>':'');
+  tipEl.className=T.card?'card':'toast';tipEl.style.display='flex';
+  if(T.card){S.tip=id;S.pause=true;document.getElementById('tipok').onclick=()=>{closeTip();if(id==='nova')nova()}}
+  else S.toast=5;
+  novab.classList.toggle('hint',id==='nova');
+}
+function closeTip(){tipEl.style.display='none';novab.classList.remove('hint');if(S.tip){S.tip=null;S.pause=false}}
+function tipsCheck(){
+  if(S.tip||S.over)return;
+  if(!M.tips.start)return showTip('start');
+  if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
+  if(!M.tips.buy&&S.px>=Math.min(...Object.keys(UP).map(cost)))return showTip('buy');
+}
 function update(dt){
   if(S.pause)return;
+  tipsCheck();if(S.pause)return;
+  if(S.toast>0&&(S.toast-=dt)<=0)closeTip();
   S.bonus=Math.max(0,(S.bonus||0)-dt);
   S.shake=Math.max(0,S.shake-dt);
   if(S.over){S.ot+=dt;return}
+  S.nova=Math.max(0,S.nova-dt);
+  if(S.nfx>=0){S.nfx+=dt;if(S.nfx>NOVA.fx)S.nfx=-1}
   // waves
   if(S.left>0){
     S.sp-=dt;
@@ -188,7 +249,7 @@ function update(dt){
     if(d<8){e.dead=true;e.reached=true;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.2;sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
-  if(S.hp<=0){S.hp=0;S.over=true;save();sfx('over');buzz([60,40,120]);showGO();return}
+  if(S.hp<=0){S.hp=0;S.over=true;S.prevBest=M.best;S.record=M.best>0&&S.wave>M.best;M.best=Math.max(M.best,S.wave);save();sfx('over');buzz([60,40,120]);showGO();return}
   S.flash=Math.max(0,S.flash-dt);
   // tower fire
   S.cd-=dt;
@@ -247,18 +308,28 @@ function draw(){
   R(CX-3,CY-3,7,7,'#e8ecf5');
   R(CX-1,CY-1,3,3,'#1b2033');
   if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
+  // nova charge arc and blast ring
+  g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
+  g.beginPath();g.arc(CX+.5,CY+.5,10,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/NOVA.cd));g.stroke();
+  if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,8+(NOVA.r-8)*k,0,Math.PI*2);g.stroke();g.lineWidth=1}
   if(S.target){
     const a=Math.atan2(S.target.y-CY,S.target.x-CX);
     R(CX+Math.cos(a)*7-1,CY+Math.sin(a)*7-1,3,3,'#ffd166');
   }
   g.restore();
   if(S.bonus>0&&!S.over){g.fillStyle='#ffd166';g.textAlign='center';g.font='7px "Press Start 2P",monospace';g.fillText('Wave '+S.wave+' clear',CX,28);g.fillText(S.bt,CX,40)}
+  if(S.pause&&!S.over&&!S.tip){
+    g.fillStyle='rgba(13,16,25,.7)';g.fillRect(0,0,W,H);
+    g.fillStyle='#e8ecf5';g.textAlign='center';
+    g.font='10px "Press Start 2P",monospace';g.fillText('PAUSED',CX,CY-4);
+    g.font='7px "Press Start 2P",monospace';g.fillText('Tap to resume',CX,CY+12);
+  }
   if(S.over){
     g.fillStyle='rgba(13,16,25,.8)';g.fillRect(0,0,W,H);
     g.fillStyle='#e8ecf5';g.textAlign='center';
     g.font='10px "Press Start 2P",monospace';g.fillText('GAME OVER',CX,CY-8);
     g.font='7px "Press Start 2P",monospace';
-    g.fillText('Reached wave '+S.wave,CX,CY+8);
+    g.fillText((S.record?'NEW BEST! ':'')+'Wave '+S.wave,CX,CY+8);
     g.fillText('+'+S.earn+' chips',CX,CY+24);
     g.fillText('Tap to restart',CX,CY+40);
   }
@@ -267,6 +338,9 @@ function ui(){
   document.getElementById('w').textContent='Wave '+Math.max(1,S.wave);
   document.getElementById('px').textContent=S.px+' px';
   document.getElementById('ch').textContent=M.chips+' chips';
+  const bw=Math.max(M.best,S.over?0:S.wave);document.getElementById('bw').textContent='Best '+(bw||'-');
+  pb.textContent=S.pause&&!S.tip?'Resume':'Pause';pb.disabled=S.over||!!S.tip;
+  const nl=S.nova>0?'Nova '+Math.ceil(S.nova-.01)+'s':'NOVA';if(novab.textContent!==nl)novab.textContent=nl;novab.disabled=S.nova>0||S.over||S.pause;
   const m=stat.max(),hp=Math.max(0,S.hp);
   document.getElementById('hpf').style.width=(100*hp/m)+'%';
   document.getElementById('hpt').textContent='HP '+fmt(Math.ceil(hp*10)/10)+'/'+m;
@@ -294,7 +368,10 @@ function fyUI(){
   for(const k in UP){const c=mcost(k);fyb[k].innerHTML='<b>'+UP[k].n+' (Lv '+M.lv[k]+')</b>'+MI[k]+' · '+c+' chips';fyb[k].disabled=M.chips<c}
 }
 function showGO(){
-  document.getElementById('gop').textContent='You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
+  document.getElementById('goh').textContent=S.record?'New record!':'Game over';
+  if(!M.tips.foundry){M.tips.foundry=1;S.goTip=true;save()}
+  document.getElementById('got').style.display=S.goTip?'block':'none';
+  document.getElementById('gop').textContent=(S.record?'You beat your best of wave '+S.prevBest+'. ':'')+'You reached wave '+S.wave+', killed by a '+(S.killer?S.killer.n:'enemy')+'. This run earned '+S.earn+' chips. You have '+M.chips+' chips.';
   const s=document.getElementById('gos');s.innerHTML='';
   const ks=Object.keys(UP).sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
   if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
@@ -310,9 +387,20 @@ function showGO(){
   document.getElementById('go').style.display='flex';
 }
 document.getElementById('gor').onclick=()=>{document.getElementById('go').style.display='none';reset()};
-document.getElementById('gof').onclick=()=>{document.getElementById('go').style.display='none';S.pause=true;fyUI();fy.style.display='flex'};
-document.getElementById('fb').onclick=()=>{S.pause=true;fyUI();fy.style.display='flex'};
-document.getElementById('fyc').onclick=()=>{S.pause=false;fy.style.display='none';if(S.over)showGO()};
+document.getElementById('gof').onclick=()=>{document.getElementById('go').style.display='none';fyUI();fy.style.display='flex'};
+// Foundry is only reachable from the game over menu, between runs.
+document.getElementById('fyc').onclick=()=>{fy.style.display='none';showGO()};
+// Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
+const pb=document.getElementById('pb');
+function setPause(on){if(S.over||S.tip)return;S.pause=on}
+pb.onclick=()=>setPause(!S.pause);
+addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
+const novab=document.getElementById('nova');
+novab.onclick=()=>nova();
+// Space always means Nova; preventDefault stops it also re-clicking a focused button.
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.repeat)nova()}});
+addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 reset();
 let last=performance.now(),acc=0;
 function loop(t){
