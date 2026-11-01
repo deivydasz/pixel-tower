@@ -149,9 +149,19 @@ const TYPES=[
   {min:5,sp:11,hp:4,c:'#b388ff',s:7,px:8,d:3,n:'Tank',up:'armor'}
 ];
 let S;
+// Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels.
+// Ignored on the live site.
+function testStart(host,proto,search){
+  if(!(/^preview\./.test(host)||proto==='file:'))return {};
+  const q=new URLSearchParams(search),w=Math.floor(+q.get('wave')),p=Math.floor(+q.get('px'));
+  return {wave:w>1&&w<=1000?w:0,px:p>0&&p<=1e6?p:0};
+}
+const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
   S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0},ot:0,pause:false,earn:0,shake:0,nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
   closeTip();
+  if(TEST.wave)S.wave=TEST.wave-1;
+  if(TEST.px)S.px=TEST.px;
 }
 const stat={
   dmg:()=>1+S.lv.dmg+.5*M.lv.dmg,
