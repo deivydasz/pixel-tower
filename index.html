@@ -22,6 +22,11 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
 #ups,#fyl{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
+#ups{align-content:start}
+#upt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:var(--mw,360px);margin-bottom:-4px}
+#upt button{text-align:center;min-height:30px;padding:4px 2px;font-size:8px;position:relative}
+#upt button.on{background:#5ec8ff;color:#0d1019;border-color:#0d1019}
+#upt button.has::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;background:#ffd166;border:1px solid #0d1019}
 #fy,#go,#home,#how,#hi,#bt{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#howh,#hih{font-size:11px}
@@ -142,7 +147,7 @@ button b{display:block;font-weight:400}
 <body>
 <div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
 <div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
-<div id="ups"></div>
+<div id="upt"></div><div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p>
 <div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
 <div id="gm"><div id="gst"></div>
@@ -174,7 +179,7 @@ const W=180,H=240,CX=90,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 cv.width=W;cv.height=H;
 function fit(){
-  const hud=document.getElementById('hud'),ups=document.getElementById('ups'),reserve=(hud&&hud.offsetHeight||40)+(ups&&ups.offsetHeight||170)+70;
+  const hud=document.getElementById('hud'),ups=document.getElementById('ups'),tb=document.getElementById('upt'),reserve=(hud&&hud.offsetHeight||40)+(ups&&ups.offsetHeight||170)+(tb&&tb.offsetHeight||0)+76;
   const raw=Math.min((innerWidth-48)/W,(innerHeight-reserve)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
   cv.style.width=W*s+'px';cv.style.height=H*s+'px';
   document.documentElement.style.setProperty('--w',W*s+'px');
@@ -183,15 +188,15 @@ addEventListener('resize',fit);fit();
 
 // Upgrades (in-run for pixels, Foundry for chips). w = best wave needed to unlock; reaching it mid-run unlocks it right away.
 const UP={
-  dmg:{n:'Damage',base:10,w:0},
-  hp:{n:'Tower HP',base:20,w:0},
-  rate:{n:'Fire rate',base:15,w:5},
-  range:{n:'Range',base:12,w:8},
-  armor:{n:'Dmg sponge',base:25,w:12},
-  magnet:{n:'Pixel magnet',base:30,w:16},
+  dmg:{n:'Damage',base:10,w:0,cat:'atk'},
+  hp:{n:'Tower HP',base:20,w:0,cat:'def'},
+  rate:{n:'Fire rate',base:15,w:5,cat:'atk'},
+  range:{n:'Range',base:12,w:8,cat:'atk'},
+  armor:{n:'Dmg sponge',base:25,w:12,cat:'def'},
+  magnet:{n:'Pixel magnet',base:30,w:16,cat:'eco'},
   // run-only upgrades: appear only after reaching wave `w` in the current run (never early, even if reached before); not in the Foundry
-  heavy:{n:'Heavy rounds',base:60,w:30,run:1},
-  critx:{n:'Crit power',base:80,w:35,run:1,needs:()=>M.res.crit>0,needTxt:'Needs crits'}
+  heavy:{n:'Heavy rounds',base:60,w:30,run:1,cat:'def'},
+  critx:{n:'Crit power',base:80,w:35,run:1,cat:'atk',needs:()=>M.res.crit>0,needTxt:'Needs crits'}
 };
 const inRun=()=>S&&!S.menu&&!S.over;
 const upOpen=k=>UP[k].run?inRun()&&S.wave>=UP[k].w&&(!UP[k].needs||UP[k].needs()):Math.max(M.best,inRun()?S.wave:0)>=UP[k].w;
@@ -379,6 +384,12 @@ function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList
 // stat value per upgrade, and how it is labelled on the in-run buttons
 const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet(),heavy:()=>stat.heavy(),critx:()=>stat.critx()};
 const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%',heavy:v=>fmt(v)+'px',critx:v=>'x'+fmt(v)};  // the button title names the stat
+// In-run upgrades are grouped into tabs so the grid stays two rows tall; a dot marks a tab with something affordable.
+const UPTABS=[['atk','Attack'],['def','Survival'],['eco','Economy']],tabBtns={};let upTab='atk';
+const upt=document.getElementById('upt');
+for(const [k,n] of UPTABS){const b=document.createElement('button');b.textContent=n;b.onclick=()=>{upTab=k;ui()};upt.appendChild(b);tabBtns[k]=b}
+// keep the grid two rows tall whatever tab is shown, so switching tabs never moves the game screen
+function lockUpsHeight(){const hs=Object.values(btns).map(b=>b.getBoundingClientRect().height).filter(Boolean);if(hs.length)ups.style.minHeight=(Math.ceil(2*Math.max(...hs)+6)+1)+'px'}
 const ups=document.getElementById('ups'),btns={};
 for(const k in UP){
   const b=document.createElement('button');
@@ -658,7 +669,10 @@ function ui(){
   });
   // each button shows the stat now > after buying one more level, e.g. "2 > 3" under "Damage"
   const info={};for(const k in UP){const now=STATV[k]();S.lv[k]++;const nx=STATV[k]();S.lv[k]--;info[k]=STATL[k](now)+' > '+STATL[k](nx)}
+  for(const [t] of UPTABS){tabBtns[t].classList.toggle('on',t===upTab);
+    tabBtns[t].classList.toggle('has',t!==upTab&&!S.over&&Object.keys(UP).some(k=>UP[k].cat===t&&upOpen(k)&&S.px>=cost(k)))}
   for(const k in UP){
+    setD(btns[k],UP[k].cat===upTab?'':'none');
     const c=cost(k);
     const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+(UP[k].needs&&!UP[k].needs()?UP[k].needTxt:UP[k].run?'Run wave '+UP[k].w:'Reach wave '+UP[k].w)+'</span>&nbsp;';
     setH(btns[k],h);btns[k].classList.toggle('lkup',!op);
@@ -915,7 +929,7 @@ function catDraw(){
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
 reset();showHome();
-ui();fit();  // size the game screen again now that the upgrade grid has its real height
+ui();lockUpsHeight();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
 // simulate the missed time (up to CATCHUP_MAX seconds) on return, and tick about once a second
 // while hidden. Sounds and vibration are muted while catching up.

@@ -3,7 +3,8 @@ const b=k=>[...document.querySelectorAll('#ups button')][Object.keys(UP).indexOf
 ok(Object.keys(UP).length===8&&document.querySelectorAll('#ups button').length===8&&META_UPS.length===6&&$('fyl').querySelectorAll('button').length===6,'eight in-run upgrades, six of them in the Foundry');
 skipTips();play();S.px=999;ui();
 ok(!b('dmg').disabled&&!b('hp').disabled,'Damage and Tower HP available from the start');
-ok(b('dmg').innerText.split('\n')[1]==='1 > 2'&&b('hp').innerText.split('\n')[1]==='20 > 30','buttons show current > next (Damage 1 > 2, Tower HP 20 > 30)');
+const hpTxt=(tab('hp'),b('hp').innerText);tab('dmg');
+ok(b('dmg').innerText.split('\n')[1]==='1 > 2'&&hpTxt.split('\n')[1]==='20 > 30','buttons show current > next (Damage 1 > 2, Tower HP 20 > 30)');
 b('dmg').onclick();ui();ok(b('dmg').innerText.split('\n')[1]==='2 > 3','after buying: 2 > 3');S.lv.dmg=0;S.px=999;
 ok(['rate','range','armor','magnet'].every(k=>b(k).disabled&&b(k).classList.contains('lkup')&&b(k).querySelector('svg')&&b(k).textContent.includes('Reach wave '+UP[k].w)),'others locked with lock icon and unlock wave');
 b('rate').onclick();ok(S.lv.rate===0&&S.px===999,'locked upgrade cannot be bought');
@@ -15,7 +16,7 @@ ok(b('range').disabled,'Range still locked at wave 5');
 M.best=16;ui();b('magnet').onclick();b('magnet').onclick();ok(Math.abs(stat.magnet()-.3)<1e-9,'Pixel magnet Lv2 = +30% pixels');
 const rnd=Math.random;Math.random=()=>.99;S.pt=[];const gr=enemy(30,0,0,1);kill(gr);Math.random=rnd;
 ok(S.pt.length===Math.floor(TYPES[0].px*1.3),'a Grunt drops '+Math.floor(TYPES[0].px*1.3)+' pixels instead of '+TYPES[0].px);
-ui();ok(b('magnet').innerText.includes('+30% > +45%'),'button shows the bonus now > next: '+b('magnet').innerText.replace(/\n/g,' / '));
+tab('magnet');ok(b('magnet').innerText.includes('+30% > +45%'),'button shows the bonus now > next: '+b('magnet').innerText.replace(/\n/g,' / '));
 // Foundry respects unlocks (best wave, not the current run)
 die();M.best=9;M.chips=999;click($('gof'));
 const fb=[...$('fyl').querySelectorAll('button')],fi=k=>fb[Object.keys(UP).indexOf(k)];
