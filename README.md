@@ -19,7 +19,8 @@ One tower stands in the middle of the screen and enemies come from every side, w
 | Pause | Pause button | P or Esc |
 | Resume | Resume, or tap the play area | P or Esc |
 | Stop the run | Pause, then Stop run, then confirm | |
-| Sound on/off | Sound button | |
+| Sound on/off (everything) | Sound button | |
+| Music on/off | Music button on the home menu or in the pause panel | |
 
 The game keeps running when you switch tabs or apps. When you come back, the missed time (up to 30 minutes) is played out instantly and silently.
 
