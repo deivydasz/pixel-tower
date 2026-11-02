@@ -9,6 +9,8 @@ VT=150000 tests/run.sh tests/balance.sim.js   # balance simulation (slow, prints
 tests/shot.sh out.png 390 844 setup.js        # screenshot at phone size after an optional setup script
 ```
 
+`VT=90000000 tests/run.sh tests/campaign.sim.js` plays 40 runs in a row with a smart bot (Foundry, research, certificates) and prints hook metrics; define `const CFG={...}` before it to try other numbers (see the top of the file).
+
 `python3 tests/stats_server.py` tests the stats server (`server/stats.py`): starts it on a spare port with a temp database.
 
 Set `CHROME=/path/to/chrome` if Chrome isn't found automatically.

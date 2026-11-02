@@ -27,13 +27,13 @@ When your Range grows past the screen, the battlefield zooms out so you always s
 The game keeps running when you switch tabs or apps. When you come back, the missed time (up to 30 minutes) is played out instantly and silently.
 
 ## Enemies
-Waves get bigger and tougher: wave *n* has 4 + 2*n* enemies, and their HP grows about 12% per wave.
+Waves get bigger and tougher: wave *n* has 4 + 2*n* enemies, their HP grows about 11% per wave, and their damage grows 10% every 5 waves (a Tank hits for 3 at first, 4.5 at wave 25, 6 at wave 50). Bosses have their own fixed numbers.
 
 | Enemy | From wave | Speed | HP | Damage to tower | Pixels dropped |
 |---|---|---|---|---|---|
-| Grunt | 1 | normal | normal | 1 | 3 |
-| Runner | 3 | fast | half | 1 | 2 |
-| Tank | 5 | slow | 4× | 3 | 8 |
+| Grunt | 1 | normal | normal | 1 (grows) | 3 |
+| Runner | 3 | fast | half | 1 (grows) | 2 |
+| Tank | 5 | slow | 4× | 3 (grows) | 8 |
 
 The legend at the top right of the game shows each enemy's current HP and the damage it will do after your armor.
 
@@ -92,6 +92,9 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 
 ## Progression
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
+- **Certificates:** completing wave 10, 20, 30... for the first time earns a certificate and one-time chips: Pixel Apprentice (10, +8), Bit Cadet (20, +20), Byte Guard (30, +38), Sprite Sentinel (40, +60), Raster Knight (50, +88), Vector Captain (60, +120), Palette Master (70, +158), Shader Sage (80, +200), Render Lord (90, +248), Pixel Legend (100, +300), then "Wave N Master". Boss waves count once the boss is beaten. See them from the menu under Progress.
+- **Boss attempts:** if a run ends while a boss is alive, you get chips for the share of its HP you took (up to its full chip reward, no core), and game over shows how much HP it had left.
+- **So close:** game over points out the nearest goal: a few waves short of your best, a certificate within 5 waves, or a Foundry upgrade you are just a few chips short of.
 - **Best wave** is shown on the menu, the game over screen and in History. During a run the HUD shows a gold "New best!" once you pass it; beating it shows "New record!" at game over.
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
