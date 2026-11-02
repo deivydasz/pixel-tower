@@ -299,24 +299,43 @@ const SFX={
   over:()=>[392,311,233].forEach((f,i)=>tone(f,.25,'triangle',.5,0,i*.18))
 };
 const GAP={shot:.05,pick:.06,kill:.03},lastSfx={};
-// ---- Background music: a slow lo-fi loop generated in code (no audio files). 70 BPM, 4 chords x 2 bars:
-// soft triangle pad, plucked sine arpeggio, quiet sine bass. Scheduled ~1s ahead on the audio clock.
-const MUSIC={bpm:70,chords:[[220,261.6,329.6,392],[174.6,220,261.6,329.6],[261.6,329.6,392,493.9],[196,246.9,293.7,329.6]],bass:[110,87.3,130.8,98],arp:[0,1,2,3,2,1,2,3]};
-const BAR=4*60/MUSIC.bpm,music={next:0,bar:0};
-const musicChord=bar=>Math.floor(bar/2)%MUSIC.chords.length;
+// ---- Background music: slow procedural lo-fi (no audio files), 70 BPM. The song is made of 8-bar sections
+// (A calm, B lifting, C moody, D breakdown) chained in a random but musical order; each section picks its own
+// arpeggio pattern, some add a soft pentatonic melody and quiet brushed percussion. Notes are scheduled ~1s ahead.
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const CH={Am7:[57,60,64,67],Fmaj7:[53,57,60,64],Cmaj7:[60,64,67,71],G6:[55,59,62,64],Dm7:[50,53,57,60],G7:[55,59,62,65],Em7:[52,55,59,62],E7:[52,56,59,62]};
+const MUSIC={bpm:70,
+  sections:{A:{ch:['Am7','Fmaj7','Cmaj7','G6'],next:['B','C','A'],drums:1},
+            B:{ch:['Dm7','G7','Cmaj7','Am7'],next:['A','D','C'],drums:1,mel:1},
+            C:{ch:['Fmaj7','Em7','Dm7','E7'],next:['A','B'],mel:1},
+            D:{ch:['Am7','Am7','Fmaj7','Fmaj7'],next:['A','B'],mel:1,sparse:1}},
+  arps:[[0,1,2,3,2,1,2,3],[0,2,1,3,0,2,1,3],[3,2,1,0,1,2,3,2],[0,1,2,1,3,2,1,2],[0,3,2,3,1,3,2,3]],
+  scale:[69,72,74,76,79,81]};
+const BAR=4*60/MUSIC.bpm,music={next:0,bar:0,sec:'A',sbar:0,arp:0,noise:null};
+// advance the song by one bar; returns {sec, chord name} for the bar to play
+function musicStep(){
+  if(music.sbar>=8){const nx=MUSIC.sections[music.sec].next;music.sec=nx[Math.floor(Math.random()*nx.length)];music.sbar=0;music.arp=Math.floor(Math.random()*MUSIC.arps.length)}
+  const sec=MUSIC.sections[music.sec],c=sec.ch[Math.floor(music.sbar/2)];music.sbar++;return {sec,c};
+}
 function mtone(f,t,dur,type,vol,att,rel){const o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
   gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(vol,t+att);gn.gain.setValueAtTime(vol,t+Math.max(att,dur-rel));gn.gain.linearRampToValueAtTime(0,t+dur);
   o.connect(gn).connect(MB);o.start(t);o.stop(t+dur+.05)}
-function musicBar(bar,t){const c=musicChord(bar),ch=MUSIC.chords[c],beat=BAR/4;
-  for(let i=0;i<3;i++)mtone(ch[i],t,BAR*1.02,'triangle',.05,.9,1.2);
-  mtone(MUSIC.bass[c],t,beat*1.6,'sine',.12,.05,.6);mtone(MUSIC.bass[c],t+2*beat,beat*1.6,'sine',.1,.05,.6);
-  MUSIC.arp.forEach((n,i)=>{if(Math.random()<.22)return;mtone(ch[n]*2,t+i*beat/2,beat*.9,'sine',.035,.01,.6)});
+function mhat(t,vol){if(!music.noise){const n=AC.createBuffer(1,Math.floor(AC.sampleRate*.08)||1764,AC.sampleRate||22050),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;music.noise=n}
+  const src=AC.createBufferSource(),hp=AC.createBiquadFilter(),gn=AC.createGain();src.buffer=music.noise;hp.type='highpass';hp.frequency.value=5000;
+  gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.0005,t+.07);src.connect(hp);hp.connect(gn);gn.connect(MB);src.start(t);src.stop(t+.09)}
+function musicBar(t){const {sec,c}=musicStep(),ch=CH[c],beat=BAR/4;
+  for(let i=0;i<3;i++)mtone(mf(ch[i]),t,BAR*1.02,'triangle',sec.sparse?.04:.05,.9,1.2);
+  if(!sec.sparse){mtone(mf(ch[0]-12),t,beat*1.6,'sine',.12,.05,.6);if(Math.random()<.8)mtone(mf(ch[0]-12),t+2*beat,beat*1.6,'sine',.1,.05,.6);
+    MUSIC.arps[music.arp].forEach((n,i)=>{if(Math.random()<.22)return;mtone(mf(ch[n]+12),t+i*beat/2,beat*.9,'sine',.035,.01,.6)})}
+  if(sec.mel){let k=Math.floor(Math.random()*MUSIC.scale.length);for(let i=0;i<8;i++)if(Math.random()<(sec.sparse?.25:.3)){
+      k=Math.max(0,Math.min(MUSIC.scale.length-1,k+Math.floor(Math.random()*3)-1));mtone(mf(MUSIC.scale[k]),t+i*beat/2,beat*(Math.random()<.5?.9:1.6),'triangle',.03,.02,.5)}}
+  if(sec.drums){mtone(55,t,.18,'sine',.09,.005,.15);mtone(55,t+2*beat,.18,'sine',.07,.005,.15);for(let i=1;i<8;i+=2)if(Math.random()<.85)mhat(t+i*beat/2,.018)}
 }
 const musicOn=()=>AC&&MB&&AC.state==='running'&&!M.mute&&M.music&&!document.hidden;
 function musicTick(){
   if(!musicOn()){music.next=0;return}
   const now=AC.currentTime;if(music.next<now+.05)music.next=now+.1;
-  while(music.next<now+1.2){musicBar(music.bar++,music.next);music.next+=BAR}
+  while(music.next<now+1.2){musicBar(music.next);music.bar++;music.next+=BAR}
 }
 function sfx(k){
   if(quiet||M.mute||!AC||AC.state!=='running')return;
