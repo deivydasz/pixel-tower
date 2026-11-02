@@ -72,6 +72,10 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hm .lk svg{display:block;margin:0 auto 4px}
 #hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px;grid-column:span 4}
 #hm #hmus{min-height:40px;font-size:8px;margin-top:6px;grid-column:span 2}
+#idl{display:none;border:2px solid #6ee7a0;padding:8px;font-size:8px;line-height:1.8;text-align:center}
+#idl b{display:block;color:#6ee7a0;font-weight:400;margin-bottom:2px}
+#idl span{display:block}
+#idl button{margin-top:6px;min-height:36px;padding:4px 18px;font-size:8px}
 #hook,.goal{border:2px solid #ffd166;padding:8px;font-size:8px;line-height:1.7;text-align:left}
 #hook i,.goal i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
 #hook b,.goal b{display:block;height:100%;background:#ffd166;width:0}
@@ -169,7 +173,7 @@ button b{display:block;font-weight:400}
 <p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p>
 <div class="hg" id="gsl"></div><div id="gos"></div>
 <button id="gof">Foundry</button><button id="gbt">Bit Theory</button><button id="gom">Main menu</button></div></div>
-<div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><button id="hplay">Play</button>
+<div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><div id="idl"><b>While you were away</b><span id="idlt"></span><button id="idlk">Nice!</button></div><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
 <div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button><button id="hce">Certificates<small id="hcen"></small></button>
 <div class="hg">Unlocks</div><span id="hlk" style="display:contents"></span>
@@ -181,6 +185,7 @@ button b{display:block;font-weight:400}
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
 <p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
+<p>After you beat your first boss, the tower keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
@@ -230,12 +235,12 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
   const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
-  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),away:n('away'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
@@ -244,7 +249,7 @@ function reset(){
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
   // progress snapshot, compared at game over to list what this run unlocked
-  S.start={best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
+  S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
 }
 const stat={
   dmg:()=>(1+S.lv.dmg+.5*M.lv.dmg)*Math.pow(1.2,M.res.depth),
@@ -295,13 +300,14 @@ const clock={now:()=>Date.now()};
 // v9 adds `uid`: a random anonymous player ID for the stats dashboard (made on first load).
 // v10 adds `cert`: the highest certificate earned (a wave, multiple of 10; 0 = none). Older saves get the ones
 // their best wave already passed, without the chip reward.
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<11){...}.
+// v11 adds `seen` (ms timestamp the game was last open, for idle income) and `stash` (idle starting pixels for the next run).
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<12){...}.
 const newUid=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('')};
-const SAVE_V=10,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0};
+const SAVE_V=11,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),seen:+m.seen>0?+m.seen:Date.now(),stash:Math.max(0,m.stash|0),cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
@@ -309,6 +315,7 @@ try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
 if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
+if(TEST.away)M.seen=Date.now()-TEST.away*60000;
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 // Anonymous gameplay stats for the dashboard (server/stats.py): only the random `uid`, no names, IPs or devices.
 // Sent to /api/e with sendBeacon (works while the page closes); only from the live site, never from preview or local files.
@@ -482,6 +489,22 @@ const bossTry=b=>{const share=Math.max(0,Math.min(1,1-b.hp/b.max));return {share
 const CERT_NAMES=['Pixel Apprentice','Bit Cadet','Byte Guard','Sprite Sentinel','Raster Knight','Vector Captain','Palette Master','Shader Sage','Render Lord','Pixel Legend'];
 const certName=w=>CERT_NAMES[w/10-1]||'Wave '+w+' Master';
 const certChips=w=>Math.round(w*(1+w/20)/2);
+// Idle income (unlocks after the first boss): while the game is closed (or hidden outside a run) the tower keeps
+// earning. A full IDLE.hours away pays one run's worth of chips to your best wave, plus starting pixels for the next
+// run (IDLE.px per best wave). Nothing for under IDLE.minMin minutes; the stash never holds more than one full period.
+const IDLE={hours:4,minMin:5,px:10};
+const idleOpen=()=>M.bk>0;
+const runChips=b=>{let c=0;for(let i=1;i<b;i++)c+=1+Math.floor(i/5);return c};
+const idleFull=()=>({chips:runChips(M.best),px:IDLE.px*M.best});
+let idleMsg=null;
+function idleCheck(now){
+  now=now||Date.now();const away=Math.max(0,now-(M.seen||now));M.seen=now;
+  if(!idleOpen()||away<IDLE.minMin*60000){save();return null}
+  const f=Math.min(1,away/(IDLE.hours*3600000)),full=idleFull(),chips=Math.floor(full.chips*f),px=Math.min(full.px,M.stash+Math.floor(full.px*f))-M.stash;
+  M.chips+=chips;M.stash+=px;save();
+  if(chips||px){idleMsg={away,chips,px};track('idle',{min:Math.round(away/60000),c:chips,px})}
+  return idleMsg;
+}
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
   for(const k in UP)if(UP[k].w===S.wave&&(UP[k].run?upOpen(k):M.best<S.wave)){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
@@ -828,6 +851,8 @@ function homeUI(){
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=M.best>=m.w;
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
+  const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
+  if(idleMsg)document.getElementById('idlt').textContent='Your tower kept defending for '+fmtDur(Math.min(idleMsg.away/1000,IDLE.hours*3600))+(idleMsg.away>IDLE.hours*3600000?' (max '+IDLE.hours+'h)':'')+': '+[idleMsg.chips?'+'+big(idleMsg.chips)+' chips':'',idleMsg.px||M.stash?big(M.stash)+' px head start for your next run':''].filter(Boolean).join(' and ')+'.';
   setT(document.getElementById('hcen'),M.cert?(M.cert/10)+' earned':'Wave 10');
   goalUI('hookt','hookb');
   const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':big(M.chips)+' chips';fn.className=rdy?'rdy':'';
@@ -835,11 +860,12 @@ function homeUI(){
 function showHome(){
   homeUI();
   S.menu=true;S.pause=true;closeTip();
-  document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+big(M.chips)+' chips'+(M.cores?' · '+M.cores+' core'+(M.cores===1?'':'s'):''):'Defend the tower from waves of pixel monsters.';
+  document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+big(M.chips)+' chips'+(M.cores?' · '+M.cores+' core'+(M.cores===1?'':'s'):'')+(idleOpen()?' · idle '+big(idleFull().chips)+' chips / '+IDLE.hours+'h':''):'Defend the tower from waves of pixel monsters.';
   show('go',0);show('fy',0);show('how',0);show('hi',0);show('bt',0);show('home',1);
 }
+function useStash(){if(!M.stash)return;S.px+=M.stash;S.ft.push({t:'Head start +'+big(M.stash)+' px',life:2.5,big:true});M.stash=0;idleMsg=null;save()}
 function openFoundry(from){fyFrom=from;show(from,0);fyUI();show('fy',1)}
-document.getElementById('hplay').onclick=()=>{show('home',0);reset()};
+document.getElementById('hplay').onclick=()=>{show('home',0);reset();useStash()};
 document.getElementById('hfy').onclick=()=>openFoundry('home');
 const fmtTime=d=>Math.floor(d/60)+':'+String(d%60).padStart(2,'0');
 const esc=t=>String(t).replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -864,6 +890,7 @@ function showCerts(){
   show('home',0);show('ce',1);
 }
 document.getElementById('hce').onclick=showCerts;
+document.getElementById('idlk').onclick=()=>{idleMsg=null;homeUI()};
 document.getElementById('cec').onclick=()=>{show('ce',0);showHome()};
 // ---- Bit Theory screen and timers
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
@@ -921,6 +948,7 @@ function runNews(){
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
   for(const m of LOCKED)if(m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
   for(const w of S.certs||[])items.push('Certificate: '+certName(w)+' (+'+certChips(w)+' chips)');
+  if(!a.bk&&M.bk>0)items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
   const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
   const opened=BIT_KEYS.filter(k=>!a.open.includes(k)&&resOpen(k));
@@ -937,7 +965,7 @@ document.getElementById('hic').onclick=showHome;
 document.getElementById('hhow').onclick=()=>{show('home',0);show('how',1)};
 document.getElementById('howc').onclick=showHome;
 document.getElementById('gom').onclick=showHome;
-document.getElementById('gor').onclick=()=>{show('go',0);reset()};
+document.getElementById('gor').onclick=()=>{show('go',0);reset();useStash()};
 document.getElementById('gof').onclick=()=>openFoundry('go');
 // Foundry is only reachable between runs: from the home menu or the game over menu.
 document.getElementById('fyc').onclick=()=>{show('fy',0);if(fyFrom==='home')showHome();else showGO()};
@@ -1027,7 +1055,7 @@ function catDraw(){
   if(word&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';const bw=g.measureText(word).width+8;
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
-reset();showHome();
+idleCheck();reset();showHome();
 save();track('open',{m:trackSnap()});  // one per page load (also saves a newly made uid)
 ui();lockUpsHeight();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
@@ -1050,6 +1078,12 @@ function loop(t){
 }
 requestAnimationFrame(loop);
 setInterval(()=>{if(document.hidden)advance(performance.now())},1000);
+// idle clock: remember when the game was last open; coming back to the menu after a while pays idle income
+setInterval(()=>{if(!document.hidden){M.seen=Date.now();save()}},30000);
+// hidden during a run: the run itself keeps going (catch-up), so that time never pays idle income
+let hidInRun=false;
+addEventListener('visibilitychange',()=>{if(document.hidden){hidInRun=inRun();M.seen=Date.now();save()}else if(inRun()||hidInRun){M.seen=Date.now();save()}else if(idleCheck()&&document.getElementById('home').style.display==='flex')homeUI()});
+addEventListener('pagehide',()=>{M.seen=Date.now();save()});
 </script>
 </body>
 </html>

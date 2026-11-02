@@ -17,7 +17,7 @@ from urllib.parse import urlparse, parse_qs
 
 DB = os.environ.get('STATS_DB', '/var/lib/pixel-tower-stats/stats.db')
 PORT = int(os.environ.get('STATS_PORT', '8787'))
-TYPES = ('open', 'run', 'research', 'foundry')
+TYPES = ('open', 'run', 'research', 'foundry', 'idle')
 ENVS = ('live',)
 MAX_BODY = 8192
 RATE = 240  # events per player ID per hour (a run ends every few minutes; this only stops floods)
@@ -121,7 +121,7 @@ def overview(env, now=None):
     with db() as c:
         evs = c.execute('SELECT ts, pid, type, data FROM events WHERE env=? ORDER BY ts', (env,)).fetchall()
     players = {}
-    runs, research, foundry = [], [], []
+    runs, research, foundry, idle = [], [], [], []
     for r in evs:
         d = json.loads(r['data'])
         p = players.setdefault(r['pid'], {'pid': r['pid'], 'first': r['ts'], 'last': r['ts'], 'runs': 0, 'time': 0, 'opens': 0, 'm': {}})
@@ -138,6 +138,8 @@ def overview(env, now=None):
             research.append(d)
         elif r['type'] == 'foundry':
             foundry.append(d)
+        elif r['type'] == 'idle':
+            idle.append(d)
     day = 86400
     act = lambda s: sum(1 for p in players.values() if now - p['last'] < s)
     new7 = sum(1 for p in players.values() if now - p['first'] < 7 * day)
@@ -145,7 +147,8 @@ def overview(env, now=None):
     tiles = [('Players', len(players), 'all time'), ('Active 24h', act(day), 'players'), ('Active 7d', act(7 * day), 'players'),
              ('New 7d', new7, 'players'), ('Runs', len(runs), 'all time'), ('Runs 24h', sum(1 for t, _, _ in runs if now - t < day), ''),
              ('Avg wave', round(sum(waves) / len(waves), 1) if waves else 0, 'per run'), ('Top wave', max(waves) if waves else 0, ''),
-             ('Play time', dur(sum(int(d.get('d') or 0) for _, _, d in runs)), 'total')]
+             ('Play time', dur(sum(int(d.get('d') or 0) for _, _, d in runs)), 'total'),
+             ('Idle returns', len(idle), '%d chips paid' % sum(int(d.get('c') or 0) for d in idle))]
     out = '<div class="tiles">' + ''.join('<div class="tile"><small>%s</small><b>%s</b><small>%s</small></div>' % (e(a), e(str(b)), e(c)) for a, b, c in tiles) + '</div>'
     # runs per day, last 14 days
     days = []
@@ -218,6 +221,8 @@ def player(env, pid, now=None):
             what = 'Research started: %s Lv %s' % (dict(RES).get(d.get('k'), d.get('k')), d.get('lv'))
         elif r['type'] == 'foundry':
             what = 'Foundry: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
+        elif r['type'] == 'idle':
+            what = 'Came back after %s min: +%s chips, +%s px head start' % (d.get('min'), d.get('c'), d.get('px'))
         else:
             what = 'Opened the game'
         rows.append('<tr><td>%s</td><td>%s</td></tr>' % (t, e(what)))
