@@ -60,8 +60,13 @@ Each research level costs boss cores and chips and takes **real time**: about 10
 | Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
 | Blast tech | Blast recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
 | Bit depth | All damage x1.2, stacking | 20 | Critical bits Lv 3 and 5 bosses beaten |
+| Overclock | Fights can run 0.5x faster (up to 3x) | 4 | 5 bosses beaten |
 
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
+
+Overclock has its own price: 2 cores + 300 chips (30 min), 3 + 800 (1 h), 6 + 3,000 (4 h), 10 + 8,000 (8 h). Once studied, a speed button appears in the top-left of the game screen: tap it to switch between 1x and your highest speed. Only the fight speeds up; research timers, banners, music and the cat stay in real time.
+
+Critical hits flash the enemy yellow and show the damage dealt.
 
 ## Upgrades
 During a run the upgrades sit in three tabs: **Power** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet, Pixel bank). A dot on a tab means something there is affordable.

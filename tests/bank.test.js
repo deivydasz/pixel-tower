@@ -11,5 +11,5 @@ ui();ok(b('bank').innerText.split('\n')[1]==='6% > 9%','button shows 6% > 9%');
 // Foundry version: half strength
 die();click($('gof'));const fb=[...$('fyl').querySelectorAll('button')].find(x=>x.textContent.startsWith('Pixel bank'));
 ok(fb&&fb.textContent.includes('0% > 1.5%'),'Foundry: Pixel bank 0% > 1.5%');click($('fyc'));
-loadMeta({v:6,chips:1,lv:{dmg:1}});ok(M.lv.bank===0&&M.v===7,'older saves: Pixel bank level 0, save v7');
+loadMeta({v:6,chips:1,lv:{dmg:1}});ok(M.lv.bank===0&&M.v===SAVE_V,'older saves: Pixel bank level 0, save v7');
 done();
