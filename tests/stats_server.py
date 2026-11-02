@@ -35,6 +35,8 @@ try:
     ok('a1b2c3' in h and 'ffffff' not in h, 'live view shows live players only')
     ok('Tank' in h and 'Critical bits' in h and 'L3:1' in h, 'dashboard shows killers and research started per level')
     ok('<b>42</b>' in h, 'top wave shown')
+    import re; days = re.findall(r'<tr><td>(\w{3} \d\d) ·', h)
+    ok(days and days[0] == time.strftime('%a %d', time.gmtime()), 'runs per day: today at the top (' + ' '.join(days[:3]) + ')')
     st, h = req('/stats?env=preview'); ok('ffffff' in h and 'a1b2c3' not in h, 'preview view separate')
     st, h = req('/stats/p/' + A)
     ok(st == 200 and 'wave 42' in h and 'NEW BEST' in h and '2x speed' in h and 'Critical bits Lv 3' in h and 'Damage Lv 5' in h, 'player page lists runs, research and purchases')

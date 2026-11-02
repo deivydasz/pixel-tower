@@ -150,12 +150,12 @@ def overview(env, now=None):
     out = '<div class="tiles">' + ''.join('<div class="tile"><small>%s</small><b>%s</b><small>%s</small></div>' % (e(a), e(str(b)), e(c)) for a, b, c in tiles) + '</div>'
     # runs per day, last 14 days
     days = []
-    for i in range(13, -1, -1):
+    for i in range(14):  # newest day first
         t0 = (int(now) // day - i) * day
         ds = time.strftime('%a %d', time.gmtime(t0))
         rs = [x for x in runs if t0 <= x[0] < t0 + day]
         days.append((ds + ' · %dp' % len({x[1] for x in rs}), len(rs)))
-    out += '<h2>Runs per day (UTC, last 14 days)</h2>' + bars(days, 'day · players')
+    out += '<h2>Runs per day (UTC, newest first)</h2>' + bars(days, 'day · players')
     # how far players get: best wave buckets
     buckets = [(1, 9), (10, 19), (20, 29), (30, 39), (40, 49), (50, 74), (75, 99), (100, 10 ** 6)]
     bests = [int(p['m'].get('best') or 0) for p in players.values()]
