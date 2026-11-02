@@ -38,6 +38,7 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 - `background-stop.test.js`: no auto-pause, background catch-up (quiet, capped), pause panel, stop-run confirmation
 - `numbers.test.js`: number rounding rules, Foundry and suggestions show current > next stat
 - `pause-foundry.test.js`: pause/resume inputs, foundry only reachable from game over
+- `music.test.js`: music toggles and save, chord loop, scheduler (stand-in audio device), mute/off stop it
 - `nova.test.js`: Nova damage, push, whole-screen range, cooldown, inputs
 - `bit-theory.test.js`: research unlock, cost, one-at-a-time timers, completion while away, spray/pierce/crit/Nova/depth effects, saves
 - `bosses.test.js`: boss schedule and rotation, rewards, escapes, Warden shield, Queen spawns, boss bar, saves

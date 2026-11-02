@@ -61,7 +61,8 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px so
 #hm .lk:disabled{opacity:var(--dim,.45)}
 #hm .lk.tr:disabled{opacity:1;border-color:#ff8c42}
 #hm .lk svg{display:block;margin:0 auto 4px}
-#hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px}
+#hm #hhow{min-height:40px;font-size:8px;border-style:dashed;margin-top:6px;grid-column:span 4}
+#hm #hmus{min-height:40px;font-size:8px;margin-top:6px;grid-column:span 2}
 #hook,.goal{border:2px solid #ffd166;padding:8px;font-size:8px;line-height:1.7;text-align:left}
 #hook i,.goal i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
 #hook b,.goal b{display:block;height:100%;background:#ffd166;width:0}
@@ -140,7 +141,7 @@ button b{display:block;font-weight:400}
 </head>
 <body>
 <div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
-<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
+<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p>
 <div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
@@ -154,7 +155,7 @@ button b{display:block;font-weight:400}
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
 <div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button>
 <div class="hg">Unlocks</div><span id="hlk" style="display:contents"></span>
-<button id="hhow">How to play</button></div></div>
+<button id="hhow">How to play</button><button id="hmus" class="mus"></button></div></div>
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
@@ -245,12 +246,13 @@ const clock={now:()=>Date.now()};
 // v3 adds `hist`: the last HIST_MAX runs, newest first: {t:time ms, w:wave, k:killer, c:chips earned, d:seconds, n:novas used, r:1 if new record}.
 // v4 adds `cores` (boss cores, spent on research later) and `bk` (bosses beaten); history entries gain `b` (bosses beaten that run).
 // v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<6){...}.
-const SAVE_V=5,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null};
+// v6 adds `music` (background music on/off, default on).
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<7){...}.
+const SAVE_V=6,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null,music:true};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
@@ -261,15 +263,22 @@ const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
 // Sound: tiny synthesized blips through a quiet master volume. No audio files.
 const VOL=.12;
-let AC=null,MG=null;
+let AC=null,MG=null,MB=null;
+// iPhone: Web Audio follows the ring/silent switch unless the page declares "playback" audio (iOS 17+). That also pauses
+// other apps' audio while playing, like a music app. Older iOS needs a sound started inside a tap to unlock audio, and
+// calls/app switches leave the context "interrupted" until the next tap.
 function audio(){
   if(!AC&&!M.mute){
+    try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
     const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
     AC=new C();MG=AC.createGain();MG.gain.value=VOL;MG.connect(AC.destination);
+    // music bus: quieter than effects and softened by a low-pass filter
+    const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1400;MB=AC.createGain();MB.gain.value=.55;MB.connect(lp);lp.connect(MG);
+    try{const b=AC.createBuffer(1,1,22050),src=AC.createBufferSource();src.buffer=b;src.connect(AC.destination);src.start(0)}catch(e){}
   }
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(AC&&AC.state!=='running'&&AC.state!=='closed')AC.resume();
 }
-for(const ev of['pointerdown','touchend','keydown'])addEventListener(ev,audio,{passive:true});
+for(const ev of['pointerdown','touchend','click','keydown'])addEventListener(ev,audio,{passive:true});
 function tone(f,dur,type,vol,f2,delay){
   const t=AC.currentTime+(delay||0),o=AC.createOscillator(),gn=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f,t);
@@ -290,6 +299,44 @@ const SFX={
   over:()=>[392,311,233].forEach((f,i)=>tone(f,.25,'triangle',.5,0,i*.18))
 };
 const GAP={shot:.05,pick:.06,kill:.03},lastSfx={};
+// ---- Background music: slow procedural lo-fi (no audio files), 70 BPM. The song is made of 8-bar sections
+// (A calm, B lifting, C moody, D breakdown) chained in a random but musical order; each section picks its own
+// arpeggio pattern, some add a soft pentatonic melody and quiet brushed percussion. Notes are scheduled ~1s ahead.
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const CH={Am7:[57,60,64,67],Fmaj7:[53,57,60,64],Cmaj7:[60,64,67,71],G6:[55,59,62,64],Dm7:[50,53,57,60],G7:[55,59,62,65],Em7:[52,55,59,62],E7:[52,56,59,62]};
+const MUSIC={bpm:70,
+  sections:{A:{ch:['Am7','Fmaj7','Cmaj7','G6'],next:['B','C','A'],drums:1},
+            B:{ch:['Dm7','G7','Cmaj7','Am7'],next:['A','D','C'],drums:1,mel:1},
+            C:{ch:['Fmaj7','Em7','Dm7','E7'],next:['A','B'],mel:1},
+            D:{ch:['Am7','Am7','Fmaj7','Fmaj7'],next:['A','B'],mel:1,sparse:1}},
+  arps:[[0,1,2,3,2,1,2,3],[0,2,1,3,0,2,1,3],[3,2,1,0,1,2,3,2],[0,1,2,1,3,2,1,2],[0,3,2,3,1,3,2,3]],
+  scale:[69,72,74,76,79,81]};
+const BAR=4*60/MUSIC.bpm,music={next:0,bar:0,sec:'A',sbar:0,arp:0,noise:null};
+// advance the song by one bar; returns {sec, chord name} for the bar to play
+function musicStep(){
+  if(music.sbar>=8){const nx=MUSIC.sections[music.sec].next;music.sec=nx[Math.floor(Math.random()*nx.length)];music.sbar=0;music.arp=Math.floor(Math.random()*MUSIC.arps.length)}
+  const sec=MUSIC.sections[music.sec],c=sec.ch[Math.floor(music.sbar/2)];music.sbar++;return {sec,c};
+}
+function mtone(f,t,dur,type,vol,att,rel){const o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(vol,t+att);gn.gain.setValueAtTime(vol,t+Math.max(att,dur-rel));gn.gain.linearRampToValueAtTime(0,t+dur);
+  o.connect(gn).connect(MB);o.start(t);o.stop(t+dur+.05)}
+function mhat(t,vol){if(!music.noise){const n=AC.createBuffer(1,Math.floor(AC.sampleRate*.08)||1764,AC.sampleRate||22050),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;music.noise=n}
+  const src=AC.createBufferSource(),hp=AC.createBiquadFilter(),gn=AC.createGain();src.buffer=music.noise;hp.type='highpass';hp.frequency.value=5000;
+  gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.0005,t+.07);src.connect(hp);hp.connect(gn);gn.connect(MB);src.start(t);src.stop(t+.09)}
+function musicBar(t){const {sec,c}=musicStep(),ch=CH[c],beat=BAR/4;
+  for(let i=0;i<3;i++)mtone(mf(ch[i]),t,BAR*1.02,'triangle',sec.sparse?.04:.05,.9,1.2);
+  if(!sec.sparse){mtone(mf(ch[0]-12),t,beat*1.6,'sine',.12,.05,.6);if(Math.random()<.8)mtone(mf(ch[0]-12),t+2*beat,beat*1.6,'sine',.1,.05,.6);
+    MUSIC.arps[music.arp].forEach((n,i)=>{if(Math.random()<.22)return;mtone(mf(ch[n]+12),t+i*beat/2,beat*.9,'sine',.035,.01,.6)})}
+  if(sec.mel){let k=Math.floor(Math.random()*MUSIC.scale.length);for(let i=0;i<8;i++)if(Math.random()<(sec.sparse?.25:.3)){
+      k=Math.max(0,Math.min(MUSIC.scale.length-1,k+Math.floor(Math.random()*3)-1));mtone(mf(MUSIC.scale[k]),t+i*beat/2,beat*(Math.random()<.5?.9:1.6),'triangle',.03,.02,.5)}}
+  if(sec.drums){mtone(55,t,.18,'sine',.09,.005,.15);mtone(55,t+2*beat,.18,'sine',.07,.005,.15);for(let i=1;i<8;i+=2)if(Math.random()<.85)mhat(t+i*beat/2,.018)}
+}
+const musicOn=()=>AC&&MB&&AC.state==='running'&&!M.mute&&M.music&&!document.hidden;
+function musicTick(){
+  if(!musicOn()){music.next=0;return}
+  const now=AC.currentTime;if(music.next<now+.05)music.next=now+.1;
+  while(music.next<now+1.2){musicBar(music.next);music.bar++;music.next+=BAR}
+}
 function sfx(k){
   if(quiet||M.mute||!AC||AC.state!=='running')return;
   const now=AC.currentTime;
@@ -299,7 +346,9 @@ function sfx(k){
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 function buzz(ms){const ua=navigator.userActivation;if(!quiet&&!M.mute&&navigator.vibrate&&(!ua||ua.hasBeenActive))navigator.vibrate(ms)}
 const sndb=document.getElementById('snd');
-function sndUI(){sndb.textContent=M.mute?'Muted':'Sound';sndb.setAttribute('aria-pressed',String(!M.mute))}
+function sndUI(){sndb.textContent=M.mute?'Muted':'Sound';sndb.setAttribute('aria-pressed',String(!M.mute));
+  document.querySelectorAll('.mus').forEach(b=>{b.textContent='Music '+(M.music?'On':'Off');b.setAttribute('aria-pressed',String(!!M.music))})}
+document.querySelectorAll('.mus').forEach(b=>b.onclick=()=>{M.music=!M.music;save();sndUI();audio()});
 sndb.onclick=()=>{M.mute=!M.mute;save();sndUI();audio()};
 sndUI();
 
@@ -845,6 +894,7 @@ let catLast=performance.now();
 function loop(t){
   advance(t);draw();ui();
   catTick(Math.min(.1,(t-catLast)/1000));catLast=t;
+  musicTick();
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
