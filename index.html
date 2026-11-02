@@ -282,12 +282,14 @@ const clock={now:()=>Date.now()};
 // v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
 // v6 adds `music` (background music on/off, default on). v7 adds the `bank` (Pixel bank) upgrade level.
 // v8 adds `res.speed` (Overclock research) and `spd` (chosen game speed, 1-3, default 1).
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<9){...}.
-const SAVE_V=8,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1};
+// v9 adds `uid`: a random anonymous player ID for the stats dashboard (made on first load).
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<10){...}.
+const newUid=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('')};
+const SAVE_V=9,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid()};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid()};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
@@ -296,6 +298,17 @@ if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
 if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
+// Anonymous gameplay stats for the dashboard (server/stats.py): only the random `uid`, no names, IPs or devices.
+// Sent to /api/e with sendBeacon (works while the page closes); live and preview only, never from local files.
+// trackLog keeps the last events for tests.
+const TRACK_ENV=/^preview\./.test(location.hostname)?'preview':location.protocol==='https:'?'live':'';
+const trackLog=[];
+const trackSnap=()=>({best:M.best,bk:M.bk,cores:M.cores,chips:M.chips,res:Object.assign({},M.res),lv:Object.assign({},M.lv),runs:M.hist.length});
+function track(type,data){
+  const ev={id:M.uid,env:TRACK_ENV,type,data};trackLog.push(ev);if(trackLog.length>50)trackLog.shift();
+  if(!TRACK_ENV||!navigator.sendBeacon)return;
+  try{navigator.sendBeacon('/api/e',new Blob([JSON.stringify(ev)],{type:'text/plain'}))}catch(e){}
+}
 const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
 // Sound: tiny synthesized blips through a quiet master volume. No audio files.
@@ -522,6 +535,7 @@ function endRun(stopped){
   S.prevBest=M.best;S.record=M.best>0&&S.wave>M.best;M.best=Math.max(M.best,S.wave);
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:S.earn,d:Math.round(S.time),n:S.novas,b:S.bosses,r:S.record?1:0}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
+  track('run',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:S.earn,n:S.novas,b:S.bosses,r:S.record?1:0,spd:Math.min(M.spd,maxSpeed()),up:Object.assign({},S.lv),m:trackSnap()});
 }
 const ZOOM_MIN=.5;
 const zoomTarget=()=>Math.max(ZOOM_MIN,Math.min(1,(W/2-6)/stat.range()));
@@ -721,7 +735,7 @@ const fmtU=(k,v)=>(k==='magnet'?'+':'')+fmt(v)+UNIT[k];
 const nowNext=k=>fmtU(k,baseStat(k,M.lv[k]))+' > '+fmtU(k,baseStat(k,M.lv[k]+1));  // e.g. "2.5 > 3", "2.4/s > 2.6/s"
 for(const k of META_UPS){
   const b=document.createElement('button');
-  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI();flashBtn(b)};
+  b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI();flashBtn(b);track('foundry',{k,lv:M.lv[k],c})};
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
@@ -753,7 +767,7 @@ function showGO(){
     const c=mcost(k),b=document.createElement('button');
     b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+big(c)+' chips';
     b.disabled=M.chips<c;
-    b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');showGO()};
+    b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');track('foundry',{k,lv:M.lv[k],c,from:'gameover'});showGO()};
     s.appendChild(b);
   });
   document.getElementById('go').style.display='flex';
@@ -818,7 +832,7 @@ const resCanAfford=k=>{const lv=M.res[k];if(lv>=BITS[k].max||!resOpen(k))return 
 function startResearch(k){
   if(M.rq||!resCanAfford(k))return false;
   const lv=M.res[k],c=resCost(k,lv);M.cores-=c.cores;M.chips-=c.chips;
-  M.rq={k,end:clock.now()+resMin(k,lv)*60000/(TEST.fast?60:1)};save();sfx('buy');return true;
+  M.rq={k,end:clock.now()+resMin(k,lv)*60000/(TEST.fast?60:1)};save();sfx('buy');track('research',{k,lv:lv+1,m:trackSnap()});return true;
 }
 function checkResearch(){
   if(!M.rq||clock.now()<M.rq.end)return false;
@@ -965,6 +979,7 @@ function catDraw(){
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
 reset();showHome();
+save();track('open',{m:trackSnap()});  // one per page load (also saves a newly made uid)
 ui();lockUpsHeight();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
 // simulate the missed time (up to CATCHUP_MAX seconds) on return, and tick about once a second

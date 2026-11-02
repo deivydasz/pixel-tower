@@ -9,6 +9,8 @@ VT=150000 tests/run.sh tests/balance.sim.js   # balance simulation (slow, prints
 tests/shot.sh out.png 390 844 setup.js        # screenshot at phone size after an optional setup script
 ```
 
+`python3 tests/stats_server.py` tests the stats server (`server/stats.py`): starts it on a spare port with a temp database.
+
 Set `CHROME=/path/to/chrome` if Chrome isn't found automatically.
 
 ## How it works

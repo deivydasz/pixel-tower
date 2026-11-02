@@ -1,0 +1,14 @@
+[Unit]
+Description=Idle Pixel Tower stats collector and dashboard
+After=network.target
+
+[Service]
+User=www-data
+Environment=STATS_DB=/var/lib/pixel-tower-stats/stats.db
+ExecStart=/usr/bin/python3 /var/www/pixel-tower/server/stats.py
+Restart=always
+RestartSec=2
+MemoryMax=60M
+
+[Install]
+WantedBy=multi-user.target

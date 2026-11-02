@@ -16,7 +16,7 @@ S.pause=true;ok(gameSpeed()===1,'paused: speed 1');S.pause=false;
 M.res.speed=1;ok(gameSpeed()===1.5,'speed capped at studied max if the save has more');
 M.spd=1;
 // saves
-loadMeta({v:7,chips:1,lv:{},res:{crit:1},best:3,hist:[]});ok(M.v===8&&M.res.speed===0&&M.spd===1,'v7 save loads with Overclock 0, speed 1x');
+loadMeta({v:7,chips:1,lv:{},res:{crit:1},best:3,hist:[]});ok(M.v===SAVE_V&&M.res.speed===0&&M.spd===1,'v7 save loads with Overclock 0, speed 1x');
 loadMeta({v:8,chips:1,lv:{},res:{speed:2},spd:9,best:3,hist:[]});ok(M.spd===2,'bad saved speed clamped to studied max');
 // crit pop-ups
 skipTips();M.spd=1;M.res.crit=20;S.en=[];S.cp=[];const e=enemy(20,0,0,1e6);S.cd=0;let n=0;while(!S.cp.length&&n++<600)step(1/60);
