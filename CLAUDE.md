@@ -9,6 +9,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - One tower in the middle of the screen. Enemies attack from all sides.
 - Enemies: Grunt (basic), Runner (fast, from wave 3), Tank (slow, tough, from wave 5).
 - Killed enemies burst into pixels that fly to the tower. Pixels are the in-run currency.
+- Blast fires only from the BLAST button (or Space on a keyboard), never from tapping the play area; tapping the play area only resumes from pause.
 - Player-facing names: the screen-wide ability is **Blast** (code still calls it `nova`), the armor upgrade is **Dmg sponge** (code key `armor`).
 - In-run upgrades (cost pixels): six stats. Damage and Tower HP from the start; Fire rate (wave 5), Range (8), Dmg sponge (12, flat armor per hit), Pixel magnet (16, more pixels per kill) unlock by best wave, mid-run too. Healing upgrades were tried and made the tower immortal in simulations, so avoid them.
 - Each cleared wave gives pixels and pixel chips. Chips are the between-runs currency.
@@ -19,7 +20,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Bosses: waves 20/40/60/80, then every 10 from 100. Brute, Swarm Queen (spawns Runners), Warden (shield, Blast breaks it). No escapes: a boss at the tower keeps hitting every second until it or the tower dies. Kill = 1 boss core + chips. Cores pay for Bit Theory.
 - Bit Theory (research, "finding the deeper meaning in pixels"): one timed study at a time in real time (keeps running while closed), paid with cores + chips. Spray and Pray, Piercing bits, Critical bits, Blast tech, Bit depth (x1.2 damage per level, the long-term multiplier). Unlocks after the first boss. Researches have requirements (bosses beaten, best wave, other research levels): Critical and Piercing first, then Spray and Pray, Blast tech, Bit depth. Data in `BITS` in index.html. Game over has Restart, Foundry and Main menu.
 - The run keeps going when the tab is hidden (no auto-pause; missed time is simulated on return, up to 30 min, silently). Pausing is manual: Pause opens a panel with Resume and Stop run; Stop run asks for confirmation, then ends the run like a death (saved to History as "Stopped").
-- The cat (requested by my daughter): grey pixel cat drawn inside the game screen during runs, every 15-30s: peeks from the left/right edge (blinks twice) or walks along the bottom (sometimes sits). Hanging from the top was tried and removed (looked awkward). Tap = Meow + hearts (does not fire Blast). Purely decorative, never pauses. Sprites in `CAT_SPR`; she may draw her own in Piskel later.
+- The cat (requested by my daughter): grey pixel cat drawn inside the game screen during runs, every 15-30s: peeks from the left/right edge (blinks twice) or walks along the bottom (sometimes sits). Hanging from the top was tried and removed (looked awkward). Tap = Meow + hearts, 30% chance to heal 1 HP. Purely decorative, never pauses. Sprites in `CAT_SPR`; she may draw her own in Piskel later.
 - History: every finished run is saved (last 50: date, wave, killer, chips, duration, Blasts used, record) and shown from the home menu.
 
 ## Technical rules

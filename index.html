@@ -158,7 +158,7 @@ button b{display:block;font-weight:400}
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
-<p>Tap the screen, the BLAST button or Space to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
+<p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
 <p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast and stacking damage. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts.</p>
@@ -336,7 +336,7 @@ for(const k in UP){
 cv.addEventListener('pointerdown',e=>{if(S.over)return;
   const r=cv.getBoundingClientRect(),gx=(e.clientX-r.left)*W/r.width,gy=(e.clientY-r.top)*H/r.height,b=cat.box;
   if(b&&gx>=b.x-3&&gx<=b.x+b.w+3&&gy>=b.y-3&&gy<=b.y+b.h+3){catTap();return}
-  if(S.pause)setPause(false);else nova()});
+  if(S.pause)setPause(false)});  // Blast fires only from the BLAST button (or Space), not from tapping the screen
 
 // Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
 // a boss that reaches the tower stays and hits it every BOSS.hitEvery seconds until one of them is destroyed. hpK multiplies the wave's base enemy HP.
@@ -401,7 +401,7 @@ const TIPS={
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
   boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with a BLAST to break the shield for '+BOSS.shieldDown+'s.</span>'},
-  nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap BLAST (or anywhere on the screen) to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
+  nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap the BLAST button to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
 function showTip(id){
@@ -771,7 +771,7 @@ addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.rep
 addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
 // ---- The cat (requested by the developer's daughter). A grey pixel cat drawn inside the game screen:
 // every 15-30s it peeks in from the left/right edge (blinking), or walks along the bottom edge (sometimes sitting
-// down for a tail swish). Tap it for "Meow!" and hearts (a tap on the cat does not fire Blast).
+// down for a tail swish). Tap it for "Meow!" and hearts, with a 30% chance to heal 1 HP.
 // It runs in real time, never pauses the game and is purely decorative. Sprites: O outline, G grey, S stripe,
 // L light, E eye, K pupil, P pink.
 const CAT_PAL={O:'#4a4f55',G:'#9ea4aa',S:'#80868d',L:'#dfe2e5',E:'#7ee8a8',K:'#1b2033',P:'#ff9fb2'};
@@ -796,7 +796,9 @@ function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.dir=Math.random()<.
   if(kind==='peek'){cat.dur=4.2;cat.y=50+Math.random()*120}
   else {cat.dur=11;cat.sit=Math.random()<.6}}
 function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:15+Math.random()*15}
+const CAT_HEAL={chance:.3,hp:1};
 function catTap(){if(!cat.kind||cat.meow)return;cat.meow=1;sfx('meow');buzz(15);
+  if(!S.over&&S.hp<stat.max()&&Math.random()<CAT_HEAL.chance){S.hp=Math.min(stat.max(),S.hp+CAT_HEAL.hp);S.ft.push({t:'+'+CAT_HEAL.hp+' HP',life:1.2})}
   const b=cat.box||{x:CX,y:CY,w:0};for(let i=0;i<4;i++)cat.hearts.push({x:b.x+b.w/2+(i-1.5)*5,y:b.y,t:-i*.12});
   cat.t=Math.max(cat.t,cat.dur-1.2)}
 function catTick(dt){

@@ -14,7 +14,8 @@ ok(nb.disabled&&nb.textContent==='Blast '+fmtTime(NOVA.cd),'button shows countdo
 S.en=[];step(10);ui();ok(nb.textContent==='Blast '+fmtTime(NOVA.cd-10),'countdown after 10s: '+nb.textContent);
 S.nova=1;step(1.1);ui();ok(!nb.disabled&&nb.textContent==='BLAST','ready again after cooldown');
 S.pause=true;ok(!nova(),'nova blocked while paused');S.pause=false;
-click($('c'));ok(S.nova>NOVA.cd-1,'tapping canvas fires nova');
+S.nova=0;click($('c'));ok(S.nova===0,'tapping the play area does NOT fire Blast');
 S.nova=0;key(' ','Space');ok(S.nova>NOVA.cd-1,'Space fires nova');
-S.nova=0;ui();click(nb);ok(S.nova>NOVA.cd-1,'NOVA button fires nova');
+S.nova=0;ui();click(nb);ok(S.nova>NOVA.cd-1,'BLAST button fires Blast');
+S.pause=true;click($('c'));ok(!S.pause,'tapping the play area still resumes from pause');
 done();
