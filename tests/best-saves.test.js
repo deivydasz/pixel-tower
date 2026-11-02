@@ -1,11 +1,11 @@
 skipTips();play();
 const bw=()=>{ui();return $('bw').textContent},goh=()=>$('goh').textContent;
-ok(bw()==='Best -','fresh player: Best -');
+ok(bw()==='','HUD shows no best-wave number')
 S.wave=3;die();ok(M.best===3&&goh()==='Game over'&&!S.record,'first run sets best 3 without "New record"');
 const saved=JSON.parse(localStorage.getItem('pixelTowerMeta'));
 ok(saved.best===3&&saved.v===SAVE_V,'best saved with current save version');
-click($('gor'));S.wave=2;ok(bw()==='Best 3','below record: Best 3');
-S.wave=5;ok(bw()==='Best 5','passing record mid-run shows live');
+click($('gor'));S.wave=2;ok(bw()==='','below your best: nothing shown');
+S.wave=5;ok(bw()==='New best!','passing your best mid-run: New best!');
 die();ok(S.record&&goh()==='New record!'&&M.best===5,'beating record shows New record!');
 ok($('gop').textContent.startsWith('You beat your best of wave 3'),'message mentions old best');
 click($('gor'));S.wave=4;die();ok(!S.record&&goh()==='Game over'&&M.best===5,'worse run keeps best');

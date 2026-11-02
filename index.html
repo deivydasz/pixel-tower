@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB80lEQVR42u3csQ3CMBBA0exBkx2yE40XSZchGCGTpGEGClrqywLIkRwZjHnW7y3Zr7JOHi7jJL1tcASCQ3AIDsEhOASH4BAcgkNwSHAIDsEhOASH4BAcgkN/iiNSKs7hwgEHHHDAAYfgEByCQ3AIDsEhOFS32K6Z4IADDsEhOASH4IADDjjggAMOOOAwYNzAFWaX6XM44BAcgkNwCA444IADDjjggAMOOASH4BAcgkNwSHAIDsEhOATHUcvt/nPBAQcccMABBxxwwAEHHHDAAQcccMABBxxwfALH4/n6SnDAAQcccMABBxxwwAEHHHDAAQcccMABBxyt4zizLxxwwAEHHHDAAQcccMABBxxwwAEHHHDAAQcccMABBxxwwAEHHHDAAQcccMABBxxwwAEHHAaM4YADDjjggAMOOOCAAw444IADDjjggAMOOMqK7DqDwye1cMABBxxwwAEHHHDAAQcccMABBxxwwAFHz8/ngkNwCA7BITgEh+CQ4BAcgqOf1jkqBQcccMABBxxwCA7BITgEh+CAA45aOCKl4oCAAw444IADDjjggAMOOOCAAw444IADDjjgEBxwwAEHHHDAAQcccMABBxxwwAEHHHDAYcBY7QWH4BAcgkNwCA7BITgEh+AQHBIcgkNwCA7BITgEh+BQt+2A41nOJAZm5gAAAABJRU5ErkJggg==">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--mw:max(var(--w,360px),min(360px,calc(100vw - 40px)));--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;--gold:#7a5900;--violet:#5b3cc4;--dim:.6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--mw:var(--w,360px);--bg:#d5dbe6;--fg:#1b2033;--btn:#ffffff;--bd:#1b2033;--gold:#7a5900;--violet:#5b3cc4;--dim:.6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5;--gold:#ffd166;--violet:#c4a7ff;--dim:.45}}
 :root[data-theme="dark"]{--bg:#0d1019;--fg:#e8ecf5;--btn:#1b2033;--bd:#e8ecf5;--gold:#ffd166;--violet:#c4a7ff;--dim:.45}
 html{height:100%;margin:0}
@@ -17,10 +17,11 @@ body{min-height:100%;margin:0;box-sizing:border-box;padding:16px}
 body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #hud{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;width:var(--mw,360px)}
 #hud button{padding:4px 6px}
+#bw{color:var(--gold)}
 #hud{font-size:8px}
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
-canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:4px solid var(--bd)}
+canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px solid var(--bd)}
 #ups,#fyl{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:var(--mw,360px)}
 #ups{align-content:start}
 #upt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:var(--mw,360px);margin-bottom:-4px}
@@ -145,7 +146,7 @@ button b{display:block;font-weight:400}
 </style>
 </head>
 <body>
-<div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw">Best -</span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
+<div id="hud"><span class="hs"><span id="w">Wave 1</span><span id="px">0 px</span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
 <div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="upt"></div><div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p>
@@ -175,14 +176,20 @@ button b{display:block;font-weight:400}
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
-const W=180,H=240,CX=90,CY=120;
+// Game screen: always 180 game px wide; its height adapts to the phone (H_MIN..H_MAX) so it can fill the UI width.
+const W=180,CX=90,H_MIN=200,H_MAX=300;let H=240,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 cv.width=W;cv.height=H;
 function fit(){
   const hud=document.getElementById('hud'),ups=document.getElementById('ups'),tb=document.getElementById('upt'),reserve=(hud&&hud.offsetHeight||40)+(ups&&ups.offsetHeight||170)+(tb&&tb.offsetHeight||0)+76;
-  const raw=Math.min((innerWidth-48)/W,(innerHeight-reserve)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
-  cv.style.width=W*s+'px';cv.style.height=H*s+'px';
-  document.documentElement.style.setProperty('--w',W*s+'px');
+  // one width for the HUD, game screen, tabs and upgrades: as wide as the page allows, capped at 540px. The game screen
+  // always matches it (scaling by a non-whole factor if needed); its height in game px adapts to the space left.
+  const uiw=Math.max(W,Math.floor(Math.min(innerWidth-36,540)));
+  const h=Math.max(H_MIN,Math.min(H_MAX,Math.round(W*(innerHeight-reserve)/uiw/2)*2));
+  if(h!==H){const dy=h/2-CY;H=h;CY=h/2;cv.height=H;  // keep everything centred on the tower if the size changes mid-run
+    try{for(const a of [S.en,S.pr,S.pt])for(const o of a)o.y+=dy}catch(e){}}  // S doesn't exist yet on the first call
+  cv.style.width=uiw+'px';cv.style.height=Math.round(uiw*H/W)+'px';
+  document.documentElement.style.setProperty('--w',uiw+'px');
 }
 addEventListener('resize',fit);fit();
 
@@ -652,7 +659,8 @@ function ui(){
   setT($id('w'),'Wave '+Math.max(1,S.wave));
   setT($id('px'),big(S.px)+' px');
   setT($id('ch'),big(M.chips)+' chips');
-  const bw=Math.max(M.best,S.over?0:S.wave);setT($id('bw'),'Best '+(bw||'-'));
+  // no best-wave number during a run (it read like a second wave counter); just a gold "New best!" once you pass it
+  setT($id('bw'),inRun()&&M.best>0&&S.wave>M.best?'New best!':'');
   const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
   checkResearch();
   if($id('home').style.display==='flex'&&M.rq)hbtTile();
@@ -890,7 +898,7 @@ function catSpr(sp,x,y,flip){const w=sp[0].length;x=Math.round(x);y=Math.round(y
   return {x,y,w:w*CS,h:sp.length*CS}}
 function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.say='';cat.hold=0;cat.dir=Math.random()<.5?1:-1;
   const pick=a=>a[Math.floor(Math.random()*a.length)];cat.idle=Math.random()<.5?pick(CAT_IDLE[kind==='peek'?'peek':'sit']):'';
-  if(kind==='peek'){cat.dur=4.2;cat.y=50+Math.random()*120}
+  if(kind==='peek'){cat.dur=4.2;cat.y=40+Math.random()*(H-100)}
   else {cat.dur=11;cat.sit=Math.random()<.6}}
 function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:15+Math.random()*15}
 // Tap rewards: one roll, 10% big heal (+5 HP, gold), else 30% small heal (+1 HP), else nothing. Never overheals.
