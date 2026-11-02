@@ -9,6 +9,7 @@ S.px=12345;S.wave=99;M.chips=999;M.best=99;const b=pos();
 S.px=7;S.wave=3;M.chips=12;M.best=8;const c=pos();
 ok(a===b&&b===c,'HUD buttons and game stay put as numbers change ('+a+' / '+b+')');
 ok($('hud').scrollWidth<=$('hud').clientWidth+1,'HUD does not overflow at 280px');
+const r=e=>e.getBoundingClientRect();ok(r($('px')).top===r($('w')).top&&r($('px')).left<r($('w')).left&&Math.round(r($('px')).left)===Math.round(r($('ch')).left)&&r($('px')).top<r($('ch')).top,'HUD: pixels above chips on the left, wave top-right');
 ok(document.title==='Idle Pixel Tower','page title is Idle Pixel Tower');
 document.documentElement.style.removeProperty('--mw');fit();ui();
 const cw=Math.round($('c').getBoundingClientRect().width),uw=Math.round($('ups').getBoundingClientRect().width),tw=Math.round($('upt').getBoundingClientRect().width);
