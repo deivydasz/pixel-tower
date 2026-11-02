@@ -73,13 +73,13 @@ def record(ev, now=None):
 
 # ---------- dashboard ----------
 e = html.escape
-CSS = '''body{font:14px/1.45 ui-monospace,Menlo,monospace;background:#0d1019;color:#e8ecf5;margin:0;padding:16px;max-width:1100px}
+CSS = '''*{box-sizing:border-box}body{font:13px/1.45 ui-monospace,Menlo,monospace;background:#0d1019;color:#e8ecf5;margin:0;padding:12px;max-width:1100px}
 h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:24px 0 8px;color:#8fa3d6}a{color:#5ec8ff}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
-.tile{background:#1b2033;border:2px solid #3a4160;padding:8px}.tile b{display:block;font-size:20px}.tile small{opacity:.7}
-table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:4px 8px;border-bottom:1px solid #2a3150;text-align:left;white-space:nowrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.tile{background:#1b2033;border:2px solid #3a4160;padding:8px}.tile b{display:block;font-size:18px;white-space:nowrap}.tile small{opacity:.7}
+table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:4px 6px;border-bottom:1px solid #2a3150;text-align:left;white-space:nowrap}
 th{color:#8fa3d6;font-weight:normal}td.n,th.n{text-align:right}.wrap{overflow-x:auto}
-.bar{background:#5ec8ff;height:10px;display:inline-block;vertical-align:middle}.muted{opacity:.6}
+.bar{background:#5ec8ff;height:10px;display:block;min-width:1px}td.b{width:40%}.muted{opacity:.6}
 nav{margin:6px 0 4px}nav a{margin-right:12px}'''
 RES = [('crit', 'Critical bits'), ('pierce', 'Piercing bits'), ('spray', 'Spray and Pray'), ('nova', 'Blast tech'), ('depth', 'Bit depth'), ('speed', 'Overclock')]
 UPS = [('dmg', 'Damage'), ('hp', 'Tower HP'), ('rate', 'Fire rate'), ('range', 'Range'), ('armor', 'Dmg sponge'), ('magnet', 'Pixel magnet'), ('bank', 'Pixel bank')]
@@ -113,8 +113,8 @@ def bars(rows, label='', top=None):
         return '<p class="muted">No data yet.</p>'
     m = max(n for _, n in rows) or 1
     return ('<table>' + (('<tr><th>%s</th><th class="n">count</th><th></th></tr>' % e(label)) if label else '') +
-            ''.join('<tr><td>%s</td><td class="n">%d</td><td><span class="bar" style="width:%dpx"></span></td></tr>'
-                    % (e(str(k)), n, max(1, 200 * n // m)) for k, n in rows) + '</table>')
+            ''.join('<tr><td>%s</td><td class="n">%d</td><td class="b"><span class="bar" style="width:%d%%"></span></td></tr>'
+                    % (e(str(k)), n, 100 * n // m) for k, n in rows) + '</table>')
 
 
 def overview(env, now=None):
@@ -152,10 +152,10 @@ def overview(env, now=None):
     days = []
     for i in range(13, -1, -1):
         t0 = (int(now) // day - i) * day
-        ds = time.strftime('%a %d %b', time.gmtime(t0))
+        ds = time.strftime('%a %d', time.gmtime(t0))
         rs = [x for x in runs if t0 <= x[0] < t0 + day]
-        days.append((ds + ' · %d players' % len({x[1] for x in rs}), len(rs)))
-    out += '<h2>Runs per day (UTC, last 14 days)</h2>' + bars(days, 'day')
+        days.append((ds + ' · %dp' % len({x[1] for x in rs}), len(rs)))
+    out += '<h2>Runs per day (UTC, last 14 days)</h2>' + bars(days, 'day · players')
     # how far players get: best wave buckets
     buckets = [(1, 9), (10, 19), (20, 29), (30, 39), (40, 49), (50, 74), (75, 99), (100, 10 ** 6)]
     bests = [int(p['m'].get('best') or 0) for p in players.values()]
