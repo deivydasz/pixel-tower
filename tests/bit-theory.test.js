@@ -32,11 +32,19 @@ M.res.nova=4;ok(novaCd()===60,'Nova tech Lv4 = 60s cooldown');M.res.nova=0;M.res
 click($('btc'));play();S.en=[];S.left=99;S.sp=99;M.res.spray=2;M.res.pierce=1;M.res.crit=10;
 const a=enemy(30,0,0,99),b=enemy(40,0,0,99);S.cd=0;const rnd=Math.random;Math.random=()=>0;step(1/60);Math.random=rnd;
 ok(S.pr.length===3,'Spray and Pray Lv2 fires 3 bullets');
+const ang=p=>Math.atan2(p.vy,p.vx),aim=Math.atan2(a.y-CY,a.x-CX),angs=S.pr.map(ang).sort((x,y)=>x-y);
+ok(Math.abs(ang(S.pr[0])-aim)<1e-9,'first bullet flies straight at the target');
+ok(Math.abs(angs[1]-aim)<1e-9&&angs[0]<aim&&angs[2]>aim,'3 bullets: the middle one is on target, one each side');
 ok(S.pr.every(p=>p.crit),'a roll under the crit chance makes a crit bullet');
 ok(Math.abs(critChance()-.5)<1e-9,'Critical bits Lv10 = 50% chance');
 const dmg0=stat.dmg();step(.35);
 ok(a.hp<99&&b.hp<99,'piercing bullet hits two enemies in a line');
 ok(Math.abs((99-a.hp)%(dmg0*3))<1e-6,'crit bullets deal x3 damage');
+// 2 bullets: one on target, one beside it (never two straddling a small enemy)
+S.pr=[];M.res.spray=1;S.cd=0;step(1/60);const a2=S.pr.map(ang),aim2=Math.atan2(S.target.y-CY,S.target.x-CX);
+ok(S.pr.length===2&&a2.some(x=>Math.abs(x-aim2)<1e-9),'2 bullets: one is exactly on target');
+S.pr=[];M.res.spray=4;S.cd=0;step(1/60);const a5=S.pr.map(ang).sort((x,y)=>x-y),aim5=Math.atan2(S.target.y-CY,S.target.x-CX);
+ok(S.pr.length===5&&Math.abs(a5[2]-aim5)<1e-9,'5 bullets: the middle one is on target');
 M.res={spray:0,pierce:0,crit:0,nova:0,depth:0};
 // max level, saves, migration
 M.rq=null;M.res.spray=BITS.spray.max;M.res.pierce=2;M.bk=5;M.cores=99;M.chips=1e6;showHome();click($('hbt'));

@@ -525,7 +525,8 @@ function update(dt){
   if(target&&S.cd<=0){
     const d=Math.hypot(target.x-CX,target.y-CY);
     const a0=Math.atan2(target.y-CY,target.x-CX),n=1+M.res.spray;
-    for(let i=0;i<n;i++){const a=a0+(i-(n-1)/2)*.14;
+    // Spray and Pray: bullet 0 always flies straight at the target; extras fan out alternately right, left, wider right...
+    for(let i=0;i<n;i++){const k=i===0?0:Math.ceil(i/2)*(i%2?1:-1),a=a0+k*.14;
       S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:M.res.pierce,hits:[],crit:Math.random()<critChance()})}
     S.cd=1/stat.rate();sfx('shot');
   }
