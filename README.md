@@ -9,13 +9,13 @@ One tower stands in the middle of the screen and enemies come from every side, w
 - Your tower aims and shoots by itself at the nearest enemy in range.
 - Destroyed enemies burst into **pixels** that fly to the tower. Spend pixels on upgrades during the run.
 - Clearing a wave gives bonus pixels and **pixel chips**. Chips stay between runs and buy permanent boosts in the **Foundry**.
-- When enemies close in, fire a **Blast**. It hits everything on screen but takes 2 minutes to recharge.
+- When enemies close in, fire a **Blast**. It hits everything on screen and knocks every enemy inside your range back out to its edge (more Range = bigger push), but takes 2 minutes to recharge.
 - The run ends when the tower's HP reaches zero, or when you stop it yourself.
 
 ### Controls
 | Action | Touch / mouse | Keyboard |
 |---|---|---|
-| Fire Blast | Tap the play area or the BLAST button | Space |
+| Fire Blast | Tap the BLAST button | Space |
 | Pause | Pause button | P or Esc |
 | Resume | Resume, or tap the play area | P or Esc |
 | Stop the run | Pause, then Stop run, then confirm | |
@@ -80,7 +80,7 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 - **Best wave** is shown in the HUD and on the menu. Beating it shows "New record!".
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
-- A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it.
+- A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it: sometimes (30%) it heals your tower by 1 HP.
 - New players get a few one-time tips: the basics, buying an upgrade, using Blast and the Foundry.
 
 Progress is saved in your browser (`localStorage`, key `pixelTowerMeta`). It is separate for each address, so the live site and the preview have their own saves. Clearing site data resets it.
