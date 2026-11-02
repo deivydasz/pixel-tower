@@ -377,9 +377,10 @@ function kill(e){
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
   }
 }
-// Nova (shown to players as "Blast"): shockwave from the tower across the whole screen. Damages every enemy and pushes them back, then recharges.
+// Nova (shown to players as "Blast"): shockwave from the tower across the whole screen. Damages every enemy and knocks those inside the tower's range back out to its edge, then recharges.
 // Balance: with a 2 minute cooldown, simulated first runs reach a median wave ~6 with or without Nova (used ~once a run); flat damage keeps it an emergency tool.
-const NOVA={cd:120,r:160,push:10,fx:.5,dmg:4,dmgK:0};
+// push: enemies inside the tower's range are knocked back out to its edge over `kb` seconds (bosses only BOSS.push of the way).
+const NOVA={cd:120,r:160,fx:.5,dmg:4,dmgK:0,kb:.25};
 const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
 function nova(){
   if(S.over||S.pause||S.nova>0)return false;
@@ -389,7 +390,7 @@ function nova(){
     if(d>NOVA.r)continue;
     e.hp-=novaDmg();e.hit=.12;
     if(e.hp<=0){e.dead=true;kill(e)}
-    else{const k=e.boss?BOSS.push:1;e.x+=dx/d*NOVA.push*k;e.y+=dy/d*NOVA.push*k;if(e.boss&&e.t.shield)e.shd=BOSS.shieldDown}
+    else{const out=Math.max(0,stat.range()-d)*(e.boss?BOSS.push:1);if(out>0)e.kb={x:dx/d*out,y:dy/d*out,t:NOVA.kb};if(e.boss&&e.t.shield)e.shd=BOSS.shieldDown}
   }
   S.en=S.en.filter(e=>!e.dead);
   return true;
@@ -453,7 +454,8 @@ function update(dt){
   for(const e of S.en.slice()){
     const dx=CX-e.x,dy=CY-e.y,d=Math.hypot(dx,dy),stop=e.boss?e.t.s/2+7:0;
     // bosses stop at the tower and keep hitting until they or the tower are destroyed (no escapes)
-    if(d>stop){const m=Math.min(d-stop,e.t.sp*dt);e.x+=dx/d*m;e.y+=dy/d*m}
+    if(e.kb){const f=Math.min(1,dt/e.kb.t);e.x+=e.kb.x*f;e.y+=e.kb.y*f;e.kb.x*=1-f;e.kb.y*=1-f;e.kb.t-=dt;if(e.kb.t<=0)e.kb=null}  // Blast knock-back slide
+    else if(d>stop){const m=Math.min(d-stop,e.t.sp*dt);e.x+=dx/d*m;e.y+=dy/d*m}
     e.hit=Math.max(0,e.hit-dt);
     if(e.boss){e.shd=Math.max(0,e.shd-dt);if(e.t.spawn&&(e.st-=dt)<=0){e.st=e.t.spawn;const r=TYPES[1];S.en.push({x:e.x,y:e.y,t:r,hp:ehp(r),hit:0})}
       if(d<=stop+.5){if(!e.at){e.at=1;e.atk=0;S.bonus=2;S.bt1='BOSS ATTACKS!';S.bt='Destroy it before it destroys you';sfx('boss')}

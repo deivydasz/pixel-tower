@@ -8,9 +8,9 @@ step(.1);let b=S.en.find(e=>e.boss);
 ok(b&&b.t.n==='Brute'&&b.hp===bossHp(b.t,20)&&b.max===b.hp,'Brute spawns first with HP '+(b&&b.hp));
 ok(S.tip==='boss'&&S.pause,'first boss shows boss tip');click($('tipok'));
 ui();ok(shown($('bb'))&&$('bbt').textContent.startsWith('BRUTE')&&$('stage').classList.contains('bossup'),'boss HP bar shown, legend moved down');
-// Nova on a boss: small push
-S.nova=0;const d0=Math.hypot(b.x-CX,b.y-CY);nova();const d1=Math.hypot(b.x-CX,b.y-CY);
-ok(Math.abs(d1-d0-NOVA.push*BOSS.push)<.01,'Nova pushes bosses less');
+// Blast on a boss inside range: pushed only part of the way to the edge
+S.nova=0;b.x=CX+20;b.y=CY;const sp0=b.t;b.t={...b.t,sp:0};nova();step(NOVA.kb+.05);const d1=Math.hypot(b.x-CX,b.y-CY);b.t=sp0;
+ok(Math.abs(d1-(20+(stat.range()-20)*BOSS.push))<.5,'Blast pushes bosses only '+BOSS.push*100+'% of the way to the range edge');
 // kill it
 const c0=M.chips,k0=M.cores;b.hp=1;b.x=CX+20;b.y=CY;S.pr=[{x:CX+20,y:CY,vx:0,vy:0,life:1}];step(.02);
 ok(!S.en.includes(b)&&M.cores===k0+1&&M.bk===1&&M.chips===c0+bossChips(20)&&S.bosses===1,'killing the boss gives a core and '+bossChips(20)+' chips');

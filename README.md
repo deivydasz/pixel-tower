@@ -9,7 +9,7 @@ One tower stands in the middle of the screen and enemies come from every side, w
 - Your tower aims and shoots by itself at the nearest enemy in range.
 - Destroyed enemies burst into **pixels** that fly to the tower. Spend pixels on upgrades during the run.
 - Clearing a wave gives bonus pixels and **pixel chips**. Chips stay between runs and buy permanent boosts in the **Foundry**.
-- When enemies close in, fire a **Blast**. It hits everything on screen but takes 2 minutes to recharge.
+- When enemies close in, fire a **Blast**. It hits everything on screen and knocks every enemy inside your range back out to its edge (more Range = bigger push), but takes 2 minutes to recharge.
 - The run ends when the tower's HP reaches zero, or when you stop it yourself.
 
 ### Controls
