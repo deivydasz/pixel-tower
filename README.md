@@ -22,6 +22,8 @@ One tower stands in the middle of the screen and enemies come from every side, w
 | Sound on/off (everything) | Sound button | |
 | Music on/off | Music button on the home menu or in the pause panel | |
 
+When your Range grows past the screen, the battlefield zooms out so you always see your whole range.
+
 The game keeps running when you switch tabs or apps. When you come back, the missed time (up to 30 minutes) is played out instantly and silently.
 
 ## Enemies
@@ -62,6 +64,8 @@ Each research level costs boss cores and chips and takes **real time**: about 10
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 
 ## Upgrades
+During a run the upgrades sit in three tabs: **Power** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet, Pixel bank). A dot on a tab means something there is affordable.
+
 You start with Damage and Tower HP. The others unlock when you first reach their wave, straight away even mid-run, and stay unlocked in runs and in the Foundry.
 
 | Upgrade | Unlocks at | In run (pixels) | Foundry (chips, permanent) |
@@ -72,13 +76,18 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 | Range | wave 8 | +8 range | +4 range |
 | Dmg sponge | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
 | Pixel magnet | wave 16 | +15% pixels per kill | +10% pixels per kill |
+| Pixel bank | wave 20 | each cleared wave pays 3% interest on unspent pixels (max +25 per level) | 1.5% (max +12 per level) |
+| Heavy rounds | wave 30 **in this run** | each hit knocks a Tank back 0.6px | (run only) |
+| Crit power | wave 35 **in this run**, needs Critical bits | crit damage x3 → +0.5 per level | (run only) |
+
+Heavy rounds and Crit power are late-run upgrades: every run starts without them, even if you reached those waves before.
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
 After a run, the game over screen suggests two Foundry upgrades: the cheapest one, and the one that best counters what killed you.
 
 ## Progression
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
-- **Best wave** is shown in the HUD and on the menu. Beating it shows "New record!".
+- **Best wave** is shown on the menu, the game over screen and in History. During a run the HUD shows a gold "New best!" once you pass it; beating it shows "New record!" at game over.
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
 - A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it and it answers (Meow!, Purrr, Mrrp?...). Sometimes it heals your tower: 10% chance of +5 HP, otherwise 30% chance of +1 HP. Now and then it yawns or chirps by itself.

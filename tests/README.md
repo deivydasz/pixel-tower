@@ -42,8 +42,12 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 - `nova.test.js`: Nova damage, push, whole-screen range, cooldown, inputs
 - `bit-theory.test.js`: research unlock, cost, one-at-a-time timers, completion while away, spray/pierce/crit/Nova/depth effects, saves
 - `bosses.test.js`: boss schedule and rotation, rewards, escapes, Warden shield, Queen spawns, boss bar, saves
+- `bank.test.js`: Pixel bank interest at wave clear, cap, label, Foundry version, unlock
 - `best-saves.test.js`: best wave record, loading v0/v1 saves
 - `teststart.test.js`: preview-only ?wave= / ?px= shortcut is ignored on the live site
+- `late-upgrades.test.js`: run-only Heavy rounds (wave 30) and Crit power (wave 35, needs Critical bits)
+- `zoom.test.js`: zoom out to keep the range ring on screen, smooth, minimum, off-screen spawns, cat unscaled
+- `tabs.test.js`: Attack/Survival/Economy tabs, fixed grid height, affordable dots
 - `upgrades.test.js`: six upgrades, wave unlocks (mid-run and Foundry), Pixel magnet drops, suggestions
 - `tips.test.js`: first-play tips, pausing, shown once
 - `balance.sim.js`: bot runs to compare wave reached (results vary about ±2 waves between runs)
