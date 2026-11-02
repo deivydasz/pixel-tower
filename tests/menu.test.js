@@ -10,10 +10,10 @@ ok($('hookt').textContent==='Next: bosses appear at wave '+W0+' (best '+M.best+'
 ok($('hfyn').textContent==='Upgrade ready!','Foundry flags an affordable upgrade');
 M.best=W0+2;showHome();
 ok(!lk()[0].querySelector('svg')&&lk()[0].textContent==='Bosses0 beaten0 cores'&&lk()[0].classList.contains('tr')&&lk()[1].querySelector('svg'),'wave 20 turns the first slot into the boss tracker, others stay locked');
-ok($('hookt').textContent.startsWith('Next unlock: '+LOCKED[1].n+'. Reach wave '+W1),'hook moves to next unlock');
-M.best=LOCKED[2].w;showHome();
+ok($('hookt').textContent.startsWith('Next unlock: '+LOCKED[1].n+'. Clear wave '+W1),'hook moves to next unlock');
+M.best=LOCKED[2].w;M.cert=50;showHome();
 M.bk=3;M.cores=1;showHome();ok(lk()[0].textContent==='Bosses3 beaten1 core','tracker counts bosses and cores (singular core)');
-ok(lk().every(b=>!b.querySelector('svg'))&&$('hookt').textContent.startsWith('All modes unlocked')&&!shown($('hookb').parentNode),'all unlocked: no locks, no bar');
+ok(lk().every(b=>!b.querySelector('svg'))&&$('hsk')&&!$('hsk').disabled&&$('hookt').textContent.startsWith('All modes unlocked')&&!shown($('hookb').parentNode),'all unlocked: no locks, no bar');
 // best updates after a run and the menu reflects it
 M.best=W0-1;skipTips();play();S.wave=W0;die();click($('gom'));
 ok(lk()[0].classList.contains('tr'),'reaching wave 20 in a run unlocks the boss tracker');

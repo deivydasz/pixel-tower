@@ -98,7 +98,8 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 - **So close:** game over points out the nearest goal: a few waves short of your best, a certificate within 5 waves, or a Foundry upgrade you are just a few chips short of.
 - **Best wave** is shown on the menu, the game over screen and in History. During a run the HUD shows a gold "New best!" once you pass it; beating it shows "New record!" at game over.
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
-- **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
+- **Skins:** the certificates for waves 30, 50 and 70 each unlock a set of skins (Bug Hunt, Neon, Crystal) for the enemies, the tower and the background. Every skin you own gives a bonus, whichever look you wear: enemy skins +5/10/15% pixels per kill, tower skins +3/6/9% damage, background skins +5/10/15% pixels and chips per wave clear. Skinned towers grow as you buy upgrades during a run. Pick the look on the Skins screen from the menu.
+- **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Skins open with the wave 30 certificate. Daily run is coming, at best wave 50. The next-unlock card on the menu tracks your progress.
 - A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it and it answers (Meow!, Purrr, Mrrp?...). Sometimes it heals your tower: 10% chance of +5 HP, otherwise 30% chance of +1 HP. Now and then it yawns or chirps by itself.
 - New players get a few one-time tips: the basics, buying an upgrade, using Blast and the Foundry.
 
