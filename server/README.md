@@ -4,7 +4,7 @@
 Python 3.7+ standard library only, SQLite database, about 15 MB of RAM.
 
 - The game (`track()` in index.html) sends `open` (page load), `run` (run ended), `research` (study started) and `foundry` (upgrade bought) events to `POST /api/e`, with a random anonymous player ID. No names, IPs or devices are stored.
-- Dashboard: https://idlepixeltower.duckdns.org/stats (basic auth). Player pages at `/stats/p/<id>`. `?env=preview` shows preview-site data.
+- Dashboard: https://idlepixeltower.duckdns.org/stats (basic auth). Player pages at `/stats/p/<id>`. Only the live site sends events; preview runs are never counted.
 - Database: `/var/lib/pixel-tower-stats/stats.db`. Back it up with `cp`, read it with `sqlite3`.
 - After a deploy changes `stats.py`, the process notices within ~20 s, exits, and systemd starts the new code. nginx snippets need `nginx -t && systemctl reload nginx` after they change.
 
