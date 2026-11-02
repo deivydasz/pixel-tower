@@ -299,9 +299,9 @@ if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
 if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 // Anonymous gameplay stats for the dashboard (server/stats.py): only the random `uid`, no names, IPs or devices.
-// Sent to /api/e with sendBeacon (works while the page closes); live and preview only, never from local files.
+// Sent to /api/e with sendBeacon (works while the page closes); only from the live site, never from preview or local files.
 // trackLog keeps the last events for tests.
-const TRACK_ENV=/^preview\./.test(location.hostname)?'preview':location.protocol==='https:'?'live':'';
+const TRACK_ENV=location.hostname==='idlepixeltower.duckdns.org'&&location.protocol==='https:'?'live':'';
 const trackLog=[];
 const trackSnap=()=>({best:M.best,bk:M.bk,cores:M.cores,chips:M.chips,res:Object.assign({},M.res),lv:Object.assign({},M.lv),runs:M.hist.length});
 function track(type,data){

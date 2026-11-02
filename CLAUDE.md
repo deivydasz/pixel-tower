@@ -30,7 +30,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 
 ## Technical rules
 - Keep it a single `index.html` unless I explicitly ask to split it up. Exception (approved 2026-11-02): `server/` holds the stats backend (`stats.py`, Python stdlib + SQLite on the Droplet, nginx snippets, systemd unit; setup in `server/README.md`).
-- Stats: the game sends anonymous events with `track(type,data)` (`open`, `run`, `research`, `foundry`) using the save's random `uid`; no names or IPs. Live and preview only. The dashboard is at /stats behind nginx basic auth. No in-game privacy note (my choice). New events need a type in `TYPES` in stats.py and a line on the dashboard.
+- Stats: the game sends anonymous events with `track(type,data)` (`open`, `run`, `research`, `foundry`) using the save's random `uid`; no names or IPs. Live site only (preview runs never count; the server rejects anything else). The dashboard is at /stats behind nginx basic auth. No in-game privacy note (my choice). New events need a type in `TYPES` in stats.py and a line on the dashboard.
 - Pixel look: low-res internal canvas scaled up, `image-rendering: pixelated`.
 - Must work on desktop and phones: touch-friendly buttons, no horizontal scroll, page padding, safe-area insets.
 - Support light and dark mode for page chrome.

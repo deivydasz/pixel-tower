@@ -2,7 +2,7 @@
 """Idle Pixel Tower stats: a tiny event collector and dashboard. Python 3.7+, standard library only.
 
   POST /api/e        one game event (JSON: id, env, type, data), sent by the game with sendBeacon
-  GET  /stats        dashboard (nginx puts basic auth in front of it)
+  GET  /stats        dashboard (nginx puts basic auth in front of it). Live site only: preview runs are never counted.
   GET  /stats/p/ID   one player's runs and purchases
 
 Players are anonymous: a random 16-hex ID made by the game. No IPs, names or devices are stored.
@@ -18,7 +18,7 @@ from urllib.parse import urlparse, parse_qs
 DB = os.environ.get('STATS_DB', '/var/lib/pixel-tower-stats/stats.db')
 PORT = int(os.environ.get('STATS_PORT', '8787'))
 TYPES = ('open', 'run', 'research', 'foundry')
-ENVS = ('live', 'preview')
+ENVS = ('live',)
 MAX_BODY = 8192
 RATE = 240  # events per player ID per hour (a run ends every few minutes; this only stops floods)
 
@@ -100,11 +100,10 @@ def dur(s):
 
 
 def page(title, body, env):
-    other = 'preview' if env == 'live' else 'live'
     return ('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>%s</title><style>%s</style></head><body><h1>%s</h1><nav><a href="/stats?env=%s">Overview</a>'
-            '<span class="muted">%s data</span> · <a href="/stats?env=%s">show %s</a></nav>%s</body></html>'
-            % (e(title), CSS, e(title), env, env, other, other, body))
+            '<title>%s</title><style>%s</style></head><body><h1>%s</h1><nav><a href="/stats">Overview</a>'
+            '<span class="muted">live site only</span></nav>%s</body></html>'
+            % (e(title), CSS, e(title), body))
 
 
 def bars(rows, label='', top=None):
@@ -189,9 +188,9 @@ def overview(env, now=None):
     out += ('<h2>Players (latest 300)</h2><div class="wrap"><table><tr><th>player</th><th>last seen</th><th>first seen</th>'
             '<th class="n">best</th><th class="n">runs</th><th class="n">visits</th><th class="n">play time</th><th class="n">bosses</th>'
             '<th>research</th></tr>' + ''.join(
-                '<tr><td><a href="/stats/p/%s?env=%s">%s</a></td><td>%s</td><td>%s</td><td class="n">%d</td><td class="n">%d</td><td class="n">%d</td>'
+                '<tr><td><a href="/stats/p/%s">%s</a></td><td>%s</td><td>%s</td><td class="n">%d</td><td class="n">%d</td><td class="n">%d</td>'
                 '<td class="n">%s</td><td class="n">%d</td><td>%s</td></tr>' % (
-                    p['pid'], env, p['pid'][:6], ago(p['last'], now), ago(p['first'], now), int(p['m'].get('best') or 0), p['runs'],
+                    p['pid'], p['pid'][:6], ago(p['last'], now), ago(p['first'], now), int(p['m'].get('best') or 0), p['runs'],
                     p['opens'], dur(p['time']), int(p['m'].get('bk') or 0),
                     e(' '.join('%s%d' % (k, int((p['m'].get('res') or {}).get(k) or 0)) for k, _ in RES if int((p['m'].get('res') or {}).get(k) or 0))) or '-')
                 for p in rows) + '</table></div>')
