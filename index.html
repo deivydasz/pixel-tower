@@ -95,7 +95,7 @@ button.bought{animation:bought .35s steps(3)}
 @media (prefers-reduced-motion:reduce){button.bought{animation:none}}
 button:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
 button b{display:block;font-weight:400}
-#ups button:last-child:nth-child(odd){grid-column:1/-1}
+
 #ups button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lw{display:flex;align-items:center;gap:5px}
 .lkup svg{flex:none;width:9px;height:10px}
@@ -194,6 +194,7 @@ const UP={
   range:{n:'Range',base:12,w:8,cat:'atk'},
   armor:{n:'Dmg sponge',base:25,w:12,cat:'def'},
   magnet:{n:'Pixel magnet',base:30,w:16,cat:'eco'},
+  bank:{n:'Pixel bank',base:40,w:20,cat:'eco'},
   // run-only upgrades: appear only after reaching wave `w` in the current run (never early, even if reached before); not in the Foundry
   heavy:{n:'Heavy rounds',base:60,w:30,run:1,cat:'def'},
   critx:{n:'Crit power',base:80,w:35,run:1,cat:'atk',needs:()=>M.res.crit>0,needTxt:'Needs crits'}
@@ -218,7 +219,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -233,10 +234,14 @@ const stat={
   armor:()=>.5*S.lv.armor+.25*M.lv.armor,
   // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
   magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*(M.lv.magnet||0),
+  // Pixel bank: interest on unspent pixels at each wave clear (rate), capped per wave (cap)
+  bank:()=>BANK.run*(S.lv.bank||0)+BANK.meta*(M.lv.bank||0),
+  bankCap:()=>BANK.capRun*(S.lv.bank||0)+BANK.capMeta*(M.lv.bank||0),
   critx:()=>3+.5*(S.lv.critx||0),      // Crit power: crit damage multiplier
   heavy:()=>.6*(S.lv.heavy||0)         // Heavy rounds: px a Tank is knocked back per hit
 };
 const MAGNET={run:.15,meta:.1};
+const BANK={run:.03,meta:.015,capRun:25,capMeta:12};
 const critChance=()=>.05*M.res.crit;
 const novaCd=()=>Math.max(60,NOVA.cd-15*M.res.nova);
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
@@ -259,13 +264,13 @@ const clock={now:()=>Date.now()};
 // v3 adds `hist`: the last HIST_MAX runs, newest first: {t:time ms, w:wave, k:killer, c:chips earned, d:seconds, n:novas used, r:1 if new record}.
 // v4 adds `cores` (boss cores, spent on research later) and `bk` (bosses beaten); history entries gain `b` (bosses beaten that run).
 // v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
-// v6 adds `music` (background music on/off, default on).
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<7){...}.
-const SAVE_V=6,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null,music:true};
+// v6 adds `music` (background music on/off, default on). v7 adds the `bank` (Pixel bank) upgrade level.
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<8){...}.
+const SAVE_V=7,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null,music:true};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
@@ -379,11 +384,11 @@ const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   leg.appendChild(d);return d;
 });
 // Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
-const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px',heavy:'+0.6 push',critx:'+0.5x crit'};
+const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px',bank:'+3% bank',heavy:'+0.6 push',critx:'+0.5x crit'};
 function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList.add('bought')}
 // stat value per upgrade, and how it is labelled on the in-run buttons
-const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet(),heavy:()=>stat.heavy(),critx:()=>stat.critx()};
-const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%',heavy:v=>fmt(v)+'px',critx:v=>'x'+fmt(v)};  // the button title names the stat
+const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet(),bank:()=>stat.bank(),heavy:()=>stat.heavy(),critx:()=>stat.critx()};
+const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%',bank:v=>fmt(100*v)+'%',heavy:v=>fmt(v)+'px',critx:v=>'x'+fmt(v)};  // the button title names the stat
 // In-run upgrades are grouped into tabs so the grid stays two rows tall; a dot marks a tab with something affordable.
 const UPTABS=[['atk','Power'],['def','Survival'],['eco','Economy']],tabBtns={};let upTab='atk';
 const upt=document.getElementById('upt');
@@ -521,7 +526,8 @@ function update(dt){
     S.sp-=dt;
     if(S.sp<=0){spawn();S.left--;S.sp=Math.max(.25,1.1-S.wave*.05)}
   }else if(!S.en.length){
-    if(S.wave>0&&!S.paid){S.paid=true;const p=5+S.wave*2,c=1+Math.floor(S.wave/5);S.px+=p;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px +'+c+' chips';save()}
+    if(S.wave>0&&!S.paid){S.paid=true;const p=5+S.wave*2,c=1+Math.floor(S.wave/5);const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
+    S.px+=p+it;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px +'+c+' chips';save()}
     S.gap-=dt;
     if(S.gap<=0){startWave();S.gap=1.5}
   }
@@ -681,8 +687,8 @@ function ui(){
 }
 const fy=document.getElementById('fy'),fyl=document.getElementById('fyl'),fyh=document.getElementById('fyh'),fyb={};
 // Stat every run starts with at Foundry level `lv` (before in-run upgrades; damage includes Bit depth).
-const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv,magnet:100*MAGNET.meta*lv})[k];
-const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
+const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,range:50+4*lv,hp:20+5*lv,armor:.25*lv,magnet:100*MAGNET.meta*lv,bank:100*BANK.meta*lv})[k];
+const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%',bank:'%'};
 const fmtU=(k,v)=>(k==='magnet'?'+':'')+fmt(v)+UNIT[k];
 const nowNext=k=>fmtU(k,baseStat(k,M.lv[k]))+' > '+fmtU(k,baseStat(k,M.lv[k]+1));  // e.g. "2.5 > 3", "2.4/s > 2.6/s"
 for(const k of META_UPS){

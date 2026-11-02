@@ -64,7 +64,7 @@ Each research level costs boss cores and chips and takes **real time**: about 10
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 
 ## Upgrades
-During a run the upgrades sit in three tabs: **Power** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet). A dot on a tab means something there is affordable.
+During a run the upgrades sit in three tabs: **Power** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet, Pixel bank). A dot on a tab means something there is affordable.
 
 You start with Damage and Tower HP. The others unlock when you first reach their wave, straight away even mid-run, and stay unlocked in runs and in the Foundry.
 
@@ -76,6 +76,7 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 | Range | wave 8 | +8 range | +4 range |
 | Dmg sponge | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
 | Pixel magnet | wave 16 | +15% pixels per kill | +10% pixels per kill |
+| Pixel bank | wave 20 | each cleared wave pays 3% interest on unspent pixels (max +25 per level) | 1.5% (max +12 per level) |
 | Heavy rounds | wave 30 **in this run** | each hit knocks a Tank back 0.6px | (run only) |
 | Crit power | wave 35 **in this run**, needs Critical bits | crit damage x3 → +0.5 per level | (run only) |
 
