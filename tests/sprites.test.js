@@ -6,7 +6,7 @@ ESK.forEach((sk,si)=>{for(const t of [...TYPES,...BOSSES]){const fr=sk.spr[t.n],
   ok(fr.every(f=>f.every(r=>r.length===f[0].length)),nm+' rows are even');
   ok(t.s<=fr[0][0].length&&fr[0][0].length<=t.s+4,nm+' sprite stays close to its hitbox size');
   ok(['','h','x'].every(st=>sprCanvas(t,1,st,si).width===fr[0][0].length),nm+' renders all colour states')}});
-M.cert=70;M.skin={e:1,t:1,b:1};
+M.cert=70;M.claim=70;M.skin={e:1,t:1,b:1};
 S.en.push({x:CX+20,y:CY,t:TYPES[2],hp:5,max:5,hit:0});S.en.push({x:CX-20,y:CY,t:BOSSES[2],hp:5,max:5,hit:0,boss:1,shd:0});
 for(const i of [0,1,2,3]){M.skin={e:i,t:i,b:i};S.zoom=1;draw();S.zoom=.5;draw();S.zoom=1}M.skin={e:1,t:1,b:1};
 ok(window.__err.length===0,'drawing every skin at zoom 1 and 0.5 throws nothing');

@@ -76,6 +76,7 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hm #hbt svg{display:block;margin:0 auto 2px}
 #hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
+#hm #hcen.rdy{color:var(--gold);opacity:1}
 #hm #hfyn.rdy{color:var(--gold);opacity:1}
 #hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
 #hm .lk:disabled{opacity:var(--dim,.45)}
@@ -110,6 +111,12 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #cel div{border:2px solid var(--bd);padding:8px 6px;font-size:8px;line-height:1.6;text-align:center;opacity:.5}
 #cel div.on{opacity:1;border-color:#ffd166;color:var(--gold)}
 #cel div.nx{opacity:1;border-style:dashed}
+#cel div.cl{opacity:1;border-color:#5ec8ff}
+#cel div.go{cursor:pointer;background:rgba(94,200,255,.15);animation:cpulse 1.2s ease-in-out infinite}
+@keyframes cpulse{50%{background:rgba(94,200,255,.3)}}
+@media (prefers-reduced-motion:reduce){#cel div.go{animation:none}}
+#cem{color:var(--gold);min-height:0}
+#cem:empty{display:none}
 #cel small{display:block;font-size:7px;color:var(--fg,inherit);opacity:.8}
 #howc,#fyc,#hic,#cec{min-width:140px;min-height:44px;text-align:center}
 #fyl,#hm,#gm,#fy p,#go p,#home p,#how p{width:min(360px,92vw)}
@@ -204,7 +211,7 @@ button b{display:block;font-weight:400}
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
-<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate and a one-time chip reward. Boss waves count once the boss is beaten.</p><div id="cel"></div><button id="cec">Back</button></div>
+<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here. Boss waves count once the boss is beaten.</p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
@@ -316,14 +323,16 @@ const clock={now:()=>Date.now()};
 // their best wave already passed, without the chip reward.
 // v11 adds `seen` (ms timestamp the game was last open, for idle income) and `stash` (idle starting pixels for the next run).
 // v12 adds `skin` {e,t,b}: the worn skin per slot (index into SKINS, 0 = Classic); owned skins come from `cert`.
+// v13 adds `claim`: the highest certificate whose reward was collected (certificates are earned in a run, collected on the menu).
 // When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<12){...}.
 const newUid=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('')};
-const SAVE_V=12,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0,skin:{e:0,t:0,b:0}};
+const SAVE_V=13,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0,skin:{e:0,t:0,b:0},claim:0};
 function loadMeta(m){
   if(!m||!m.lv)return;
   M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),seen:+m.seen>0?+m.seen:Date.now(),stash:Math.max(0,m.stash|0),skin:{e:(m.skin&&m.skin.e)|0,t:(m.skin&&m.skin.t)|0,b:(m.skin&&m.skin.b)|0},cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
+  M.claim=(m.v|0)>=13?Math.min(M.cert,Math.floor((m.claim|0)/10)*10):M.cert;  // older saves were paid when earned
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
@@ -503,6 +512,9 @@ const bossTry=b=>{const share=Math.max(0,Math.min(1,1-b.hp/b.max));return {share
 // what a whole run to that wave earns, so it feels big but doesn't skip progress). Completing a boss wave means beating the boss.
 const CERT_NAMES=['Pixel Apprentice','Bit Cadet','Byte Guard','Sprite Sentinel','Raster Knight','Vector Captain','Palette Master','Shader Sage','Render Lord','Pixel Legend'];
 const certName=w=>CERT_NAMES[w/10-1]||'Wave '+w+' Master';
+// Collect the lowest earned, uncollected certificate: its chips, and its skin set if it has one. Returns the wave or 0.
+const certReady=()=>M.cert>M.claim;
+function claimCert(){if(!certReady())return 0;const w=M.claim+10;M.claim=w;M.chips+=certChips(w);save();return w}
 const certChips=w=>Math.round(w*(1+w/20)/2);
 // Idle income (unlocks after the first boss): while the game is closed (or hidden outside a run) the tower keeps
 // earning. A full IDLE.hours away pays one run's worth of chips to your best wave, plus starting pixels for the next
@@ -626,7 +638,7 @@ function update(dt){
   }else if(!S.en.length){
     if(S.wave>0&&!S.paid){S.paid=true;const sb=1+skinBonus('b'),cr=(1+Math.floor(S.wave/5))*sb+(S.cf||0),p=Math.round((5+S.wave*2)*sb),c=Math.floor(cr+1e-9);S.cf=cr-c;const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
     S.px+=p+it;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px +'+c+' chips';
-    if(S.wave%10===0&&S.wave>M.cert){const cc=certChips(S.wave);M.cert=S.wave;M.chips+=cc;S.earn+=cc;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1=SKINS.some(x=>x.w===S.wave)?'CERTIFICATE + SKINS':'CERTIFICATE';S.bt=certName(S.wave)+' +'+cc+' chips'}
+    if(S.wave%10===0&&S.wave>M.cert){M.cert=S.wave;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1='CERTIFICATE: '+certName(S.wave);S.bt='Collect it on the menu'}
     save()}
     S.gap-=dt;
     if(S.gap<=0){startWave();S.gap=1.5}
@@ -697,7 +709,7 @@ function update(dt){
 // whatever look is worn. The worn look is picked per slot on the Skins screen and saved as `skin` {e,t,b}.
 const SKINS=[{n:'Classic',w:0},{n:'Bug Hunt',w:30,e:.05,t:.03,b:.05},{n:'Neon',w:50,e:.10,t:.06,b:.10},{n:'Crystal',w:70,e:.15,t:.09,b:.15}];
 const SKIN_SLOTS=[['e','Enemies','pixels per kill'],['t','Tower','damage'],['b','Background','wave clear pixels and chips']];
-const skinOwned=i=>i===0||M.cert>=SKINS[i].w;
+const skinOwned=i=>i===0||M.claim>=SKINS[i].w;
 const skinBonus=k=>SKINS.reduce((s,x,i)=>s+(i&&skinOwned(i)?x[k]:0),0);
 const sk=k=>{const i=M.skin&&M.skin[k]|0;return i>0&&i<SKINS.length&&skinOwned(i)?i:0};
 // Enemy sprites: two frames each, drawn a little larger than the hitbox (t.s). Letters: c body, d darker, l lighter,
@@ -972,13 +984,15 @@ let fyFrom='go';
 // Upcoming modes shown locked on the home menu. Reaching the wave unlocks them (they say "Soon" until built).
 // Thresholds are deliberately far (new players reach ~wave 8; Foundry lv3 in everything ~wave 29) because the modes aren't built yet.
 const LOCKED=[{n:'Bosses',w:BOSS.first,boss:1},{n:'Skins',w:30,cert:1},{n:'Daily run',w:50}];
-// Skins open with the wave 30 certificate (clearing wave 30), the others when the best wave reaches w
-const lockOpen=m=>m.cert?M.cert>=m.w:M.best>=m.w;
+// Skins open when the wave 30 certificate is collected, the others when the best wave reaches w
+const lockOpen=m=>m.cert?M.claim>=m.w:M.best>=m.w;
 const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h1v2h1v5H0V3h1V1h1zM2 1v2h3V1z" fill-rule="evenodd"/></svg>';
 // Next-unlock goal card (home menu and game over): text plus progress bar toward the next locked mode.
 function goalUI(tid,bid){
   const next=LOCKED.find(m=>!lockOpen(m)),hb=document.getElementById(bid);
-  document.getElementById(tid).textContent=next?(next.boss?'Next: bosses appear at wave ':next.cert?'Next unlock: '+next.n+'. Clear wave ':'Next unlock: '+next.n+'. Reach wave ')+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
+  const goalTxt=m=>m.cert&&M.cert>=m.w?'Next unlock: '+m.n+'. Collect your '+certName(m.w)+' certificate.':
+    (m.boss?'Next: bosses appear at wave ':m.cert?'Next unlock: '+m.n+'. Clear wave ':'Next unlock: '+m.n+'. Reach wave ')+m.w+(M.best?' (best '+M.best+')':'')+'.';
+  document.getElementById(tid).textContent=next?goalTxt(next):'All modes unlocked! They are on the way.';
   hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
 }
 function homeUI(){
@@ -986,10 +1000,10 @@ function homeUI(){
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
     if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
-    return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
+    return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
   if(idleMsg)document.getElementById('idlt').textContent='Your tower kept defending for '+fmtDur(Math.min(idleMsg.away/1000,IDLE.hours*3600))+(idleMsg.away>IDLE.hours*3600000?' (max '+IDLE.hours+'h)':'')+': '+[idleMsg.chips?'+'+big(idleMsg.chips)+' chips':'',idleMsg.px||M.stash?big(M.stash)+' px head start for your next run':''].filter(Boolean).join(' and ')+'.';
-  setT(document.getElementById('hcen'),M.cert?(M.cert/10)+' earned':'Wave 10');
+  const cn=document.getElementById('hcen');setT(cn,certReady()?'Reward ready!':M.cert?(M.cert/10)+' earned':'Wave 10');cn.className=certReady()?'rdy':'';
   goalUI('hookt','hookb');
   const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':big(M.chips)+' chips';fn.className=rdy?'rdy':'';
 }
@@ -1019,13 +1033,20 @@ function showHistory(){
 }
 document.getElementById('hhi').onclick=showHistory;
 function showCerts(){
-  const top=Math.max(100,M.cert+20),rows=[];
-  for(let w=10;w<=top;w+=10){const on=w<=M.cert,nx=w===M.cert+10;
-    rows.push('<div class="'+(on?'on':nx?'nx':'')+'">'+(on?'':LOCK_SVG+' ')+esc(certName(w))+'<small>Wave '+w+' · '+(on?'earned':'+'+certChips(w)+' chips')+(SKINS.some(x=>x.w===w)?' + '+SKINS.find(x=>x.w===w).n+' skins':'')+'</small></div>')}
+  const top=Math.max(100,M.cert+20),rows=[],skinOf=w=>SKINS.find(x=>x.w===w);
+  for(let w=10;w<=top;w+=10){const got=w<=M.claim,rdy=w<=M.cert&&!got,first=rdy&&w===M.claim+10,nx=w===M.cert+10,sk=skinOf(w);
+    const reward='+'+certChips(w)+' chips'+(sk?' + '+sk.n+' skins':'');
+    rows.push('<div class="'+(got?'on':rdy?'cl'+(first?' go':''):nx?'nx':'')+'"'+(first?' role="button" tabindex="0" data-w="'+w+'"':'')+'>'+(got||rdy?'':LOCK_SVG+' ')+esc(certName(w))+
+      '<small>Wave '+w+' · '+(got?'collected':first?'Tap to collect '+reward:rdy?reward+' (collect the one before)':reward)+'</small></div>')}
   document.getElementById('cel').innerHTML=rows.join('');
   show('home',0);show('ce',1);
 }
-document.getElementById('hce').onclick=showCerts;
+document.getElementById('hce').onclick=()=>{document.getElementById('cem').textContent='';showCerts()};
+// tap the next earned certificate to collect it
+function collectCert(){const w=claimCert();if(!w)return;sfx('wave');buzz(30);const sk=SKINS.find(x=>x.w===w);
+  document.getElementById('cem').textContent=certName(w)+': +'+certChips(w)+' chips collected!'+(sk?' '+sk.n+' skins unlocked, wear them from Skins on the menu.':'');showCerts()}
+document.getElementById('cel').addEventListener('click',e=>{if(e.target.closest('.go'))collectCert()});
+document.getElementById('cel').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.go')){e.preventDefault();collectCert()}});
 // Skins screen: per slot, every set with a small preview; owned ones can be worn, locked ones show their certificate.
 const pct=v=>'+'+Math.round(v*100)+'%';
 function skinPreview(k,i){const c=document.createElement('canvas'),x=c.getContext('2d');c.width=40;c.height=24;x.imageSmoothingEnabled=false;
@@ -1104,7 +1125,7 @@ function runNews(){
   const items=[],w=S.wave;
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
   for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
-  for(const w of S.certs||[]){items.push('Certificate: '+certName(w)+' (+'+certChips(w)+' chips)');const si=SKINS.findIndex(x=>x.w===w);if(si>0)items.push('New skins: '+SKINS[si].n+' set for enemies, tower and background (bonuses count right away)')}
+  for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect +'+certChips(w)+' chips'+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
   if(!a.bk&&M.bk>0)items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
   const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');

@@ -6,7 +6,8 @@ S.wave=50;ok(Math.abs(edmg(TYPES[0])-2)<1e-9,'Grunt hits 2 at wave 50');S.lv.arm
 ui();ok($('leg').textContent.includes('Dmg 2'),'legend shows the grown damage');
 // certificate on completing wave 10
 const c0=M.chips;S.wave=9;S.en=[];S.left=0;S.paid=true;S.gap=0;step(.05);ok(S.wave===10,'wave 10 started');
-S.left=0;S.en=[];step(.05);ok(M.cert===10&&M.chips===c0+3+certChips(10)&&S.bt1==='CERTIFICATE'&&S.bt.startsWith('Pixel Apprentice'),'completing wave 10 gives the Pixel Apprentice certificate +'+certChips(10)+' chips');
+S.left=0;S.en=[];step(.05);ok(M.cert===10&&M.claim===0&&M.chips===c0+3&&S.bt1==='CERTIFICATE: Pixel Apprentice'&&S.bt==='Collect it on the menu','completing wave 10 earns Pixel Apprentice, reward not paid yet');
+ok(claimCert()===10&&M.chips===c0+3+certChips(10)&&M.claim===10&&claimCert()===0,'collecting pays +'+certChips(10)+' chips once');
 const c1=M.chips;M.cert=10;S.wave=9;S.paid=true;S.gap=0;S.left=0;S.en=[];step(.05);S.left=0;S.en=[];step(.05);ok(M.cert===10&&M.chips===c1+3,'only once');
 ok([10,20,30,50,100].map(certChips).join()==='8,20,38,88,300','certificate rewards grow with the wave');
 // boss attempt reward
@@ -21,11 +22,19 @@ reset();S.menu=false;M.best=30;M.cert=20;S.wave=12;M.chips=mcost('dmg')-2;for(co
 reset();S.menu=false;M.chips=0;for(const k of META_UPS)M.lv[k]=9;S.wave=12;M.best=50;M.cert=40;endRun(false);ok(!shown($('gnm'))||$('gnm').textContent==='','nothing close: no line');
 // unlocked card and certificates screen
 reset();S.menu=false;S.certs=[10];S.start={best:99,cores:0,res:Object.assign({},M.res),open:[],bt:true};S.wave=11;endRun(false);ok($('gnl').textContent.includes('Certificate: Pixel Apprentice'),'game over lists the certificate');
-M.cert=20;showHome();ok($('hcen').textContent==='2 earned','home shows 2 certificates earned');
+M.cert=20;M.claim=20;showHome();ok($('hcen').textContent==='2 earned','home shows 2 certificates earned');
 click($('hce'));ok(shown($('ce'))&&$('cel').querySelectorAll('.on').length===2&&$('cel').querySelector('.nx').textContent.includes('Byte Guard'),'certificates screen: 2 earned, Byte Guard next');
 click($('cec'));ok(shown($('home')),'Back to home');
 // saves
 loadMeta({v:9,chips:1,lv:{},best:47,hist:[]});ok(M.cert===40&&M.chips===1,'v9 save with best 47 gets certificates up to 40, no chips');
 loadMeta({v:9,chips:1,lv:{},best:10,hist:[]});ok(M.cert===0,'best 10 = wave 10 not completed, no certificate');
 loadMeta({v:10,chips:1,lv:{},best:47,cert:33,hist:[]});ok(M.cert===30,'odd cert value rounded down');
+// collecting on the certificates screen
+skipTips();M.cert=30;M.claim=10;M.chips=0;showHome();ok($('hcen').textContent==='Reward ready!'&&$('hcen').classList.contains('rdy'),'menu flags an uncollected certificate');
+click($('hce'));const go=()=>$('cel').querySelector('.go');ok(go()&&go().textContent.includes('Bit Cadet')&&$('cel').querySelectorAll('.cl').length===2,'Bit Cadet is next to collect, 2 waiting');
+click(go());ok(M.claim===20&&M.chips===certChips(20)&&$('cem').textContent.startsWith('Bit Cadet: +20 chips collected'),'tap collects Bit Cadet');
+click(go());ok(M.claim===30&&$('cem').textContent.includes('Bug Hunt skins unlocked')&&!go(),'then Byte Guard with the Bug Hunt skins, nothing left');
+ok(JSON.parse(localStorage.getItem('pixelTowerMeta')).claim===30,'collected certificates are saved');
+click($('cec'));ok($('hcen').textContent==='3 earned','menu back to the earned count');
+loadMeta({v:12,chips:1,lv:{},best:47,cert:40,hist:[]});ok(M.claim===40,'v12 save: certificates already paid count as collected');
 done();
