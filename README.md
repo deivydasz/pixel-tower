@@ -81,7 +81,7 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 - **Best wave** is shown in the HUD and on the menu. Beating it shows "New record!".
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Daily run and Tower skins are coming, at best wave 50 and 75. The next-unlock card on the menu tracks your progress.
-- A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it: sometimes (30%) it heals your tower by 1 HP.
+- A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it and it answers (Meow!, Purrr, Mrrp?...). Sometimes it heals your tower: 10% chance of +5 HP, otherwise 30% chance of +1 HP. Now and then it yawns or chirps by itself.
 - New players get a few one-time tips: the basics, buying an upgrade, using Blast and the Foundry.
 
 Progress is saved in your browser (`localStorage`, key `pixelTowerMeta`). It is separate for each address, so the live site and the preview have their own saves. Clearing site data resets it.

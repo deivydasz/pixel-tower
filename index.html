@@ -295,7 +295,8 @@ const SFX={
   wave:()=>[523,659,784].forEach((f,i)=>tone(f,.12,'triangle',.4,0,i*.09)),
   nova:()=>tone(620,.35,'triangle',.5,70),
   boss:()=>[110,98,82].forEach((f,i)=>tone(f,.3,'square',.25,0,i*.22)),
-  meow:()=>{tone(720,.16,'triangle',.35,520);tone(540,.28,'triangle',.35,860,.15)},
+  meow:(p=1)=>{tone(720*p,.16,'triangle',.35,520*p);tone(540*p,.28,'triangle',.35,860*p,.15)},
+  purr:()=>{for(let i=0;i<6;i++)tone(70+i%2*8,.09,'sawtooth',.12,60,i*.08)},
   over:()=>[392,311,233].forEach((f,i)=>tone(f,.25,'triangle',.5,0,i*.18))
 };
 const GAP={shot:.05,pick:.06,kill:.03},lastSfx={};
@@ -337,11 +338,11 @@ function musicTick(){
   const now=AC.currentTime;if(music.next<now+.05)music.next=now+.1;
   while(music.next<now+1.2){musicBar(music.next);music.bar++;music.next+=BAR}
 }
-function sfx(k){
+function sfx(k,a){
   if(quiet||M.mute||!AC||AC.state!=='running')return;
   const now=AC.currentTime;
   if(GAP[k]&&now-(lastSfx[k]||0)<GAP[k])return;
-  lastSfx[k]=now;SFX[k]();
+  lastSfx[k]=now;SFX[k](a);
 }
 const RM=matchMedia('(prefers-reduced-motion: reduce)');
 function buzz(ms){const ua=navigator.userActivation;if(!quiet&&!M.mute&&navigator.vibrate&&(!ua||ua.hasBeenActive))navigator.vibrate(ms)}
@@ -574,7 +575,7 @@ function draw(){
   // floating purchase labels, in the free space below the tower
   if(S.ft.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';
     // labels with their own spot (e.g. the cat's +1 HP) rise from there; purchase labels stack under the tower
-    let n=0;S.ft.forEach(f=>{g.fillStyle='rgba(110,231,160,'+Math.min(1,f.life*2)+')';
+    let n=0;S.ft.forEach(f=>{g.fillStyle=(f.big?'rgba(255,209,102,':'rgba(110,231,160,')+Math.min(1,f.life*2)+')';
       if(f.x!=null)g.fillText(f.t,Math.round(f.x),Math.round(f.y-(1.4-f.life)*10));else g.fillText(f.t,CX,Math.round(CY+24+(n++)*9-(1-f.life)*8))})}
   // projectiles
   for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
@@ -825,7 +826,8 @@ addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.rep
 addEventListener('keyup',e=>{if(e.code==='Space')e.preventDefault()});
 // ---- The cat (requested by the developer's daughter). A grey pixel cat drawn inside the game screen:
 // every 15-30s it peeks in from the left/right edge (blinking), or walks along the bottom edge (sometimes sitting
-// down for a tail swish). Tap it for "Meow!" and hearts, with a 30% chance to heal 1 HP.
+// down for a tail swish), and sometimes says something by itself. Tap it: it answers (Meow!, Purrr, Mrrp?...) with
+// hearts, and may heal the tower: 10% +5 HP, else 30% +1 HP.
 // It runs in real time, never pauses the game and is purely decorative. Sprites: O outline, G grey, S stripe,
 // L light, E eye, K pupil, P pink.
 const CAT_PAL={O:'#4a4f55',G:'#9ea4aa',S:'#80868d',L:'#dfe2e5',E:'#7ee8a8',K:'#1b2033',P:'#ff9fb2'};
@@ -846,19 +848,30 @@ const catW=sp=>sp[0].length*CS,catH=sp=>sp.length*CS;
 function catSpr(sp,x,y,flip){const w=sp[0].length;x=Math.round(x);y=Math.round(y);
   sp.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[flip?w-1-i:i];if(CAT_PAL[ch]){g.fillStyle=CAT_PAL[ch];g.fillRect(x+i*CS,y+j*CS,CS,CS)}}});
   return {x,y,w:w*CS,h:sp.length*CS}}
-function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.dir=Math.random()<.5?1:-1;
+function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.say='';cat.hold=0;cat.dir=Math.random()<.5?1:-1;
+  const pick=a=>a[Math.floor(Math.random()*a.length)];cat.idle=Math.random()<.5?pick(CAT_IDLE[kind==='peek'?'peek':'sit']):'';
   if(kind==='peek'){cat.dur=4.2;cat.y=50+Math.random()*120}
   else {cat.dur=11;cat.sit=Math.random()<.6}}
 function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:15+Math.random()*15}
-const CAT_HEAL={chance:.3,hp:1};
-function catTap(){if(!cat.kind||cat.meow)return;cat.meow=1;sfx('meow');buzz(15);
-  if(!S.over&&S.hp<stat.max()&&Math.random()<CAT_HEAL.chance){S.hp=Math.min(stat.max(),S.hp+CAT_HEAL.hp);
-    const b=cat.box;S.ft.push({t:'+'+CAT_HEAL.hp+' HP',life:1.4,x:b?Math.min(W-22,Math.max(22,b.x+b.w/2)):CX,y:b?Math.max(18,b.y-14):CY})}
-  const b=cat.box||{x:CX,y:CY,w:0};for(let i=0;i<4;i++)cat.hearts.push({x:b.x+b.w/2+(i-1.5)*5,y:b.y,t:-i*.12});
-  cat.t=Math.max(cat.t,cat.dur-1.2)}
+// Tap rewards: one roll, 10% big heal (+5 HP, gold), else 30% small heal (+1 HP), else nothing. Never overheals.
+const CAT_HEAL=[{chance:.1,hp:5,big:1},{chance:.3,hp:1}];
+// What the cat says when tapped (weights) and the pitch of its meow; sounds it makes on its own.
+const CAT_WORDS=[['Meow!',30,1],['Mrrr',20,.8],['Purrr',20,0],['Mrrp?',15,1.2],['Prrrt!',10,1.1],['Mew!',5,1.5]];
+const CAT_IDLE={sit:['*yawn*','Purrr','Mrrr','Prrrt!'],peek:['Mrrp?','Mew!']};
+function catWord(){let r=Math.random()*CAT_WORDS.reduce((a,w)=>a+w[1],0);for(const w of CAT_WORDS)if((r-=w[1])<0)return w;return CAT_WORDS[0]}
+function catTap(){if(!cat.kind||cat.meow)return;cat.meow=1;buzz(15);
+  const w=catWord();cat.say=w[0];if(w[2])sfx('meow',w[2]);else sfx('purr');
+  const b=cat.box||{x:CX,y:CY,w:0},roll=Math.random();let acc=0,heal=null;
+  for(const h of CAT_HEAL){acc+=h.chance;if(roll<acc){heal=h;break}}
+  if(heal&&!S.over&&S.hp<stat.max()){S.hp=Math.min(stat.max(),S.hp+heal.hp);
+    S.ft.push({t:'+'+heal.hp+' HP',life:heal.big?1.8:1.4,big:heal.big,x:Math.min(W-22,Math.max(22,b.x+b.w/2)),y:Math.max(18,b.y-14)})}
+  for(let i=0,n=heal&&heal.big?8:4;i<n;i++)cat.hearts.push({x:b.x+b.w/2+(i-(n-1)/2)*5,y:b.y,t:-i*.1});
+  // a peeking cat slides away soon after; a walking cat sits for a moment (time held, so it doesn't jump) then walks on
+  if(cat.kind==='peek')cat.t=Math.max(cat.t,cat.dur-1.2);else cat.hold=1.6}
 function catTick(dt){
   for(const h of cat.hearts){h.t+=dt;h.y-=dt*14}cat.hearts=cat.hearts.filter(h=>h.t<1.2);
   if(!cat.kind){if(!S.menu&&!S.over&&!document.hidden&&(cat.next-=dt)<=0)catStart(Math.random()<.5?'peek':'walk');return}
+  if(cat.hold>0){cat.hold-=dt;return}
   if((cat.t+=dt)>=cat.dur)catEnd();
 }
 // the peeking cat blinks twice while fully in view
@@ -871,13 +884,15 @@ function catDraw(){
     cat.box=cat.dir>0?catSpr(sp,-w+io*show,cat.y,false):catSpr(sp,W-io*show,cat.y,true)}
   else if(cat.kind==='walk'){
     // walk to ~45%, maybe sit for 2.5s, then walk on; tail swish and leg frames from time
-    const sitFrom=4.2,sitFor=cat.sit?2.5:0,moving=t<sitFrom||t>sitFrom+sitFor,mt=t<sitFrom?t:Math.max(sitFrom,t-sitFor),sp=CAT_SPR.walk[0],w=catW(sp),h=catH(sp);
+    const sitFrom=4.2,sitFor=cat.sit?2.5:0,moving=!(cat.hold>0)&&(t<sitFrom||t>sitFrom+sitFor),mt=t<sitFrom?t:Math.max(sitFrom,t-sitFor),sp=CAT_SPR.walk[0],w=catW(sp),h=catH(sp);
     const speed=(W+w)/(d-sitFor),x=cat.dir>0?-w+mt*speed:W-mt*speed;
     if(moving){const f=CAT_SPR.walk[Math.floor(t*5)%2];cat.box=catSpr(f,x,H-h-1,cat.dir<0)}
     else {const f=CAT_SPR.sit[Math.floor(t*2.5)%2],fh=catH(f),fw=catW(f),head=blink?CAT_BLINK:CAT_HEAD;
       cat.box=catSpr(head.concat(f.slice(8)),x+(w-fw)/2,H-fh-1,cat.dir<0)}}
-  if(cat.meow&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';
-    const tx=Math.min(W-22,Math.max(22,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(tx-21,ty-8,42,10);g.fillStyle='#1b2033';g.fillText('Meow!',tx,ty)}
+  const idleOn=cat.idle&&!cat.meow&&(cat.kind==='peek'?t>1.1&&t<3:cat.sit&&t>4.6&&t<6.4);
+  const word=cat.meow?cat.say:idleOn?cat.idle:'';
+  if(word&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';const bw=g.measureText(word).width+8;
+    const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
 reset();showHome();
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
