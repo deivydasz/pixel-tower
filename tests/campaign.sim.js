@@ -80,6 +80,7 @@ if(C.mode==='compare'){
     const r=playRun(C.bot);runs.push(r);
     if(r.w>best){best=r.w;news++;dry=0}else{dry++;maxDry=Math.max(maxDry,dry)}
     if(!firstBoss&&M.bk>0)firstBoss=i+1;
+    while(claimCert());  // collect certificates between runs
     foundry();research(r.min*60+600);foundry();
   }
   const ws=runs.map(r=>r.w),mins=runs.map(r=>r.min);
