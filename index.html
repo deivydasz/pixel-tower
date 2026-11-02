@@ -28,10 +28,21 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #upt button{text-align:center;min-height:30px;padding:4px 2px;font-size:8px;position:relative}
 #upt button.on{background:#5ec8ff;color:#0d1019;border-color:#0d1019}
 #upt button.has::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;background:#ffd166;border:1px solid #0d1019}
-#fy,#go,#home,#how,#hi,#bt,#ce{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#fy,#go,#home,#how,#hi,#bt,#ce,#sk{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#howh,#hih{font-size:11px}
 #bth{font-size:16px;color:var(--violet);text-shadow:3px 3px 0 var(--bd)}
+#skh{font-size:16px;color:var(--gold);text-shadow:3px 3px 0 var(--bd)}
+#sk>p{margin:0;font-size:8px;line-height:1.7;text-align:center;width:min(360px,92vw)}
+#sk>p b{color:var(--gold)}
+#skl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:min(360px,92vw)}
+#skl .hg{grid-column:1/-1;font-size:8px;margin-top:6px}
+#skl button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;font-size:7px;line-height:1.5}
+#skl button canvas{width:100%;max-width:80px;aspect-ratio:40/24;outline:0}
+#skl button.on{border-color:#ffd166}
+#skl button small{display:block;opacity:.8}
+#skl button svg{vertical-align:-3px;margin-right:2px}
+#hm .lk.sk{opacity:1;border-color:#ffd166}
 #ceh{font-size:16px;color:var(--gold);text-shadow:3px 3px 0 var(--bd)}
 #bt p{margin:0;font-size:8px;line-height:1.8;text-align:center;width:min(360px,92vw)}
 #btw{color:var(--gold)}
@@ -130,7 +141,9 @@ button b{display:block;font-weight:400}
 #leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
 #leg.fade{opacity:.2}
 #leg div{display:flex;flex-direction:column}
-#leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
+#leg span:first-child{display:flex;align-items:center}
+#leg i{display:inline-flex;align-items:center;justify-content:center;width:18px;height:16px;margin-right:4px}
+#leg i canvas{image-rendering:pixelated;display:block;outline:0;border:0;box-shadow:none;background:none;margin:0;max-width:none}
 #leg .off{opacity:.4}
 #nova{position:absolute;right:6px;bottom:6px;min-width:76px;min-height:38px;padding:4px 8px;font-size:8px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
 #tip{position:absolute;left:10px;right:10px;display:none;flex-direction:column;gap:8px;padding:10px;background:#0d1019;color:#e8ecf5;border:2px solid #ffd166;font-size:8px;line-height:1.8}
@@ -190,6 +203,7 @@ button b{display:block;font-weight:400}
 <button id="howc">Back</button></div>
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
+<div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
 <div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate and a one-time chip reward. Boss waves count once the boss is beaten.</p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
@@ -252,7 +266,7 @@ function reset(){
   S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
 }
 const stat={
-  dmg:()=>(1+S.lv.dmg+.5*M.lv.dmg)*Math.pow(1.2,M.res.depth),
+  dmg:()=>(1+S.lv.dmg+.5*M.lv.dmg)*Math.pow(1.2,M.res.depth)*(1+skinBonus('t')),
   rate:()=>1+.4*S.lv.rate+.2*M.lv.rate,
   range:()=>50+8*S.lv.range+4*M.lv.range,
   max:()=>20+10*S.lv.hp+5*M.lv.hp,
@@ -301,13 +315,14 @@ const clock={now:()=>Date.now()};
 // v10 adds `cert`: the highest certificate earned (a wave, multiple of 10; 0 = none). Older saves get the ones
 // their best wave already passed, without the chip reward.
 // v11 adds `seen` (ms timestamp the game was last open, for idle income) and `stash` (idle starting pixels for the next run).
+// v12 adds `skin` {e,t,b}: the worn skin per slot (index into SKINS, 0 = Classic); owned skins come from `cert`.
 // When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<12){...}.
 const newUid=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('')};
-const SAVE_V=11,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0};
+const SAVE_V=12,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0,skin:{e:0,t:0,b:0}};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),seen:+m.seen>0?+m.seen:Date.now(),stash:Math.max(0,m.stash|0),cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),seen:+m.seen>0?+m.seen:Date.now(),stash:Math.max(0,m.stash|0),skin:{e:(m.skin&&m.skin.e)|0,t:(m.skin&&m.skin.t)|0,b:(m.skin&&m.skin.b)|0},cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
@@ -436,7 +451,7 @@ const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFi
 const legBox={n:0,x0:0,x1:0,y0:0,y1:0};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   const d=document.createElement('div');
-  d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
+  d.innerHTML='<span><i></i>'+t.n+'</span><span></span>';
   leg.appendChild(d);return d;
 });
 // Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
@@ -524,7 +539,7 @@ function spawn(){
 function kill(e){
   sfx('kill');
   if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
-  const np=e.t.px*(1+stat.magnet()),n=Math.floor(np)+(Math.random()<np%1?1:0);
+  const np=e.t.px*(1+stat.magnet())*(1+skinBonus('e')),n=Math.floor(np)+(Math.random()<np%1?1:0);
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,v=20+Math.random()*30;
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
@@ -609,9 +624,9 @@ function update(dt){
     S.sp-=dt;
     if(S.sp<=0){spawn();S.left--;S.sp=Math.max(.25,1.1-S.wave*.05)}
   }else if(!S.en.length){
-    if(S.wave>0&&!S.paid){S.paid=true;const p=5+S.wave*2,c=1+Math.floor(S.wave/5);const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
+    if(S.wave>0&&!S.paid){S.paid=true;const sb=1+skinBonus('b'),cr=(1+Math.floor(S.wave/5))*sb+(S.cf||0),p=Math.round((5+S.wave*2)*sb),c=Math.floor(cr+1e-9);S.cf=cr-c;const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
     S.px+=p+it;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px +'+c+' chips';
-    if(S.wave%10===0&&S.wave>M.cert){const cc=certChips(S.wave);M.cert=S.wave;M.chips+=cc;S.earn+=cc;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1='CERTIFICATE';S.bt=certName(S.wave)+' +'+cc+' chips'}
+    if(S.wave%10===0&&S.wave>M.cert){const cc=certChips(S.wave);M.cert=S.wave;M.chips+=cc;S.earn+=cc;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1=SKINS.some(x=>x.w===S.wave)?'CERTIFICATE + SKINS':'CERTIFICATE';S.bt=certName(S.wave)+' +'+cc+' chips'}
     save()}
     S.gap-=dt;
     if(S.gap<=0){startWave();S.gap=1.5}
@@ -630,7 +645,7 @@ function update(dt){
   }
   S.en=S.en.filter(e=>!e.dead);
   if(S.hp<=0){S.hp=0;endRun(false);return}
-  S.flash=Math.max(0,S.flash-dt);
+  S.flash=Math.max(0,S.flash-dt);if(S.mf)S.mf=Math.max(0,S.mf-dt);
   // tower fire
   S.cd-=dt;
   let target=null,best=1e9;
@@ -645,7 +660,7 @@ function update(dt){
     // Spray and Pray: bullet 0 always flies straight at the target; extras fan out alternately right, left, wider right...
     for(let i=0;i<n;i++){const k=i===0?0:Math.ceil(i/2)*(i%2?1:-1),a=a0+k*.14;
       S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:M.res.pierce,hits:[],crit:Math.random()<critChance()})}
-    S.cd=1/stat.rate();sfx('shot');
+    S.cd=1/stat.rate();S.aim=a0;S.mf=MUZZLE;sfx('shot');
   }
   // projectiles
   for(const p of S.pr){
@@ -677,10 +692,133 @@ function update(dt){
 }
 // World zoom: when Range grows past the screen, the battlefield zooms out around the tower so the range ring
 // always fits (down to ZOOM_MIN). R() draws world pixels through it; HUD overlays, banners, labels and the cat don't.
+// Skins: Classic plus one set per certificate at wave 30, 50 and 70 (SKINS). Each set has enemies, a tower and a
+// background; every OWNED skin's bonus counts (e: pixels per kill, t: damage, b: pixels and chips per wave clear),
+// whatever look is worn. The worn look is picked per slot on the Skins screen and saved as `skin` {e,t,b}.
+const SKINS=[{n:'Classic',w:0},{n:'Bug Hunt',w:30,e:.05,t:.03,b:.05},{n:'Neon',w:50,e:.10,t:.06,b:.10},{n:'Crystal',w:70,e:.15,t:.09,b:.15}];
+const SKIN_SLOTS=[['e','Enemies','pixels per kill'],['t','Tower','damage'],['b','Background','wave clear pixels and chips']];
+const skinOwned=i=>i===0||M.cert>=SKINS[i].w;
+const skinBonus=k=>SKINS.reduce((s,x,i)=>s+(i&&skinOwned(i)?x[k]:0),0);
+const sk=k=>{const i=M.skin&&M.skin[k]|0;return i>0&&i<SKINS.length&&skinOwned(i)?i:0};
+// Enemy sprites: two frames each, drawn a little larger than the hitbox (t.s). Letters: c body, d darker, l lighter,
+// e eye, p dark; each skin maps them to colours from the type colour. Rendered once per skin and colour state.
+const ESPR={  // Bug Hunt (also the boss shapes of the other sets)
+  Grunt:[[".d...d.","..ccc..",".cecec.","dcccccd",".ddddd.","d.d.d.d"],
+         [".d...d.","..ccc..",".cecec.","dcccccd",".ddddd.",".d.d.d."]],
+  Runner:[["..l..",".ccc.","lcecl",".ccc.","d...d"],["..l..",".ccc.","lcecl",".ccc.",".d.d."]],
+  Tank:[["..ddddd..",".dllllld.","dlcccccld","dcecccecd","dcccccccd","ddcdcdcdd",".ddddddd.","d.d...d.d"],
+        ["..ddddd..",".dllllld.","dlcccccld","dcecccecd","dcccccccd","ddcdcdcdd",".ddddddd.",".d.d.d.d."]],
+  Brute:[["l.............l","ld...........dl",".ddddddddddddd.","dllllllllllllld","dcpcccccccccpcd","dcepcccccccpecd","dcccccccccccccd","dccpppppppppccd","dccpepepepepccd","dcccccccccccccd","ddddddddddddddd","dd.dd.....dd.dd"],
+         ["l.............l","ld...........dl",".ddddddddddddd.","dllllllllllllld","dcpcccccccccpcd","dcepcccccccpecd","dcccccccccccccd","dccpppppppppccd","dccpepepepepccd","dcccccccccccccd","ddddddddddddddd",".dd.dd...dd.dd."]],
+  'Swarm Queen':[["...l...l...l...","...lllllllll...","....ddddddd....","...dcccccccd...","..dcecccccecd..","d.dcccccccccd.d",".ddcclllllccdd.","d.dclllllllcd.d",".ddcclllllccdd.","d.dcccccccccd.d","...dcccccccd...","....ddddddd...."],
+                 ["...l...l...l...","...lllllllll...","....ddddddd....","...dcccccccd...","..dcecccccecd..",".ddcccccccccdd.","d.dcclllllccd.d",".ddclllllllcdd.","d.dcclllllccd.d",".ddcccccccccdd.","...dcccccccd...","....ddddddd...."]],
+  Warden:[["...ddddddddd...","..dllllllllld..",".dlcccccccccld.","dlcccccccccccld","dcccdddddddcccd","dccdppepppddccd","dcccdddddddcccd","dcccccccccccccd","dclcclccclcclcd","dcccccccccccccd",".ddddddddddddd.","..l.l.l.l.l.l.."],
+          ["...ddddddddd...","..dllllllllld..",".dlcccccccccld.","dlcccccccccccld","dcccdddddddcccd","dccdppppepddccd","dcccdddddddcccd","dcccccccccccccd","dclcclccclcclcd","dcccccccccccccd",".ddddddddddddd.","...l.l.l.l.l..."]]
+};
+// Classic: simple one-colour shapes the size of the hitbox
+const ESPR0=Object.assign({},ESPR,{
+  Grunt:[[".ccc.","ccccc","cpcpc","ccccc","c.c.c"],[".ccc.","ccccc","cpcpc","ccccc",".c.c."]],
+  Runner:[[".c.","cpc",".c."],[".c.","cpc","c.c"]],
+  Tank:[[".ccccc.","ccccccc","cpcccpc","ccccccc","ccccccc",".ccccc.","c.c.c.c"],[".ccccc.","ccccccc","cpcccpc","ccccccc","ccccccc",".ccccc.",".c.c.c."]]});
+// Neon: glowing outline ghosts, darts and crabs
+const ESPR2=Object.assign({},ESPR,{
+  Grunt:[[".lllll.","lcccccl","lpcccpl","lcccccl","lclclcl","l.l.l.l"],[".lllll.","lcccccl","lpcccpl","lcccccl","lclclcl",".l.l.l."]],
+  Runner:[["l.l.l",".lcl.","lcpcl",".lcl.","l.l.l"],[".l.l.","llcll",".cpc.","llcll",".l.l."]],
+  Tank:[["l.......l","ll.....ll",".lllllll.","lcccccccl","lcpcccpcl","lcccccccl",".lllllll.","l.l...l.l"],["l.......l","ll.....ll",".lllllll.","lcccccccl","lcpcccpcl","lcccccccl",".lllllll.",".l.l.l.l."]]});
+// Crystal: faceted gems with a sparkle that moves
+const ESPR3=Object.assign({},ESPR,{
+  Grunt:[["...l...","..lcd..",".lccdd.","lcpcpdd",".ccddd.","..cdd..","...d..."],["......l","..lcd..",".lccdd.","lcpcpdd",".ccddd.","..cdd..","l..d..."]],
+  Runner:[["..l..",".lcd.","lcpdd",".cdd.","..d.."],["....l",".lcd.","lcpdd",".cdd.","l.d.."]],
+  Tank:[["...lcd...","..lccdd..",".lccccdd.","lccpcpddd","lcccccddd",".ccccddd.","..ccddd..","...cdd..."],["l..lcd...","..lccdd..",".lccccdd.","lccpcpddd","lcccccddd",".ccccddd.","..ccddd..","...cdd..l"]]});
+const shade=(hex,k)=>{const n=parseInt(hex.slice(1),16),f=v=>Math.round(k<0?v*(1+k):v+(255-v)*k);return 'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')'};
+const ESK=[
+  {spr:ESPR0,pal:t=>({c:t.c,d:t.c,l:t.c,e:'#0d1019',p:'#0d1019'})},
+  {spr:ESPR,pal:t=>({c:t.c,d:shade(t.c,-.4),l:shade(t.c,.45),e:'#fff',p:'#0d1019'})},
+  {spr:ESPR2,pal:t=>({c:shade(t.c,-.72),d:t.c,l:shade(t.c,.4),e:'#fff',p:'#fff'})},
+  {spr:ESPR3,pal:t=>({c:shade(t.c,.15),d:shade(t.c,-.35),l:'#fff',e:'#fff',p:shade(t.c,-.75)})}];
+const sprCache={};
+// state: '' normal, 'h' hit (white), 'x' crit (yellow); skin defaults to the worn enemy skin
+function sprCanvas(t,f,state,skin){const si=skin==null?sk('e'):skin,key=si+t.n+f+state;if(sprCache[key])return sprCache[key];
+  const rows=ESK[si].spr[t.n][f],cv=document.createElement('canvas');cv.width=rows[0].length;cv.height=rows.length;const x=cv.getContext('2d');
+  const pal=state?null:ESK[si].pal(t);
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;x.fillStyle=pal?pal[ch]:state==='h'?(ch==='p'||ch==='d'?'#aab4c8':'#fff'):(ch==='p'||ch==='d'?'#b8860b':'#ffd166');x.fillRect(i,j,1,1)}});
+  return sprCache[key]=cv}
+function drawEnemy(e){const t=e.t;if(e.ph==null)e.ph=Math.random();
+  const f=Math.floor(S.time*(2+t.sp/5)+e.ph*2)%2,cv=sprCanvas(t,f,e.crit>0?'x':e.hit>0?'h':''),z=S.zoom||1;
+  const [sx,sy]=toScreen(e.x,e.y),w=Math.max(1,Math.round(cv.width*z)),h=Math.max(1,Math.round(cv.height*z));
+  g.drawImage(cv,Math.round(sx-w/2),Math.round(sy-h/2),w,h)}
+// Tower look. Skinned towers grow with levels bought this run (tiers at 1, 5, 12), so the tower grows every run;
+// Classic stays the plain square with a barrel. TSK: base palette, barrel, dome rim, outline per skin.
+const MUZZLE=.07,TIER=[1,5,12];
+const TSK=[
+  {pal:{d:'#8fa3d6',m:'#8fa3d6',l:'#8fa3d6',f:'#e8ecf5'},bar:'#c3cde6',tip:'#ffffff',rim:'#1b2033',out:'#1b2033'},
+  {pal:{d:'#3a4566',m:'#8fa3d6',l:'#c3cde6',f:'#232a40'},bar:'#c3cde6',tip:'#ffffff',rim:'#8fa3d6',out:'#11151f'},
+  {pal:{d:'#ff4fd8',m:'#5ef0ff',l:'#2a1640',f:'#0d0a1a'},bar:'#5ef0ff',tip:'#ffffff',rim:'#ff4fd8',out:'#0d0a1a'},
+  {pal:{d:'#8a6a1a',m:'#ffd166',l:'#fff1c2',f:'#2a2140'},bar:'#b8f3ff',tip:'#ffffff',rim:'#b388ff',out:'#1a1430'}];
+const TPAL_HIT={d:'#7a2a3a',m:'#ff6b6b',l:'#ff9a9a',f:'#3a1d29'};
+const tier=k=>{if(!sk('t'))return 0;const v=S.lv[k]||0;return v>=TIER[2]?3:v>=TIER[1]?2:v>=TIER[0]?1:0};
+const towerN=()=>11+2*tier('hp'),towerR=()=>Math.ceil(towerN()/2*1.25);
+// base grid: dark rim, wall ring (thicker at tier 2+), merlons at tier 2+, corner towers from tier 1
+function towerGrid(t){const n=11+2*t,c=t?t+1:0,wall=t>=2?2:1,rows=[];
+  for(let j=0;j<n;j++){let r='';for(let i=0;i<n;i++){const e=Math.min(i,j,n-1-i,n-1-j),cx=i<c||i>=n-c,cy=j<c||j>=n-c;
+    if(cx&&cy){const ci=i<c?i:n-1-i,cj=j<c?j:n-1-j;r+=(ci===0||cj===0||ci===c-1||cj===c-1)?'d':'l'}
+    else if(e===0)r+=t===0&&(i===0||i===n-1)&&(j===0||j===n-1)?'.':t>=2&&(i+j)%2?'.':'d';
+    else if(e<=wall)r+=e===1?'m':'l';
+    else r+='f'}rows.push(r)}return rows}
+const towerCache={};
+function towerCanvas(t,hit,skin){const si=skin==null?sk('t'):skin,key=si+'_'+t+(hit?'h':'');if(towerCache[key])return towerCache[key];
+  const rows=towerGrid(t),cv=document.createElement('canvas');cv.width=cv.height=rows.length;const x=cv.getContext('2d');
+  const pal=hit?TPAL_HIT:TSK[si].pal,classic=si===0;
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.'||classic){x.fillStyle=pal[r[i]]||pal.d;x.fillRect(i,j,1,1)}});return towerCache[key]=cv}
+function drawTower(){const t=tier('hp'),n=towerN(),h=(n-1)/2,z=WZ,ts=TSK[sk('t')],cv=towerCanvas(t,S.flash>0),w=Math.max(1,Math.round(n*z));
+  g.drawImage(cv,Math.round(CX-w/2+.5),Math.round(CY-w/2+.5),w,w);
+  // Dmg sponge: blue plates on the sides (top, bottom, left, right), one per level up to 4
+  const a=Math.min(S.lv.armor,4),pc='#5ec8ff',q=h-2;
+  if(a>0)R(CX-q,CY-h-1,2*q+1,1,pc);if(a>1)R(CX-q,CY+h+1,2*q+1,1,pc);if(a>2)R(CX-h-1,CY-q,1,2*q+1,pc);if(a>3)R(CX+h+1,CY-q,1,2*q+1,pc);
+  // Range: antennas on the corners (1, 2, 4) with blinking tips
+  const ra=[0,1,2,4][tier('range')],blink=Math.floor(S.time*2)%2;
+  [[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,ra).forEach(([sx,sy],i)=>{const x=CX+sx*(h+1),y=CY+sy*(h+1);R(x,y,1,1,'#c3cde6');R(x+sx,y+sy,1,1,(blink+i)%2?'#7ee8a8':'#2f6b4f')});
+  // turret: barrel(s) towards the target; longer with Damage; one barrel per Spray and Pray bullet, fanned wider so they read
+  const ang=S.target?Math.atan2(S.target.y-CY,S.target.x-CX):(S.aim!=null?S.aim:-Math.PI/2);
+  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+(M.res.spray||0),bw=dt>=2&&nb===1?2:1;
+  const fan=[];for(let i=0;i<nb;i++)fan.push(ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38);
+  const pts=a=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
+  fan.forEach(a=>{for(const[x,y]of pts(a))R(x-1,y-1,bw+2,bw+2,ts.out)});          // outline first
+  fan.forEach(a=>{for(const[x,y,i]of pts(a))R(x,y,bw,bw,i>=len-1?ts.tip:ts.bar);
+    if(S.mf>0){const fx=Math.round(CX+Math.cos(a)*(len+2)),fy=Math.round(CY+Math.sin(a)*(len+2));R(fx-1,fy-1,3,3,'#ffd166');R(fx,fy,1,1,'#fff')}});
+  if(!sk('t')){R(CX-1,CY-1,3,3,'#1b2033');return}
+  // dome: gold rim with Pixel magnet, core glows with Fire rate
+  const rim=S.lv.magnet>0?'#ffd166':ts.rim;
+  R(CX-2,CY-3,5,7,ts.out);R(CX-3,CY-2,7,5,ts.out);R(CX-2,CY-2,5,5,rim);R(CX-1,CY-2,3,5,rim);R(CX-2,CY-1,5,3,rim);
+  R(CX-1,CY-1,3,3,'#e8ecf5');
+  R(CX,CY,1,1,['#1b2033','#5ec8ff','#7ee8a8','#ffd166'][rateGlow])}
+// Backgrounds: drawn once per skin and screen size (seeded, so the same every time), in screen space.
+const bgCache={};
+function bgCanvas(si){const key=si+'_'+W+'x'+H;if(bgCache[key])return bgCache[key];
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');let seed=7+si*101;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const P=(px,py,w,h,c)=>{x.fillStyle=c;x.fillRect(px,py,w,h)};
+  if(si===1){P(0,0,W,H,'#1a1f30');  // circuit board: traces on an 8 px grid, vias and a few chips
+    for(let n=0;n<70;n++){let px=Math.floor(rnd()*W/8)*8,py=Math.floor(rnd()*H/8)*8;P(px-1,py-1,3,3,'#2c3654');
+      for(let k=0;k<4;k++){const hz=rnd()<.5,len=8*(1+Math.floor(rnd()*4)),dir=rnd()<.5?-1:1;
+        if(hz){P(dir>0?px:px-len,py,len+1,1,'#252e48');px+=dir*len}else{P(px,dir>0?py:py-len,1,len+1,'#252e48');py+=dir*len}}
+      P(px-1,py-1,3,3,'#2c3654');P(px,py,1,1,'#3a4870')}
+    for(let n=0;n<6;n++){const px=Math.floor(rnd()*(W-20)),py=Math.floor(rnd()*(H-14));P(px,py,14,8,'#161a28');P(px+1,py+1,12,6,'#20263a');for(let k=0;k<6;k++){P(px+1+k*2,py-1,1,1,'#2c3654');P(px+1+k*2,py+8,1,1,'#2c3654')}}}
+  else if(si===2){P(0,0,W,H,'#120d22');  // neon grid
+    for(let gx=CX%12;gx<W;gx+=12)P(gx,0,1,H,Math.round((gx-CX)/12)%4?'#1f1638':'#2e1c55');
+    for(let gy=CY%12;gy<H;gy+=12)P(0,gy,W,1,Math.round((gy-CY)/12)%4?'#1f1638':'#2e1c55');
+    for(let n=0;n<30;n++)P(Math.floor(rnd()*W/12)*12+CX%12,Math.floor(rnd()*H/12)*12+CY%12,1,1,rnd()<.5?'#ff4fd8':'#5ef0ff')}
+  else if(si===3){P(0,0,W,H,'#0e1020');  // deep space with faint nebula dither and stars
+    for(let n=0;n<5;n++){const cx=rnd()*W,cy=rnd()*H,r=20+rnd()*30;for(let py=Math.max(0,cy-r|0);py<Math.min(H,cy+r);py++)for(let px=Math.max(0,cx-r|0);px<Math.min(W,cx+r);px++)
+      if((px+py)%2===0&&Math.hypot(px-cx,py-cy)<r*(.6+.4*rnd()))P(px,py,1,1,n%2?'#16183a':'#1d1430')}
+    for(let n=0;n<110;n++)P(Math.floor(rnd()*W),Math.floor(rnd()*H),1,1,rnd()<.2?'#8b95c9':'#3a4266')}
+  return bgCache[key]=cv}
+function drawBg(){const si=sk('b');if(!si)return;g.drawImage(bgCanvas(si),0,0);
+  if(si===3&&!RM.matches)for(let n=0;n<6;n++){const t=S.time*.7+n*1.7,on=Math.sin(t)>.6;if(on){const x=(n*53+17)%W,y=(n*97+31)%H;g.fillStyle='#e8ecf5';g.fillRect(x,y,1,1);g.fillStyle='rgba(232,236,245,.4)';g.fillRect(x-1,y,3,1);g.fillRect(x,y-1,1,3)}}}
 let WZ=1;
 function R(x,y,w,h,c){g.fillStyle=c;if(WZ!==1){x=CX+(x-CX)*WZ;y=CY+(y-CY)*WZ;w=Math.max(1,Math.round(w*WZ));h=Math.max(1,Math.round(h*WZ))}g.fillRect(Math.round(x),Math.round(y),w,h)}
 function draw(){
   g.clearRect(0,0,W,H);
+  g.imageSmoothingEnabled=false;drawBg();
   g.save();
   if(S.shake>0&&!S.over&&!RM.matches)g.translate(Math.round(Math.random()*2-1),Math.round(Math.random()*2-1));
   WZ=S.zoom||1;
@@ -690,10 +828,9 @@ function draw(){
   // pixels
   for(const p of S.pt)R(p.x-1,p.y-1,2,2,p.c);
   // enemies
-  for(const e of S.en){const s=e.t.s;
-    if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
-      if(e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
-    else R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c)}
+  g.imageSmoothingEnabled=false;
+  for(const e of S.en){const s=e.t.s;drawEnemy(e);
+    if(e.boss&&e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
   // crit pop-ups: yellow damage numbers rising from the enemy (world position, readable size at any zoom)
   if(S.cp.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';g.lineWidth=2;g.strokeStyle='#0d1019';
     for(const f of S.cp){const[x,y]=toScreen(f.x,f.y),ty=Math.round(y-(CRIT_POP-f.life)*14);g.globalAlpha=Math.min(1,f.life*3);
@@ -705,19 +842,13 @@ function draw(){
       if(f.x!=null)g.fillText(f.t,Math.round(f.x),Math.round(f.y-(1.4-f.life)*10));else g.fillText(f.t,CX,Math.round(CY+24+(n++)*9-(1-f.life)*8))})}
   // projectiles
   for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
-  // tower
-  R(CX-5,CY-5,11,11,S.flash>0?'#ff6b6b':'#8fa3d6');
-  R(CX-3,CY-3,7,7,'#e8ecf5');
-  R(CX-1,CY-1,3,3,'#1b2033');
-  if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
-  // nova charge arc and blast ring
+  // tower: base grows with Tower HP, plates show Dmg sponge, antennas Range, turret Damage / Fire rate
+  drawTower();
+  // nova charge arc (just outside the base) and blast ring
+  const ar=towerR()+2;
   g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
-  g.beginPath();g.arc(CX+.5,CY+.5,10*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
+  g.beginPath();g.arc(CX+.5,CY+.5,ar*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
   if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,(8+(NOVA.r-8)*k)*WZ,0,Math.PI*2);g.stroke();g.lineWidth=1}
-  if(S.target){
-    const a=Math.atan2(S.target.y-CY,S.target.x-CX);
-    R(CX+Math.cos(a)*7-1,CY+Math.sin(a)*7-1,3,3,'#ffd166');
-  }
   WZ=1;
   catDraw();
   g.restore();
@@ -763,6 +894,8 @@ function ui(){
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.classList.toggle('off',!on);
+    // worn enemy skin as the legend icon (sprites are defined further down, so filled in here and redone on a skin change)
+    const ic=r.querySelector('i');if(ic._sk!==sk('e')){ic._sk=sk('e');ic.innerHTML='';const src=sprCanvas(t,0,''),c=document.createElement('canvas');c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);c.style.width=src.width*2+'px';c.style.height=src.height*2+'px';ic.appendChild(c)}
     setT(r.lastChild,on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min);
   });
   // each button shows the stat now > after buying one more level, e.g. "2 > 3" under "Damage"
@@ -838,17 +971,20 @@ const show=(id,on)=>{const el=document.getElementById(id),v=on?'flex':'none';if(
 let fyFrom='go';
 // Upcoming modes shown locked on the home menu. Reaching the wave unlocks them (they say "Soon" until built).
 // Thresholds are deliberately far (new players reach ~wave 8; Foundry lv3 in everything ~wave 29) because the modes aren't built yet.
-const LOCKED=[{n:'Bosses',w:BOSS.first,boss:1},{n:'Daily run',w:50},{n:'Tower skins',w:75}];
+const LOCKED=[{n:'Bosses',w:BOSS.first,boss:1},{n:'Skins',w:30,cert:1},{n:'Daily run',w:50}];
+// Skins open with the wave 30 certificate (clearing wave 30), the others when the best wave reaches w
+const lockOpen=m=>m.cert?M.cert>=m.w:M.best>=m.w;
 const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h1v2h1v5H0V3h1V1h1zM2 1v2h3V1z" fill-rule="evenodd"/></svg>';
 // Next-unlock goal card (home menu and game over): text plus progress bar toward the next locked mode.
 function goalUI(tid,bid){
-  const next=LOCKED.find(m=>M.best<m.w),hb=document.getElementById(bid);
-  document.getElementById(tid).textContent=next?(next.boss?'Next: bosses appear at wave ':'Next unlock: '+next.n+'. Reach wave ')+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
+  const next=LOCKED.find(m=>!lockOpen(m)),hb=document.getElementById(bid);
+  document.getElementById(tid).textContent=next?(next.boss?'Next: bosses appear at wave ':next.cert?'Next unlock: '+next.n+'. Clear wave ':'Next unlock: '+next.n+'. Reach wave ')+next.w+(M.best?' (best '+M.best+')':'')+'.':'All modes unlocked! They are on the way.';
   hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
 }
 function homeUI(){
   checkResearch();hbtTile();
-  document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=M.best>=m.w;
+  document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
+    if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+(open?'':LOCK_SVG)+m.n+'<small>'+(open?'Soon':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
@@ -861,7 +997,7 @@ function showHome(){
   homeUI();
   S.menu=true;S.pause=true;closeTip();
   document.getElementById('hst').textContent=M.best?'Best wave '+M.best+' · '+big(M.chips)+' chips'+(M.cores?' · '+M.cores+' core'+(M.cores===1?'':'s'):'')+(idleOpen()?' · idle '+big(idleFull().chips)+' chips / '+IDLE.hours+'h':''):'Defend the tower from waves of pixel monsters.';
-  show('go',0);show('fy',0);show('how',0);show('hi',0);show('bt',0);show('home',1);
+  show('go',0);show('fy',0);show('how',0);show('hi',0);show('bt',0);show('sk',0);show('home',1);
 }
 function useStash(){if(!M.stash)return;S.px+=M.stash;S.ft.push({t:'Head start +'+big(M.stash)+' px',life:2.5,big:true});M.stash=0;idleMsg=null;save()}
 function openFoundry(from){fyFrom=from;show(from,0);fyUI();show('fy',1)}
@@ -885,11 +1021,32 @@ document.getElementById('hhi').onclick=showHistory;
 function showCerts(){
   const top=Math.max(100,M.cert+20),rows=[];
   for(let w=10;w<=top;w+=10){const on=w<=M.cert,nx=w===M.cert+10;
-    rows.push('<div class="'+(on?'on':nx?'nx':'')+'">'+(on?'':LOCK_SVG+' ')+esc(certName(w))+'<small>Wave '+w+' · '+(on?'earned':'+'+certChips(w)+' chips')+'</small></div>')}
+    rows.push('<div class="'+(on?'on':nx?'nx':'')+'">'+(on?'':LOCK_SVG+' ')+esc(certName(w))+'<small>Wave '+w+' · '+(on?'earned':'+'+certChips(w)+' chips')+(SKINS.some(x=>x.w===w)?' + '+SKINS.find(x=>x.w===w).n+' skins':'')+'</small></div>')}
   document.getElementById('cel').innerHTML=rows.join('');
   show('home',0);show('ce',1);
 }
 document.getElementById('hce').onclick=showCerts;
+// Skins screen: per slot, every set with a small preview; owned ones can be worn, locked ones show their certificate.
+const pct=v=>'+'+Math.round(v*100)+'%';
+function skinPreview(k,i){const c=document.createElement('canvas'),x=c.getContext('2d');c.width=40;c.height=24;x.imageSmoothingEnabled=false;
+  x.fillStyle='#1b2033';x.fillRect(0,0,40,24);
+  if(k==='b'){if(i)x.drawImage(bgCanvas(i),CX-20,CY-40,40,24,0,0,40,24)}
+  else if(k==='e'){const a=sprCanvas(TYPES[0],0,'',i),b=sprCanvas(TYPES[2],0,'',i),r=sprCanvas(TYPES[1],0,'',i);x.drawImage(a,4,12-a.height/2|0);x.drawImage(r,15,12-r.height/2|0);x.drawImage(b,24,12-b.height/2|0)}
+  else{const t=i?2:0,cv=towerCanvas(t,false,i);x.drawImage(cv,20-cv.width/2|0,12-cv.height/2|0);x.fillStyle=TSK[i].rim;x.fillRect(18,10,5,5);x.fillStyle=TSK[i].bar;x.fillRect(23,12,7,1)}
+  return c}
+function showSkins(){
+  const own=SKINS.filter((x,i)=>i&&skinOwned(i));
+  document.getElementById('skb').innerHTML=own.length?'Your skin bonuses (all owned skins count): '+SKIN_SLOTS.map(([k,,d])=>'<b>'+pct(skinBonus(k))+'</b> '+d).join(', ')+'.':'Clear wave 30 to earn the first set.';
+  const l=document.getElementById('skl');l.innerHTML='';
+  for(const [k,n,d] of SKIN_SLOTS){const h=document.createElement('div');h.className='hg';h.textContent=n+' · '+d;l.appendChild(h);
+    SKINS.forEach((x,i)=>{const b=document.createElement('button'),on=skinOwned(i),worn=(M.skin[k]|0)===i||(!i&&!sk(k));
+      b.className=worn?'on':'';b.disabled=!on;b.appendChild(skinPreview(k,i));
+      const t=document.createElement('span');t.innerHTML=(on?'':LOCK_SVG)+esc(x.n)+'<small>'+(!on?'Wave '+x.w+' certificate':i?pct(x[k]):'No bonus')+(worn?' · worn':'')+'</small>';b.appendChild(t);
+      b.onclick=()=>{M.skin[k]=i;save();showSkins()};l.appendChild(b)})}
+  show('home',0);show('sk',1);
+}
+document.getElementById('hlk').addEventListener('click',e=>{if(e.target.closest('#hsk'))showSkins()});
+document.getElementById('skc').onclick=()=>{show('sk',0);showHome()};
 document.getElementById('idlk').onclick=()=>{idleMsg=null;homeUI()};
 document.getElementById('cec').onclick=()=>{show('ce',0);showHome()};
 // ---- Bit Theory screen and timers
@@ -946,8 +1103,8 @@ function runNews(){
   const a=S.start;if(!a)return {items:[],bt:false};
   const items=[],w=S.wave;
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
-  for(const m of LOCKED)if(m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
-  for(const w of S.certs||[])items.push('Certificate: '+certName(w)+' (+'+certChips(w)+' chips)');
+  for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
+  for(const w of S.certs||[]){items.push('Certificate: '+certName(w)+' (+'+certChips(w)+' chips)');const si=SKINS.findIndex(x=>x.w===w);if(si>0)items.push('New skins: '+SKINS[si].n+' set for enemies, tower and background (bonuses count right away)')}
   if(!a.bk&&M.bk>0)items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
   const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
