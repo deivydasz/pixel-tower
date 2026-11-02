@@ -630,7 +630,7 @@ function update(dt){
   }
   S.en=S.en.filter(e=>!e.dead);
   if(S.hp<=0){S.hp=0;endRun(false);return}
-  S.flash=Math.max(0,S.flash-dt);
+  S.flash=Math.max(0,S.flash-dt);if(S.mf)S.mf=Math.max(0,S.mf-dt);
   // tower fire
   S.cd-=dt;
   let target=null,best=1e9;
@@ -645,7 +645,7 @@ function update(dt){
     // Spray and Pray: bullet 0 always flies straight at the target; extras fan out alternately right, left, wider right...
     for(let i=0;i<n;i++){const k=i===0?0:Math.ceil(i/2)*(i%2?1:-1),a=a0+k*.14;
       S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:M.res.pierce,hits:[],crit:Math.random()<critChance()})}
-    S.cd=1/stat.rate();sfx('shot');
+    S.cd=1/stat.rate();S.aim=a0;S.mf=MUZZLE;sfx('shot');
   }
   // projectiles
   for(const p of S.pr){
@@ -704,6 +704,44 @@ function drawEnemy(e){const t=e.t;if(e.ph==null)e.ph=Math.random();
   const f=Math.floor(S.time*(2+t.sp/5)+e.ph*2)%2,cv=sprCanvas(t,f,e.crit>0?'x':e.hit>0?'h':''),z=S.zoom||1;
   const [sx,sy]=toScreen(e.x,e.y),w=Math.max(1,Math.round(cv.width*z)),h=Math.max(1,Math.round(cv.height*z));
   g.drawImage(cv,Math.round(sx-w/2),Math.round(sy-h/2),w,h)}
+// Tower look. Tiers come from levels bought this run (0, 1+, 5+, 12+), so the tower grows during every run.
+const MUZZLE=.07,TIER=[1,5,12];
+const tier=k=>{const v=S.lv[k]||0;return v>=TIER[2]?3:v>=TIER[1]?2:v>=TIER[0]?1:0};
+const towerN=()=>11+2*tier('hp'),towerR=()=>Math.ceil(towerN()/2*1.25);
+const TPAL={d:'#3a4566',m:'#8fa3d6',l:'#c3cde6',f:'#232a40',c:'#e8ecf5',r:'#ff6b6b',R:'#ff9a9a',D:'#7a2a3a'};
+// base grid: dark rim, wall ring (thicker at tier 2+), merlons at tier 2+, corner towers from tier 1
+function towerGrid(t){const n=11+2*t,c=t?t+1:0,wall=t>=2?2:1,rows=[];
+  for(let j=0;j<n;j++){let r='';for(let i=0;i<n;i++){const e=Math.min(i,j,n-1-i,n-1-j),cx=i<c||i>=n-c,cy=j<c||j>=n-c;
+    if(cx&&cy){const ci=i<c?i:n-1-i,cj=j<c?j:n-1-j;r+=(ci===0||cj===0||ci===c-1||cj===c-1)?'d':'l'}
+    else if(e===0)r+=t===0&&(i===0||i===n-1)&&(j===0||j===n-1)?'.':t>=2&&(i+j)%2?'.':'d';
+    else if(e<=wall)r+=e===1?'m':'l';
+    else r+='f'}rows.push(r)}return rows}
+const towerCache={};
+function towerCanvas(t,hit){const key=t+(hit?'h':'');if(towerCache[key])return towerCache[key];
+  const rows=towerGrid(t),cv=document.createElement('canvas');cv.width=cv.height=rows.length;const x=cv.getContext('2d');
+  const pal=hit?{d:TPAL.D,m:TPAL.r,l:TPAL.R,f:'#3a1d29'}:TPAL;
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.'){x.fillStyle=pal[r[i]];x.fillRect(i,j,1,1)}});return towerCache[key]=cv}
+function drawTower(){const t=tier('hp'),n=towerN(),h=(n-1)/2,z=WZ,cv=towerCanvas(t,S.flash>0),w=Math.max(1,Math.round(n*z));
+  g.drawImage(cv,Math.round(CX-w/2+.5),Math.round(CY-w/2+.5),w,w);
+  // Dmg sponge: blue plates on the sides (top, bottom, left, right), one per level up to 4
+  const a=Math.min(S.lv.armor,4),pc='#5ec8ff',q=h-2;
+  if(a>0)R(CX-q,CY-h-1,2*q+1,1,pc);if(a>1)R(CX-q,CY+h+1,2*q+1,1,pc);if(a>2)R(CX-h-1,CY-q,1,2*q+1,pc);if(a>3)R(CX+h+1,CY-q,1,2*q+1,pc);
+  // Range: antennas on the corners (1, 2, 4) with blinking tips
+  const ra=[0,1,2,4][tier('range')],blink=Math.floor(S.time*2)%2;
+  [[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,ra).forEach(([sx,sy],i)=>{const x=CX+sx*(h+1),y=CY+sy*(h+1);R(x,y,1,1,'#c3cde6');R(x+sx,y+sy,1,1,(blink+i)%2?'#7ee8a8':'#2f6b4f')});
+  // turret: dome, barrel(s) towards the target; longer with Damage, twin with Fire rate tier 2+, gold rim with Pixel magnet
+  const ang=S.target?Math.atan2(S.target.y-CY,S.target.x-CX):(S.aim!=null?S.aim:-Math.PI/2),dx=Math.cos(ang),dy=Math.sin(ang);
+  // one barrel per bullet: Spray and Pray adds barrels fanned like its bullets (wider apart so they read)
+  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+(M.res.spray||0),bw=dt>=2&&nb===1?2:1;
+  const fan=[];for(let i=0;i<nb;i++)fan.push(ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38);
+  const pts=a=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
+  fan.forEach(a=>{for(const[x,y]of pts(a))R(x-1,y-1,bw+2,bw+2,'#11151f')});          // outline first
+  fan.forEach(a=>{for(const[x,y,i]of pts(a))R(x,y,bw,bw,i>=len-1?'#ffffff':'#c3cde6');
+    if(S.mf>0){const fx=Math.round(CX+Math.cos(a)*(len+2)),fy=Math.round(CY+Math.sin(a)*(len+2));R(fx-1,fy-1,3,3,'#ffd166');R(fx,fy,1,1,'#fff')}});
+  const rim=S.lv.magnet>0?'#ffd166':'#8fa3d6';
+  R(CX-2,CY-3,5,7,'#11151f');R(CX-3,CY-2,7,5,'#11151f');R(CX-2,CY-2,5,5,rim);R(CX-1,CY-3+1,3,5,rim);R(CX-2,CY-1,5,3,rim);
+  R(CX-1,CY-1,3,3,'#e8ecf5');
+  R(CX,CY,1,1,['#1b2033','#5ec8ff','#7ee8a8','#ffd166'][rateGlow])}
 let WZ=1;
 function R(x,y,w,h,c){g.fillStyle=c;if(WZ!==1){x=CX+(x-CX)*WZ;y=CY+(y-CY)*WZ;w=Math.max(1,Math.round(w*WZ));h=Math.max(1,Math.round(h*WZ))}g.fillRect(Math.round(x),Math.round(y),w,h)}
 function draw(){
@@ -731,19 +769,13 @@ function draw(){
       if(f.x!=null)g.fillText(f.t,Math.round(f.x),Math.round(f.y-(1.4-f.life)*10));else g.fillText(f.t,CX,Math.round(CY+24+(n++)*9-(1-f.life)*8))})}
   // projectiles
   for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
-  // tower
-  R(CX-5,CY-5,11,11,S.flash>0?'#ff6b6b':'#8fa3d6');
-  R(CX-3,CY-3,7,7,'#e8ecf5');
-  R(CX-1,CY-1,3,3,'#1b2033');
-  if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
-  // nova charge arc and blast ring
+  // tower: base grows with Tower HP, plates show Dmg sponge, antennas Range, turret Damage / Fire rate
+  drawTower();
+  // nova charge arc (just outside the base) and blast ring
+  const ar=towerR()+2;
   g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
-  g.beginPath();g.arc(CX+.5,CY+.5,10*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
+  g.beginPath();g.arc(CX+.5,CY+.5,ar*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
   if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,(8+(NOVA.r-8)*k)*WZ,0,Math.PI*2);g.stroke();g.lineWidth=1}
-  if(S.target){
-    const a=Math.atan2(S.target.y-CY,S.target.x-CX);
-    R(CX+Math.cos(a)*7-1,CY+Math.sin(a)*7-1,3,3,'#ffd166');
-  }
   WZ=1;
   catDraw();
   g.restore();

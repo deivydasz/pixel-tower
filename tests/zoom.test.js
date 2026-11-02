@@ -10,6 +10,7 @@ let inside=0;for(let i=0;i<72;i++){const a=i/72*Math.PI*2,d=spawnDist(a),[x,y]=t
 ok(inside===0&&spawnDist(0)>=140,'zoomed out: every spawn point is just off-screen');
 // drawing: world shrinks (tower drawn smaller), HUD-like labels and the cat do not
 const rects=[];const fr=g.fillRect.bind(g);g.fillRect=(x,y,w,h)=>{rects.push([x,y,w,h]);fr(x,y,w,h)};draw();g.fillRect=fr;
-ok(rects.some(q=>q[2]===Math.max(1,Math.round(11*S.zoom))&&q[3]===q[2]),'tower drawn at zoomed size');
+const imgs=[];const di=g.drawImage.bind(g);g.drawImage=(...a)=>{imgs.push(a);di(...a)};draw();g.drawImage=di;
+ok(imgs.some(a=>a[0]===towerCanvas(tier('hp'),false)&&a[3]===Math.max(1,Math.round(towerN()*S.zoom))),'tower drawn at zoomed size');
 catStart('walk');cat.dir=1;for(let i=0;i<20;i++)catTick(.05);draw();ok(cat.box&&cat.box.h===catH(CAT_SPR.walk[0]),'cat stays full size when zoomed');catEnd();
 done();
