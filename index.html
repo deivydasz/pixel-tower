@@ -521,7 +521,9 @@ function draw(){
     else R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c)}
   // floating purchase labels, in the free space below the tower
   if(S.ft.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';
-    S.ft.forEach((f,i)=>{g.fillStyle='rgba(110,231,160,'+Math.min(1,f.life*2)+')';g.fillText(f.t,CX,Math.round(CY+24+i*9-(1-f.life)*8))})}
+    // labels with their own spot (e.g. the cat's +1 HP) rise from there; purchase labels stack under the tower
+    let n=0;S.ft.forEach(f=>{g.fillStyle='rgba(110,231,160,'+Math.min(1,f.life*2)+')';
+      if(f.x!=null)g.fillText(f.t,Math.round(f.x),Math.round(f.y-(1.4-f.life)*10));else g.fillText(f.t,CX,Math.round(CY+24+(n++)*9-(1-f.life)*8))})}
   // projectiles
   for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
   // tower
@@ -798,7 +800,8 @@ function catStart(kind){cat.kind=kind;cat.t=0;cat.meow=0;cat.dir=Math.random()<.
 function catEnd(){cat.kind=null;cat.box=null;cat.next=TEST.cat?3+Math.random()*3:15+Math.random()*15}
 const CAT_HEAL={chance:.3,hp:1};
 function catTap(){if(!cat.kind||cat.meow)return;cat.meow=1;sfx('meow');buzz(15);
-  if(!S.over&&S.hp<stat.max()&&Math.random()<CAT_HEAL.chance){S.hp=Math.min(stat.max(),S.hp+CAT_HEAL.hp);S.ft.push({t:'+'+CAT_HEAL.hp+' HP',life:1.2})}
+  if(!S.over&&S.hp<stat.max()&&Math.random()<CAT_HEAL.chance){S.hp=Math.min(stat.max(),S.hp+CAT_HEAL.hp);
+    const b=cat.box;S.ft.push({t:'+'+CAT_HEAL.hp+' HP',life:1.4,x:b?Math.min(W-22,Math.max(22,b.x+b.w/2)):CX,y:b?Math.max(18,b.y-14):CY})}
   const b=cat.box||{x:CX,y:CY,w:0};for(let i=0;i<4;i++)cat.hearts.push({x:b.x+b.w/2+(i-1.5)*5,y:b.y,t:-i*.12});
   cat.t=Math.max(cat.t,cat.dur-1.2)}
 function catTick(dt){

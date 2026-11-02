@@ -28,6 +28,7 @@ S.nova=0;cv.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:r
 // 30% chance to heal 1 HP: roll under the chance heals, over does not, full HP never overheals
 const heal=(roll,hp)=>{catStart('peek');cat.dir=1;tickTo(1.5);S.hp=hp;S.ft=[];Math.random=()=>roll;catTap();Math.random=rnd0;return S.hp};
 ok(heal(.1,5)===6&&S.ft.some(f=>f.t==='+1 HP'),'lucky tap (30%): +1 HP with a +1 HP label');
+const lab=S.ft.find(f=>f.t==='+1 HP'),cb=cat.box;ok(lab&&Math.abs(lab.x-Math.min(W-22,Math.max(22,cb.x+cb.w/2)))<1&&lab.y<cb.y,'+1 HP pops up from the cat, not the tower');
 ok(heal(.5,5)===5&&!S.ft.some(f=>f.t==='+1 HP'),'unlucky tap: just a meow');
 ok(heal(.1,stat.max())===stat.max(),'no overheal at full HP');catEnd();
 // visits come by themselves during play, not on menus
