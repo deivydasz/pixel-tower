@@ -265,7 +265,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[]};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[],fx:[],sfl:0,bin:0};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -541,7 +541,7 @@ function spawn(){
   if(S.boss&&!S.en.some(e=>e.boss)&&!S.bossDone){
     const t=bossFor(S.wave),a=Math.random()*Math.PI*2,hp=bossHp(t,S.wave);
     const sd=spawnDist(a);S.en.push({x:CX+Math.cos(a)*sd,y:CY+Math.sin(a)*sd,t,hp,max:hp,hit:0,boss:1,shd:0,st:t.spawn||0});
-    S.bossDone=true;return;
+    S.bossDone=true;S.bin=1.6;S.shake=.35;return;
   }
   const ok=TYPES.filter(t=>S.wave>=t.min);
   const t=ok[Math.floor(Math.random()*ok.length)];
@@ -550,6 +550,8 @@ function spawn(){
 }
 function kill(e){
   sfx('kill');
+  if(e.boss){ring(e.x,e.y,8,40,'#fff',.5);ring(e.x,e.y,4,26,e.t.c,.6);sparks(e.x,e.y,26,e.t.c,70,.6);sparks(e.x,e.y,10,'#fff',90,.4);S.shake=.45;S.sfl=.22}
+  else{ring(e.x,e.y,e.t.s/2,6,e.t.c,.22);sparks(e.x,e.y,4,e.t.c,45,.25)}
   if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
   const np=e.t.px*(1+stat.magnet())*(1+skinBonus('e')),n=Math.floor(np)+(Math.random()<np%1?1:0);
   for(let i=0;i<n;i++){
@@ -562,9 +564,17 @@ function kill(e){
 // push: enemies inside the tower's range are knocked back out to its edge over `kb` seconds (bosses only BOSS.push of the way).
 const NOVA={cd:120,r:160,fx:.5,dmg:4,dmgK:0,kb:.25};
 const novaDmg=()=>NOVA.dmg+NOVA.dmgK*stat.dmg();
+// Visual effects in world space (S.fx), run on real time and capped at FX_MAX (oldest dropped):
+// sparks (k 0) fly out and fade, rings (k 'r') grow and fade. sfl = Blast screen flash, bin = boss entrance warning.
+const FX_MAX=140;
+function fxCap(){if(S.fx.length>FX_MAX)S.fx.splice(0,S.fx.length-FX_MAX)}
+function sparks(x,y,n,c,sp,life){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=sp*(.5+Math.random()*.7);
+  S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+Math.random()*.6),max:life,c})}fxCap()}
+function ring(x,y,r,grow,c,life){S.fx.push({x,y,r,grow,c,life,max:life,k:'r'});fxCap()}
 function nova(){
   if(S.over||S.pause||S.nova>0)return false;
-  S.nova=novaCd();S.nfx=0;S.novas++;S.shake=.15;sfx('nova');buzz(40);
+  S.nova=novaCd();S.nfx=0;S.novas++;S.shake=.15;S.sfl=.18;sfx('nova');buzz(40);
+  for(let i=0;i<28;i++){const a=i/28*Math.PI*2,v=110+Math.random()*40;S.fx.push({x:CX,y:CY,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.4,max:.4,c:i%2?'#5ec8ff':'#e8ecf5'})}fxCap();
   for(const e of S.en){
     const dx=e.x-CX,dy=e.y-CY,d=Math.hypot(dx,dy)||1;
     if(d>NOVA.r)continue;
@@ -627,6 +637,8 @@ function update(dt){
   S.shake=Math.max(0,S.shake-rt);
   for(const f of S.ft)f.life-=rt;S.ft=S.ft.filter(f=>f.life>0);
   for(const f of S.cp)f.life-=rt;S.cp=S.cp.filter(f=>f.life>0);
+  if(S.fx.length){const dr=Math.pow(.02,rt);for(const f of S.fx){f.life-=rt;if(f.k)continue;f.x+=f.vx*rt;f.y+=f.vy*rt;f.vx*=dr;f.vy*=dr}S.fx=S.fx.filter(f=>f.life>0)}
+  S.sfl=Math.max(0,S.sfl-rt);S.bin=Math.max(0,S.bin-rt);
   if(S.over){S.ot+=dt;return}
   S.time+=dt;
   S.nova=Math.max(0,S.nova-dt);
@@ -652,8 +664,8 @@ function update(dt){
     e.hit=Math.max(0,e.hit-dt);if(e.crit)e.crit=Math.max(0,e.crit-dt);
     if(e.boss){e.shd=Math.max(0,e.shd-dt);if(e.t.spawn&&(e.st-=dt)<=0){e.st=e.t.spawn;const r=TYPES[1];S.en.push({x:e.x,y:e.y,t:r,hp:ehp(r),hit:0})}
       if(d<=stop+.5){if(!e.at){e.at=1;e.atk=0;S.bonus=2;S.bt1='BOSS ATTACKS!';S.bt='Destroy it before it destroys you';sfx('boss')}
-        if((e.atk-=dt)<=0){e.atk=BOSS.hitEvery;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.25;sfx('hit');buzz(40)}}}
-    else if(d<8){e.dead=true;e.reached=true;S.hp-=edmg(e.t);S.killer=e.t;S.flash=.15;S.shake=.2;sfx('hit');buzz(30)}
+        if((e.atk-=dt)<=0){e.atk=BOSS.hitEvery;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.25;sparks(CX,CY,6,'#ff6b6b',50,.3);sfx('hit');buzz(40)}}}
+    else if(d<8){e.dead=true;e.reached=true;S.hp-=edmg(e.t);S.killer=e.t;S.flash=.15;S.shake=.2;sparks(e.x,e.y,4,'#ff6b6b',40,.25);sparks(e.x,e.y,3,e.t.c,35,.25);sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
   if(S.hp<=0){S.hp=0;endRun(false);return}
@@ -679,7 +691,7 @@ function update(dt){
     p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
     for(const e of S.en){
       if(!e.dead&&Math.abs(p.x-e.x)<e.t.s/2+1&&Math.abs(p.y-e.y)<e.t.s/2+1&&!(p.hits&&p.hits.includes(e))){
-        const dmg=stat.dmg()*(p.crit?stat.critx():1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hp-=dmg;e.hit=.08;
+        const dmg=stat.dmg()*(p.crit?stat.critx():1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hp-=dmg;e.hit=.08;sparks(p.x,p.y,p.crit?4:2,p.crit?'#ffd166':'#fff',40,.16);
         if(p.crit){e.crit=.12;S.cp.push({x:e.x,y:e.y-e.t.s/2-2,t:big(dmg),life:CRIT_POP});if(S.cp.length>CRIT_MAX)S.cp.shift()}
         if(e.t===TYPES[2]&&stat.heavy()){const ex=e.x-CX,ey=e.y-CY,ed=Math.hypot(ex,ey)||1;e.x+=ex/ed*stat.heavy();e.y+=ey/ed*stat.heavy()}
         if(p.hits)p.hits.push(e);if(p.pierce>0)p.pierce--;else p.life=0;
@@ -853,15 +865,28 @@ function draw(){
     let n=0;S.ft.forEach(f=>{g.fillStyle=(f.big?'rgba(255,209,102,':'rgba(110,231,160,')+Math.min(1,f.life*2)+')';
       if(f.x!=null)g.fillText(f.t,Math.round(f.x),Math.round(f.y-(1.4-f.life)*10));else g.fillText(f.t,CX,Math.round(CY+24+(n++)*9-(1-f.life)*8))})}
   // projectiles
-  for(const p of S.pr)R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff');
+  for(const p of S.pr){const c=p.crit?'255,209,102':'255,255,255';R(p.x-1-p.vx*.04,p.y-1-p.vy*.04,1,1,'rgba('+c+',.2)');R(p.x-.5-p.vx*.02,p.y-.5-p.vy*.02,1,1,'rgba('+c+',.45)');R(p.x-1,p.y-1,2,2,p.crit?'#ffd166':'#fff')}
+  // effects: sparks fade out, rings grow and fade
+  for(const f of S.fx){const a=Math.max(0,f.life/f.max);g.globalAlpha=a;
+    if(f.k){const[x,y]=toScreen(f.x,f.y);g.strokeStyle=f.c;g.lineWidth=1;g.beginPath();g.arc(Math.round(x)+.5,Math.round(y)+.5,(f.r+f.grow*(1-a))*WZ,0,Math.PI*2);g.stroke()}
+    else R(f.x,f.y,a>.5?2:1,a>.5?2:1,f.c)}
+  g.globalAlpha=1;
   // tower: base grows with Tower HP, plates show Dmg sponge, antennas Range, turret Damage / Fire rate
   drawTower();
   // nova charge arc (just outside the base) and blast ring
   const ar=towerR()+2;
   g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
   g.beginPath();g.arc(CX+.5,CY+.5,ar*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
-  if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,(8+(NOVA.r-8)*k)*WZ,0,Math.PI*2);g.stroke();g.lineWidth=1}
+  if(S.nfx>=0){const k=S.nfx/NOVA.fx,r=(8+(NOVA.r-8)*k)*WZ;
+    g.fillStyle='rgba(94,200,255,'+(.12*(1-k))+')';g.beginPath();g.arc(CX+.5,CY+.5,r,0,Math.PI*2);g.fill();
+    g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=3;g.beginPath();g.arc(CX+.5,CY+.5,r,0,Math.PI*2);g.stroke();
+    g.strokeStyle='rgba(232,236,245,'+(1-k)+')';g.lineWidth=1;g.beginPath();g.arc(CX+.5,CY+.5,r*.82,0,Math.PI*2);g.stroke()}
   WZ=1;
+  // Blast / boss kill flash and the boss entrance warning (red pulsing edges); skipped with reduced motion
+  if(!RM.matches){
+    if(S.sfl>0){g.fillStyle='rgba(200,240,255,'+Math.min(.18,S.sfl)+')';g.fillRect(0,0,W,H)}
+    if(S.bin>0){const a=(.25+.2*Math.sin(S.bin*12))*Math.min(1,S.bin/.5);
+      for(let i=0;i<4;i++){g.fillStyle='rgba(255,60,80,'+(a*(1-i/4))+')';g.fillRect(i*2,0,2,H);g.fillRect(W-2-i*2,0,2,H);g.fillRect(0,i*2,W,2);g.fillRect(0,H-2-i*2,W,2)}}}
   catDraw();
   g.restore();
   // wave / boss / unlock banner: centred below the tower, clear of the HP bar, boss bar and legend (top) and BLAST (bottom)
