@@ -677,6 +677,33 @@ function update(dt){
 }
 // World zoom: when Range grows past the screen, the battlefield zooms out around the tower so the range ring
 // always fits (down to ZOOM_MIN). R() draws world pixels through it; HUD overlays, banners, labels and the cat don't.
+// Enemy sprites ("digital bugs"): two frames each, drawn a little larger than the hitbox (t.s). Letters: c body
+// (type colour), d darker, l lighter, e eye, p dark. Rendered once per colour state into small canvases.
+const ESPR={
+  Grunt:[[".d...d.","..ccc..",".cecec.","dcccccd",".ddddd.","d.d.d.d"],
+         [".d...d.","..ccc..",".cecec.","dcccccd",".ddddd.",".d.d.d."]],
+  Runner:[["..l..",".ccc.","lcecl",".ccc.","d...d"],["..l..",".ccc.","lcecl",".ccc.",".d.d."]],
+  Tank:[["..ddddd..",".dllllld.","dlcccccld","dcecccecd","dcccccccd","ddcdcdcdd",".ddddddd.","d.d...d.d"],
+        ["..ddddd..",".dllllld.","dlcccccld","dcecccecd","dcccccccd","ddcdcdcdd",".ddddddd.",".d.d.d.d."]],
+  Brute:[["l.............l","ld...........dl",".ddddddddddddd.","dllllllllllllld","dcpcccccccccpcd","dcepcccccccpecd","dcccccccccccccd","dccpppppppppccd","dccpepepepepccd","dcccccccccccccd","ddddddddddddddd","dd.dd.....dd.dd"],
+         ["l.............l","ld...........dl",".ddddddddddddd.","dllllllllllllld","dcpcccccccccpcd","dcepcccccccpecd","dcccccccccccccd","dccpppppppppccd","dccpepepepepccd","dcccccccccccccd","ddddddddddddddd",".dd.dd...dd.dd."]],
+  'Swarm Queen':[["...l...l...l...","...lllllllll...","....ddddddd....","...dcccccccd...","..dcecccccecd..","d.dcccccccccd.d",".ddcclllllccdd.","d.dclllllllcd.d",".ddcclllllccdd.","d.dcccccccccd.d","...dcccccccd...","....ddddddd...."],
+                 ["...l...l...l...","...lllllllll...","....ddddddd....","...dcccccccd...","..dcecccccecd..",".ddcccccccccdd.","d.dcclllllccd.d",".ddclllllllcdd.","d.dcclllllccd.d",".ddcccccccccdd.","...dcccccccd...","....ddddddd...."]],
+  Warden:[["...ddddddddd...","..dllllllllld..",".dlcccccccccld.","dlcccccccccccld","dcccdddddddcccd","dccdppepppddccd","dcccdddddddcccd","dcccccccccccccd","dclcclccclcclcd","dcccccccccccccd",".ddddddddddddd.","..l.l.l.l.l.l.."],
+          ["...ddddddddd...","..dllllllllld..",".dlcccccccccld.","dlcccccccccccld","dcccdddddddcccd","dccdppppepddccd","dcccdddddddcccd","dcccccccccccccd","dclcclccclcclcd","dcccccccccccccd",".ddddddddddddd.","...l.l.l.l.l..."]]
+};
+const shade=(hex,k)=>{const n=parseInt(hex.slice(1),16),f=v=>Math.round(k<0?v*(1+k):v+(255-v)*k);return 'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')'};
+const sprCache={};
+// state: '' normal, 'h' hit (white), 'x' crit (yellow)
+function sprCanvas(t,f,state){const key=t.n+f+state;if(sprCache[key])return sprCache[key];
+  const rows=ESPR[t.n][f],cv=document.createElement('canvas');cv.width=rows[0].length;cv.height=rows.length;const x=cv.getContext('2d');
+  const pal=state==='h'?null:state==='x'?null:{c:t.c,d:shade(t.c,-.4),l:shade(t.c,.45),e:'#fff',p:'#0d1019'};
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='.')continue;x.fillStyle=pal?pal[ch]:state==='h'?(ch==='p'||ch==='d'?'#aab4c8':'#fff'):(ch==='p'||ch==='d'?'#b8860b':'#ffd166');x.fillRect(i,j,1,1)}});
+  return sprCache[key]=cv}
+function drawEnemy(e){const t=e.t;if(e.ph==null)e.ph=Math.random();
+  const f=Math.floor(S.time*(2+t.sp/5)+e.ph*2)%2,cv=sprCanvas(t,f,e.crit>0?'x':e.hit>0?'h':''),z=S.zoom||1;
+  const [sx,sy]=toScreen(e.x,e.y),w=Math.max(1,Math.round(cv.width*z)),h=Math.max(1,Math.round(cv.height*z));
+  g.drawImage(cv,Math.round(sx-w/2),Math.round(sy-h/2),w,h)}
 let WZ=1;
 function R(x,y,w,h,c){g.fillStyle=c;if(WZ!==1){x=CX+(x-CX)*WZ;y=CY+(y-CY)*WZ;w=Math.max(1,Math.round(w*WZ));h=Math.max(1,Math.round(h*WZ))}g.fillRect(Math.round(x),Math.round(y),w,h)}
 function draw(){
@@ -690,10 +717,9 @@ function draw(){
   // pixels
   for(const p of S.pt)R(p.x-1,p.y-1,2,2,p.c);
   // enemies
-  for(const e of S.en){const s=e.t.s;
-    if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
-      if(e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
-    else R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c)}
+  g.imageSmoothingEnabled=false;
+  for(const e of S.en){const s=e.t.s;drawEnemy(e);
+    if(e.boss&&e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
   // crit pop-ups: yellow damage numbers rising from the enemy (world position, readable size at any zoom)
   if(S.cp.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';g.lineWidth=2;g.strokeStyle='#0d1019';
     for(const f of S.cp){const[x,y]=toScreen(f.x,f.y),ty=Math.round(y-(CRIT_POP-f.life)*14);g.globalAlpha=Math.min(1,f.life*3);
