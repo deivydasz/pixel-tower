@@ -174,7 +174,8 @@ const W=180,H=240,CX=90,CY=120;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 cv.width=W;cv.height=H;
 function fit(){
-  const raw=Math.min((innerWidth-48)/W,(innerHeight-250)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
+  const hud=document.getElementById('hud'),ups=document.getElementById('ups'),reserve=(hud&&hud.offsetHeight||40)+(ups&&ups.offsetHeight||170)+70;
+  const raw=Math.min((innerWidth-48)/W,(innerHeight-reserve)/H),s=Math.max(1,raw>=3?Math.floor(raw):Math.floor(raw*4)/4);
   cv.style.width=W*s+'px';cv.style.height=H*s+'px';
   document.documentElement.style.setProperty('--w',W*s+'px');
 }
@@ -187,9 +188,14 @@ const UP={
   rate:{n:'Fire rate',base:15,w:5},
   range:{n:'Range',base:12,w:8},
   armor:{n:'Dmg sponge',base:25,w:12},
-  magnet:{n:'Pixel magnet',base:30,w:16}
+  magnet:{n:'Pixel magnet',base:30,w:16},
+  // run-only upgrades: appear only after reaching wave `w` in the current run (never early, even if reached before); not in the Foundry
+  heavy:{n:'Heavy rounds',base:60,w:30,run:1},
+  critx:{n:'Crit power',base:80,w:35,run:1,needs:()=>M.res.crit>0,needTxt:'Needs crits'}
 };
-const upOpen=k=>Math.max(M.best,S&&!S.menu&&!S.over?S.wave:0)>=UP[k].w;
+const inRun=()=>S&&!S.menu&&!S.over;
+const upOpen=k=>UP[k].run?inRun()&&S.wave>=UP[k].w&&(!UP[k].needs||UP[k].needs()):Math.max(M.best,inRun()?S.wave:0)>=UP[k].w;
+const META_UPS=Object.keys(UP).filter(k=>!UP[k].run);  // the ones the Foundry upgrades
 const openUps=()=>Object.keys(UP).filter(upOpen);
 const TYPES=[
   {min:1,sp:18,hp:1,c:'#ff6b6b',s:5,px:3,d:1,n:'Grunt',up:'rate'},
@@ -207,7 +213,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -221,7 +227,9 @@ const stat={
   max:()=>20+10*S.lv.hp+5*M.lv.hp,
   armor:()=>.5*S.lv.armor+.25*M.lv.armor,
   // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
-  magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*(M.lv.magnet||0)
+  magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*(M.lv.magnet||0),
+  critx:()=>3+.5*(S.lv.critx||0),      // Crit power: crit damage multiplier
+  heavy:()=>.6*(S.lv.heavy||0)         // Heavy rounds: px a Tank is knocked back per hit
 };
 const MAGNET={run:.15,meta:.1};
 const critChance=()=>.05*M.res.crit;
@@ -366,11 +374,11 @@ const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   leg.appendChild(d);return d;
 });
 // Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
-const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px'};
+const GAIN={dmg:'+1 dmg',hp:'+10 HP',rate:'+0.4/s',range:'+8 range',armor:'+0.5 armor',magnet:'+15% px',heavy:'+0.6 push',critx:'+0.5x crit'};
 function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList.add('bought')}
 // stat value per upgrade, and how it is labelled on the in-run buttons
-const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet()};
-const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%'};  // the button title names the stat
+const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet(),heavy:()=>stat.heavy(),critx:()=>stat.critx()};
+const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%',heavy:v=>fmt(v)+'px',critx:v=>'x'+fmt(v)};  // the button title names the stat
 const ups=document.getElementById('ups'),btns={};
 for(const k in UP){
   const b=document.createElement('button');
@@ -404,7 +412,7 @@ const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
 const bossChips=w=>5+Math.floor(w/10);
 function startWave(){
   S.wave++;S.left=4+S.wave*2;S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
-  for(const k in UP)if(UP[k].w===S.wave&&M.best<S.wave){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
+  for(const k in UP)if(UP[k].w===S.wave&&(UP[k].run?upOpen(k):M.best<S.wave)){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
   if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' incoming';sfx('boss')}
 }
 function spawn(){
@@ -536,7 +544,8 @@ function update(dt){
     p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
     for(const e of S.en){
       if(!e.dead&&Math.abs(p.x-e.x)<e.t.s/2+1&&Math.abs(p.y-e.y)<e.t.s/2+1&&!(p.hits&&p.hits.includes(e))){
-        e.hp-=stat.dmg()*(p.crit?3:1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hit=.08;
+        e.hp-=stat.dmg()*(p.crit?stat.critx():1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hit=.08;
+        if(e.t===TYPES[2]&&stat.heavy()){const ex=e.x-CX,ey=e.y-CY,ed=Math.hypot(ex,ey)||1;e.x+=ex/ed*stat.heavy();e.y+=ey/ed*stat.heavy()}
         if(p.hits)p.hits.push(e);if(p.pierce>0)p.pierce--;else p.life=0;
         if(e.hp<=0){e.dead=true;kill(e)}
         break;
@@ -640,7 +649,7 @@ function ui(){
   const info={};for(const k in UP){const now=STATV[k]();S.lv[k]++;const nx=STATV[k]();S.lv[k]--;info[k]=STATL[k](now)+' > '+STATL[k](nx)}
   for(const k in UP){
     const c=cost(k);
-    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+'Reach wave '+UP[k].w+'</span>&nbsp;';
+    const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+(UP[k].needs&&!UP[k].needs()?UP[k].needTxt:UP[k].run?'Run wave '+UP[k].w:'Reach wave '+UP[k].w)+'</span>&nbsp;';
     setH(btns[k],h);btns[k].classList.toggle('lkup',!op);
     setDis(btns[k],S.over||!op||S.px<c);
   }
@@ -651,14 +660,14 @@ const baseStat=(k,lv)=>({dmg:(1+.5*lv)*Math.pow(1.2,M.res.depth),rate:1+.2*lv,ra
 const UNIT={dmg:'',rate:'/s',range:'',hp:'',armor:'',magnet:'%'};
 const fmtU=(k,v)=>(k==='magnet'?'+':'')+fmt(v)+UNIT[k];
 const nowNext=k=>fmtU(k,baseStat(k,M.lv[k]))+' > '+fmtU(k,baseStat(k,M.lv[k]+1));  // e.g. "2.5 > 3", "2.4/s > 2.6/s"
-for(const k in UP){
+for(const k of META_UPS){
   const b=document.createElement('button');
   b.onclick=()=>{const c=mcost(k);if(M.chips<c||!upOpen(k))return;M.chips-=c;M.lv[k]++;save();sfx('buy');fyUI();flashBtn(b)};
   fyl.appendChild(b);fyb[k]=b;
 }
 function fyUI(){
   fyh.textContent='Pixel foundry: '+big(M.chips)+' chips';
-  for(const k in UP){const c=mcost(k),op=upOpen(k);fyb[k].classList.toggle('lkup',!op);
+  for(const k of META_UPS){const c=mcost(k),op=upOpen(k);fyb[k].classList.toggle('lkup',!op);
     fyb[k].innerHTML=op?'<b>'+UP[k].n+'</b>Lv '+M.lv[k]+'<br>'+nowNext(k)+'<br>'+big(c)+' chips':'<b>'+LOCK_SVG+UP[k].n+'</b>Reach wave '+UP[k].w;fyb[k].disabled=!op||M.chips<c}
 }
 function showGO(){
@@ -788,7 +797,7 @@ function hbtTile(){
 function runNews(){
   const a=S.start;if(!a)return {items:[],bt:false};
   const items=[],w=S.wave;
-  for(const k in UP)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
+  for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
   for(const m of LOCKED)if(m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.n+' unlocked (coming soon)');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
   const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
@@ -895,6 +904,7 @@ function catDraw(){
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
 reset();showHome();
+ui();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
 // simulate the missed time (up to CATCHUP_MAX seconds) on return, and tick about once a second
 // while hidden. Sounds and vibration are muted while catching up.

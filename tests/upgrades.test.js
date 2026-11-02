@@ -1,6 +1,6 @@
 // Six upgrades; only Damage and Tower HP at first, the rest unlock by best wave (mid-run too). Pixel magnet = more pixels per kill.
 const b=k=>[...document.querySelectorAll('#ups button')][Object.keys(UP).indexOf(k)];
-ok(Object.keys(UP).length===6&&document.querySelectorAll('#ups button').length===6,'six upgrades, six buttons');
+ok(Object.keys(UP).length===8&&document.querySelectorAll('#ups button').length===8&&META_UPS.length===6&&$('fyl').querySelectorAll('button').length===6,'eight in-run upgrades, six of them in the Foundry');
 skipTips();play();S.px=999;ui();
 ok(!b('dmg').disabled&&!b('hp').disabled,'Damage and Tower HP available from the start');
 ok(b('dmg').innerText.split('\n')[1]==='1 > 2'&&b('hp').innerText.split('\n')[1]==='20 > 30','buttons show current > next (Damage 1 > 2, Tower HP 20 > 30)');

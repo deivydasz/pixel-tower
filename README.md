@@ -72,6 +72,10 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 | Range | wave 8 | +8 range | +4 range |
 | Dmg sponge | wave 12 | +0.5 armor per hit | +0.25 armor per hit |
 | Pixel magnet | wave 16 | +15% pixels per kill | +10% pixels per kill |
+| Heavy rounds | wave 30 **in this run** | each hit knocks a Tank back 0.6px | (run only) |
+| Crit power | wave 35 **in this run**, needs Critical bits | crit damage x3 → +0.5 per level | (run only) |
+
+Heavy rounds and Crit power are late-run upgrades: every run starts without them, even if you reached those waves before.
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
 After a run, the game over screen suggests two Foundry upgrades: the cheapest one, and the one that best counters what killed you.
