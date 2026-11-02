@@ -2,8 +2,8 @@
 skipTips();M.best=99;M.res.crit=1;play();S.wave=40;S.px=0;ui();
 const vis=()=>[...document.querySelectorAll('#ups button')].filter(x=>shown(x)).map(x=>x.querySelector('b').textContent);
 const tb=[...document.querySelectorAll('#upt button')];
-ok(tb.map(x=>x.textContent).join('|')==='Attack|Survival|Economy'&&tb[0].classList.contains('on'),'three tabs, Attack selected');
-ok(vis().join('|')==='Damage|Fire rate|Range|Crit power','Attack: Damage, Fire rate, Range, Crit power');
+ok(tb.map(x=>x.textContent).join('|')==='Power|Survival|Economy'&&tb[0].classList.contains('on'),'three tabs, Power selected');
+ok(vis().join('|')==='Damage|Fire rate|Range|Crit power','Power: Damage, Fire rate, Range, Crit power');
 click(tb[1]);ok(vis().join('|')==='Tower HP|Dmg sponge|Heavy rounds'&&tb[1].classList.contains('on'),'Survival: Tower HP, Dmg sponge, Heavy rounds');
 click(tb[2]);ok(vis().join('|')==='Pixel magnet','Economy: Pixel magnet');
 // height never changes between tabs

@@ -64,7 +64,7 @@ Each research level costs boss cores and chips and takes **real time**: about 10
 Bit depth multiplies rather than adds, which is what makes the deep waves reachable.
 
 ## Upgrades
-During a run the upgrades sit in three tabs: **Attack** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet). A dot on a tab means something there is affordable.
+During a run the upgrades sit in three tabs: **Power** (Damage, Fire rate, Range, Crit power), **Survival** (Tower HP, Dmg sponge, Heavy rounds) and **Economy** (Pixel magnet). A dot on a tab means something there is affordable.
 
 You start with Damage and Tower HP. The others unlock when you first reach their wave, straight away even mid-run, and stay unlocked in runs and in the Foundry.
 

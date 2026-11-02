@@ -385,7 +385,7 @@ function flashBtn(b){b.classList.remove('bought');void b.offsetWidth;b.classList
 const STATV={dmg:()=>stat.dmg(),hp:()=>stat.max(),rate:()=>stat.rate(),range:()=>stat.range(),armor:()=>stat.armor(),magnet:()=>stat.magnet(),heavy:()=>stat.heavy(),critx:()=>stat.critx()};
 const STATL={dmg:v=>fmt(v),hp:v=>fmt(v),rate:v=>fmt(v)+'/s',range:v=>fmt(v),armor:v=>fmt(v),magnet:v=>'+'+fmt(100*v)+'%',heavy:v=>fmt(v)+'px',critx:v=>'x'+fmt(v)};  // the button title names the stat
 // In-run upgrades are grouped into tabs so the grid stays two rows tall; a dot marks a tab with something affordable.
-const UPTABS=[['atk','Attack'],['def','Survival'],['eco','Economy']],tabBtns={};let upTab='atk';
+const UPTABS=[['atk','Power'],['def','Survival'],['eco','Economy']],tabBtns={};let upTab='atk';
 const upt=document.getElementById('upt');
 for(const [k,n] of UPTABS){const b=document.createElement('button');b.textContent=n;b.onclick=()=>{upTab=k;ui()};upt.appendChild(b);tabBtns[k]=b}
 // keep the grid two rows tall whatever tab is shown, so switching tabs never moves the game screen
