@@ -220,12 +220,12 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
   const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
-  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
@@ -294,6 +294,7 @@ function loadMeta(m){
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
+if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
