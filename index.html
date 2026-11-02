@@ -130,7 +130,9 @@ button b{display:block;font-weight:400}
 #leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
 #leg.fade{opacity:.2}
 #leg div{display:flex;flex-direction:column}
-#leg i{display:inline-block;width:7px;height:7px;margin-right:4px;vertical-align:0}
+#leg span:first-child{display:flex;align-items:center}
+#leg i{display:inline-flex;align-items:center;justify-content:center;width:18px;height:16px;margin-right:4px}
+#leg i canvas{image-rendering:pixelated;display:block;outline:0;border:0;box-shadow:none;background:none;margin:0;max-width:none}
 #leg .off{opacity:.4}
 #nova{position:absolute;right:6px;bottom:6px;min-width:76px;min-height:38px;padding:4px 8px;font-size:8px;text-align:center;color:#0d1019;background:#5ec8ff;border-color:#0d1019}
 #tip{position:absolute;left:10px;right:10px;display:none;flex-direction:column;gap:8px;padding:10px;background:#0d1019;color:#e8ecf5;border:2px solid #ffd166;font-size:8px;line-height:1.8}
@@ -436,7 +438,7 @@ const fmt=n=>{const a=Math.abs(n);return String(a<10?+n.toFixed(2):a<100?+n.toFi
 const legBox={n:0,x0:0,x1:0,y0:0,y1:0};
 const leg=document.getElementById('leg'),legr=TYPES.map(t=>{
   const d=document.createElement('div');
-  d.innerHTML='<span><i style="background:'+t.c+'"></i>'+t.n+'</span><span></span>';
+  d.innerHTML='<span><i></i>'+t.n+'</span><span></span>';
   leg.appendChild(d);return d;
 });
 // Purchase feedback: short flash on the button, and a label floating up from the tower (in-run buys).
@@ -821,6 +823,8 @@ function ui(){
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.classList.toggle('off',!on);
+    // enemy sprite as the legend icon (sprites are defined further down, so fill in on the first update)
+    const ic=r.querySelector('i');if(!ic.firstChild){const src=sprCanvas(t,0,''),c=document.createElement('canvas');c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);c.style.width=src.width*2+'px';c.style.height=src.height*2+'px';ic.appendChild(c)}
     setT(r.lastChild,on?'HP '+ehp(t)+' Dmg '+fmt(edmg(t)):'Wave '+t.min);
   });
   // each button shows the stat now > after buying one more level, e.g. "2 > 3" under "Damage"

@@ -14,4 +14,6 @@ ok([0,1,2,3].every(t=>towerGrid(t).every(r=>r.length===11+2*t)),'tower grids are
 const barrels=()=>{const n0=[];const fr=g.fillRect.bind(g);let c=0;g.fillRect=(x,y,w,h)=>{if(g.fillStyle==='#ffffff')c++;fr(x,y,w,h)};S.mf=0;draw();g.fillRect=fr;return c};
 M.res.spray=0;const b1=barrels();M.res.spray=2;const b3=barrels();M.res.spray=0;
 ok(b3===3*b1,'Spray and Pray 2 draws three barrels ('+b1+' / '+b3+' tip pixels)');
+ui();ok([...$('leg').querySelectorAll('i canvas')].length===TYPES.length,'legend shows a sprite icon per enemy type');
+ok(getComputedStyle($('leg').querySelector('i canvas')).outlineStyle==='none','legend icons have no frame');
 done();
