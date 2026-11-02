@@ -108,6 +108,9 @@ button b{display:block;font-weight:400}
 #bbf{height:100%;background:#ff6b6b}
 #bbt{position:absolute;inset:0;white-space:nowrap;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;text-shadow:1px 1px 0 #0d1019}
 #stage.bossup #leg{top:40px}
+#spd{position:absolute;left:4px;top:26px;min-width:44px;min-height:30px;padding:4px 6px;font-size:8px;color:#e8ecf5;background:rgba(13,16,25,.6);border-color:rgba(143,163,214,.7);display:none}
+#spd.on{color:#0d1019;background:#ffd166;border-color:#0d1019}
+#stage.bossup #spd{top:40px}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
 #hpt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;text-shadow:1px 1px 0 #0d1019}
@@ -147,7 +150,7 @@ button b{display:block;font-weight:400}
 </head>
 <body>
 <div id="hud"><span class="hs"><span id="px">0 px</span><span id="w">Wave 1</span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
-<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
+<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><button id="spd" aria-label="Game speed">1x</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="upt"></div><div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p>
 <div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
@@ -167,7 +170,7 @@ button b{display:block;font-weight:400}
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
-<p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast and stacking damage. Research keeps running while the game is closed.</p>
+<p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
@@ -217,16 +220,16 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?fast=1 makes Bit Theory research 60x faster, ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
   const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
-  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),fast:q.get('fast')==='1',cat:q.get('cat')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[]};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -250,6 +253,7 @@ const stat={
 const MAGNET={run:.15,meta:.1};
 const BANK={run:.03,meta:.015,capRun:25,capMeta:12};
 const critChance=()=>.05*M.res.crit;
+const CRIT_POP=.6,CRIT_MAX=8;  // crit damage numbers: seconds on screen, most at once
 const novaCd=()=>Math.max(60,NOVA.cd-15*M.res.nova);
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k]));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
@@ -260,11 +264,16 @@ const BITS={
   pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy',req:{}},
   spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out',req:{res:{pierce:2},bk:3}},
   nova:{n:'Blast tech',max:4,t:20,d:'Blast recharges 15s faster',req:{best:35,bk:2}},
-  depth:{n:'Bit depth',max:20,t:30,d:'All damage x1.2 (stacks)',req:{res:{crit:3},bk:5}}
+  depth:{n:'Bit depth',max:20,t:30,d:'All damage x1.2 (stacks)',req:{res:{crit:3},bk:5}},
+  // own costs and minutes per level (levels 3-4 are expensive); only fights speed up, never research or the cat
+  speed:{n:'Overclock',max:4,d:'Fights run +0.5x faster (speed button)',req:{bk:5},cost:[[2,300],[3,800],[6,3000],[10,8000]],time:[30,60,240,480]}
 };
 const BIT_KEYS=Object.keys(BITS);
-const resMin=(k,lv)=>Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
-const resCost=(k,lv)=>({cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))});
+// Game speed (Overclock): the player picks 1x up to the studied max with the speed button. Only fights speed up.
+const maxSpeed=()=>1+.5*(M.res.speed||0);
+const gameSpeed=()=>inRun()&&!S.pause?Math.min(M.spd||1,maxSpeed()):1;
+const resMin=(k,lv)=>BITS[k].time?BITS[k].time[Math.min(lv|0,BITS[k].time.length-1)]:Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
+const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return {cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}};
 const clock={now:()=>Date.now()};
 // Save format version. Saves without `v` are v0 (same shape as v1).
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
@@ -272,17 +281,20 @@ const clock={now:()=>Date.now()};
 // v4 adds `cores` (boss cores, spent on research later) and `bk` (bosses beaten); history entries gain `b` (bosses beaten that run).
 // v5 adds `res` (Bit Theory levels), `rq` (running study {k, end: ms timestamp} or null) and the `magnet` upgrade level.
 // v6 adds `music` (background music on/off, default on). v7 adds the `bank` (Pixel bank) upgrade level.
-// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<8){...}.
-const SAVE_V=7,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0},rq:null,music:true};
+// v8 adds `res.speed` (Overclock research) and `spd` (chosen game speed, 1-3, default 1).
+// When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<9){...}.
+const SAVE_V=8,HIST_MAX=50;
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1};
 function loadMeta(m){
   if(!m||!m.lv)return;
-  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false};
+  M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
+  M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
+if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 const mcost=k=>Math.round(3*Math.pow(1.7,M.lv[k]));
 
@@ -518,12 +530,14 @@ const spawnDist=a=>{const z=zoomTarget(),ex=(W/2)/Math.max(.01,Math.abs(Math.cos
 const toScreen=(x,y)=>[CX+(x-CX)*(S.zoom||1),CY+(y-CY)*(S.zoom||1)];
 function update(dt){
   if(S.pause)return;
-  S.zoom=(S.zoom||1)+(zoomTarget()-(S.zoom||1))*Math.min(1,dt*2);
+  const rt=dt/gameSpeed();  // real time: banners, labels, zoom and shake don't speed up with Overclock
+  S.zoom=(S.zoom||1)+(zoomTarget()-(S.zoom||1))*Math.min(1,rt*2);
   tipsCheck();if(S.pause)return;
-  if(S.toast>0&&(S.toast-=dt)<=0)closeTip();
-  S.bonus=Math.max(0,(S.bonus||0)-dt);
-  S.shake=Math.max(0,S.shake-dt);
-  for(const f of S.ft)f.life-=dt;S.ft=S.ft.filter(f=>f.life>0);
+  if(S.toast>0&&(S.toast-=rt)<=0)closeTip();
+  S.bonus=Math.max(0,(S.bonus||0)-rt);
+  S.shake=Math.max(0,S.shake-rt);
+  for(const f of S.ft)f.life-=rt;S.ft=S.ft.filter(f=>f.life>0);
+  for(const f of S.cp)f.life-=rt;S.cp=S.cp.filter(f=>f.life>0);
   if(S.over){S.ot+=dt;return}
   S.time+=dt;
   S.nova=Math.max(0,S.nova-dt);
@@ -544,7 +558,7 @@ function update(dt){
     // bosses stop at the tower and keep hitting until they or the tower are destroyed (no escapes)
     if(e.kb){const f=Math.min(1,dt/e.kb.t);e.x+=e.kb.x*f;e.y+=e.kb.y*f;e.kb.x*=1-f;e.kb.y*=1-f;e.kb.t-=dt;if(e.kb.t<=0)e.kb=null}  // Blast knock-back slide
     else if(d>stop){const m=Math.min(d-stop,e.t.sp*dt);e.x+=dx/d*m;e.y+=dy/d*m}
-    e.hit=Math.max(0,e.hit-dt);
+    e.hit=Math.max(0,e.hit-dt);if(e.crit)e.crit=Math.max(0,e.crit-dt);
     if(e.boss){e.shd=Math.max(0,e.shd-dt);if(e.t.spawn&&(e.st-=dt)<=0){e.st=e.t.spawn;const r=TYPES[1];S.en.push({x:e.x,y:e.y,t:r,hp:ehp(r),hit:0})}
       if(d<=stop+.5){if(!e.at){e.at=1;e.atk=0;S.bonus=2;S.bt1='BOSS ATTACKS!';S.bt='Destroy it before it destroys you';sfx('boss')}
         if((e.atk-=dt)<=0){e.atk=BOSS.hitEvery;S.hp-=Math.max(.2,e.t.d-stat.armor());S.killer=e.t;S.flash=.15;S.shake=.25;sfx('hit');buzz(40)}}}
@@ -574,7 +588,8 @@ function update(dt){
     p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
     for(const e of S.en){
       if(!e.dead&&Math.abs(p.x-e.x)<e.t.s/2+1&&Math.abs(p.y-e.y)<e.t.s/2+1&&!(p.hits&&p.hits.includes(e))){
-        e.hp-=stat.dmg()*(p.crit?stat.critx():1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hit=.08;
+        const dmg=stat.dmg()*(p.crit?stat.critx():1)*(e.boss&&e.t.shield&&e.shd<=0?e.t.shield:1);e.hp-=dmg;e.hit=.08;
+        if(p.crit){e.crit=.12;S.cp.push({x:e.x,y:e.y-e.t.s/2-2,t:big(dmg),life:CRIT_POP});if(S.cp.length>CRIT_MAX)S.cp.shift()}
         if(e.t===TYPES[2]&&stat.heavy()){const ex=e.x-CX,ey=e.y-CY,ed=Math.hypot(ex,ey)||1;e.x+=ex/ed*stat.heavy();e.y+=ey/ed*stat.heavy()}
         if(p.hits)p.hits.push(e);if(p.pierce>0)p.pierce--;else p.life=0;
         if(e.hp<=0){e.dead=true;kill(e)}
@@ -612,9 +627,13 @@ function draw(){
   for(const p of S.pt)R(p.x-1,p.y-1,2,2,p.c);
   // enemies
   for(const e of S.en){const s=e.t.s;
-    if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
+    if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
       if(e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
-    else R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c)}
+    else R(e.x-s/2,e.y-s/2,s,s,e.crit>0?'#ffd166':e.hit>0?'#fff':e.t.c)}
+  // crit pop-ups: yellow damage numbers rising from the enemy (world position, readable size at any zoom)
+  if(S.cp.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';g.lineWidth=2;g.strokeStyle='#0d1019';
+    for(const f of S.cp){const[x,y]=toScreen(f.x,f.y),ty=Math.round(y-(CRIT_POP-f.life)*14);g.globalAlpha=Math.min(1,f.life*3);
+      g.strokeText(f.t,Math.round(x),ty);g.fillStyle='#ffd166';g.fillText(f.t,Math.round(x),ty)}g.globalAlpha=1}
   // floating purchase labels, in the free space below the tower
   if(S.ft.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';
     // labels with their own spot (e.g. the cat's +1 HP) rise from there; purchase labels stack under the tower
@@ -666,6 +685,7 @@ function ui(){
   if($id('home').style.display==='flex'&&M.rq)hbtTile();
   if($id('bt').style.display==='flex')btTick();
   setT(pb,S.pause&&!S.tip?'Resume':'Pause');setDis(pb,S.over||S.tip);
+  const sOn=inRun()&&M.res.speed>0;setD(spdb,sOn?'block':'none');if(sOn){const v=Math.min(M.spd,maxSpeed());setT(spdb,fmt(v)+'x');spdb.classList.toggle('on',v>1)}
   setT(novab,S.nova>0?'Blast '+fmtTime(Math.ceil(S.nova-.01)):'BLAST');setDis(novab,S.nova>0||S.over||S.pause);
   const bo=!S.over&&S.en.find(e=>e.boss);$id('stage').classList.toggle('bossup',!!bo);setD($id('bb'),bo?'block':'none');
   if(bo){setW($id('bbf'),100*Math.max(0,bo.hp)/bo.max);setT($id('bbt'),bo.t.n.toUpperCase()+' '+Math.ceil(Math.max(0,bo.hp))+(bo.t.shield?(bo.shd>0?' EXPOSED':' SHIELD'):''))}
@@ -785,7 +805,7 @@ function showHistory(){
 document.getElementById('hhi').onclick=showHistory;
 // ---- Bit Theory screen and timers
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
-const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg'})[k];
+const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
 const resUnlocked=()=>M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
 // Requirement list for a research: [{t:label, have, need}], all must have >= need.
 function resReqs(k){const r=BITS[k].req,out=[];
@@ -867,7 +887,9 @@ document.getElementById('cfk').onclick=()=>{S.confirm=false};
 document.getElementById('cfs').onclick=()=>{if(!S.over&&!S.menu)endRun(true)};
 pb.onclick=()=>setPause(!S.pause);
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
-const novab=document.getElementById('nova');
+const novab=document.getElementById('nova'),spdb=document.getElementById('spd');
+// speed button cycles 1x, 1.5x ... up to the Overclock level, then back to 1x; the choice is saved
+spdb.onclick=()=>{const v=Math.min(M.spd,maxSpeed())+.5;M.spd=v>maxSpeed()+.01?1:v;save();sfx('buy')};
 novab.onclick=()=>nova();
 // Space always means Nova; preventDefault stops it also re-clicking a focused button.
 addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(!e.repeat)nova()}});
@@ -951,7 +973,7 @@ const CATCHUP_MAX=30*60;
 let last=performance.now(),acc=0,quiet=false;
 function advance(now){
   const el=Math.min(CATCHUP_MAX,Math.max(0,(now-last)/1000));last=now;
-  quiet=el>.5;acc+=el;
+  quiet=el>.5;acc+=Math.min(CATCHUP_MAX,el*gameSpeed());  // Overclock: more game steps per real second (catch-up still capped)
   while(acc>=1/60){update(1/60);acc-=1/60}
   quiet=false;
 }
