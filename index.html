@@ -213,7 +213,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0};S.hp=stat.max();
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1};S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
@@ -418,13 +418,13 @@ function startWave(){
 function spawn(){
   if(S.boss&&!S.en.some(e=>e.boss)&&!S.bossDone){
     const t=bossFor(S.wave),a=Math.random()*Math.PI*2,hp=bossHp(t,S.wave);
-    S.en.push({x:CX+Math.cos(a)*140,y:CY+Math.sin(a)*140,t,hp,max:hp,hit:0,boss:1,shd:0,st:t.spawn||0});
+    const sd=spawnDist(a);S.en.push({x:CX+Math.cos(a)*sd,y:CY+Math.sin(a)*sd,t,hp,max:hp,hit:0,boss:1,shd:0,st:t.spawn||0});
     S.bossDone=true;return;
   }
   const ok=TYPES.filter(t=>S.wave>=t.min);
   const t=ok[Math.floor(Math.random()*ok.length)];
   const a=Math.random()*Math.PI*2;
-  S.en.push({x:CX+Math.cos(a)*140,y:CY+Math.sin(a)*140,t,hp:ehp(t),hit:0});
+  const sd=spawnDist(a);S.en.push({x:CX+Math.cos(a)*sd,y:CY+Math.sin(a)*sd,t,hp:ehp(t),hit:0});
 }
 function kill(e){
   sfx('kill');
@@ -488,8 +488,14 @@ function endRun(stopped){
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:S.earn,d:Math.round(S.time),n:S.novas,b:S.bosses,r:S.record?1:0}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
 }
+const ZOOM_MIN=.5;
+const zoomTarget=()=>Math.max(ZOOM_MIN,Math.min(1,(W/2-6)/stat.range()));
+// spawn just outside the visible area in that direction (never closer than the classic 140)
+const spawnDist=a=>{const z=zoomTarget(),ex=(W/2)/Math.max(.01,Math.abs(Math.cos(a))),ey=(H/2)/Math.max(.01,Math.abs(Math.sin(a)));return Math.max(140,Math.min(ex,ey)/z+8)};
+const toScreen=(x,y)=>[CX+(x-CX)*(S.zoom||1),CY+(y-CY)*(S.zoom||1)];
 function update(dt){
   if(S.pause)return;
+  S.zoom=(S.zoom||1)+(zoomTarget()-(S.zoom||1))*Math.min(1,dt*2);
   tipsCheck();if(S.pause)return;
   if(S.toast>0&&(S.toast-=dt)<=0)closeTip();
   S.bonus=Math.max(0,(S.bonus||0)-dt);
@@ -566,20 +572,24 @@ function update(dt){
   }
   S.pt=S.pt.filter(p=>!p.done);
 }
-function R(x,y,w,h,c){g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),w,h)}
+// World zoom: when Range grows past the screen, the battlefield zooms out around the tower so the range ring
+// always fits (down to ZOOM_MIN). R() draws world pixels through it; HUD overlays, banners, labels and the cat don't.
+let WZ=1;
+function R(x,y,w,h,c){g.fillStyle=c;if(WZ!==1){x=CX+(x-CX)*WZ;y=CY+(y-CY)*WZ;w=Math.max(1,Math.round(w*WZ));h=Math.max(1,Math.round(h*WZ))}g.fillRect(Math.round(x),Math.round(y),w,h)}
 function draw(){
   g.clearRect(0,0,W,H);
   g.save();
   if(S.shake>0&&!S.over&&!RM.matches)g.translate(Math.round(Math.random()*2-1),Math.round(Math.random()*2-1));
+  WZ=S.zoom||1;
   // range ring
   g.strokeStyle='rgba(143,163,214,.25)';g.lineWidth=1;
-  g.beginPath();g.arc(CX+.5,CY+.5,stat.range(),0,Math.PI*2);g.stroke();
+  g.beginPath();g.arc(CX+.5,CY+.5,stat.range()*WZ,0,Math.PI*2);g.stroke();
   // pixels
   for(const p of S.pt)R(p.x-1,p.y-1,2,2,p.c);
   // enemies
   for(const e of S.en){const s=e.t.s;
     if(e.boss){R(e.x-s/2-1,e.y-s/2-1,s+2,s+2,'#0d1019');R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c);R(e.x-2,e.y-2,4,4,'#0d1019');
-      if(e.t.shield&&e.shd<=0){g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(e.x)+.5,Math.round(e.y)+.5,s,0,Math.PI*2);g.stroke()}}
+      if(e.t.shield&&e.shd<=0){const[sx,sy]=toScreen(e.x,e.y);g.strokeStyle='rgba(125,211,252,.9)';g.lineWidth=1;g.beginPath();g.arc(Math.round(sx)+.5,Math.round(sy)+.5,s*WZ,0,Math.PI*2);g.stroke()}}
     else R(e.x-s/2,e.y-s/2,s,s,e.hit>0?'#fff':e.t.c)}
   // floating purchase labels, in the free space below the tower
   if(S.ft.length){g.font='7px "Press Start 2P",monospace';g.textAlign='center';
@@ -595,12 +605,13 @@ function draw(){
   if(S.lv.armor){const a=Math.min(S.lv.armor,4),c='#5ec8ff';R(CX-7,CY-7,13+0,1,c);R(CX-7,CY+7,13,1,a>1?c:'rgba(0,0,0,0)');R(CX-7,CY-7,1,15,a>2?c:'rgba(0,0,0,0)');R(CX+7,CY-7,1,15,a>3?c:'rgba(0,0,0,0)')}
   // nova charge arc and blast ring
   g.lineWidth=1;g.strokeStyle=S.nova>0?'rgba(94,200,255,.45)':'#5ec8ff';
-  g.beginPath();g.arc(CX+.5,CY+.5,10,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
-  if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,8+(NOVA.r-8)*k,0,Math.PI*2);g.stroke();g.lineWidth=1}
+  g.beginPath();g.arc(CX+.5,CY+.5,10*WZ,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-S.nova/novaCd()));g.stroke();
+  if(S.nfx>=0){const k=S.nfx/NOVA.fx;g.strokeStyle='rgba(94,200,255,'+(1-k)+')';g.lineWidth=2;g.beginPath();g.arc(CX+.5,CY+.5,(8+(NOVA.r-8)*k)*WZ,0,Math.PI*2);g.stroke();g.lineWidth=1}
   if(S.target){
     const a=Math.atan2(S.target.y-CY,S.target.x-CX);
     R(CX+Math.cos(a)*7-1,CY+Math.sin(a)*7-1,3,3,'#ffd166');
   }
+  WZ=1;
   catDraw();
   g.restore();
   // wave / boss / unlock banner: centred below the tower, clear of the HP bar, boss bar and legend (top) and BLAST (bottom)
@@ -639,7 +650,7 @@ function ui(){
   // fade the legend while an enemy is underneath it (legend box measured in canvas units every 20 frames)
   if(!(legBox.n++%20)){const lr=leg.getBoundingClientRect(),cr=cv.getBoundingClientRect(),sc=cr.width/W||1;
     legBox.x0=(lr.left-cr.left)/sc-3;legBox.x1=(lr.right-cr.left)/sc+3;legBox.y0=(lr.top-cr.top)/sc-3;legBox.y1=(lr.bottom-cr.top)/sc+3}
-  leg.classList.toggle('fade',!S.over&&S.en.some(e=>e.x>legBox.x0&&e.x<legBox.x1&&e.y>legBox.y0&&e.y<legBox.y1));
+  leg.classList.toggle('fade',!S.over&&S.en.some(e=>{const[x,y]=toScreen(e.x,e.y);return x>legBox.x0&&x<legBox.x1&&y>legBox.y0&&y<legBox.y1}));
   TYPES.forEach((t,i)=>{
     const on=Math.max(1,S.wave)>=t.min,r=legr[i];
     r.classList.toggle('off',!on);

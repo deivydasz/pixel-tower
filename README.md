@@ -22,6 +22,8 @@ One tower stands in the middle of the screen and enemies come from every side, w
 | Sound on/off (everything) | Sound button | |
 | Music on/off | Music button on the home menu or in the pause panel | |
 
+When your Range grows past the screen, the battlefield zooms out so you always see your whole range.
+
 The game keeps running when you switch tabs or apps. When you come back, the missed time (up to 30 minutes) is played out instantly and silently.
 
 ## Enemies
