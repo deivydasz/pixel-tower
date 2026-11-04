@@ -4,8 +4,10 @@ step(.1);ok(shown(tip)&&S.tip==='start'&&S.pause&&tip.className==='card','first 
 ui();ok($('pb').disabled&&$('pb').textContent==='Pause','pause button disabled and says Pause under card');
 click($('c'));ok(S.pause&&S.nova===0,'tapping canvas under card does nothing');
 click($('tipok'));ok(!shown(tip)&&!S.pause&&!S.tip,'Got it closes card and resumes');
-S.px=100;step(.1);ok(shown(tip)&&tip.className==='toast'&&!S.pause,'buy toast shows without pausing');
-ui();document.querySelector('#ups button').click();ok(!shown(tip),'buying an upgrade dismisses toast');
+upTab='def';S.px=cost('dmg')-1;step(.1);ok(!shown(tip),'no buy prompt until Damage is affordable');
+S.px=cost('dmg');step(.1);ui();ok(shown(tip)&&tip.className==='toast'&&!S.pause&&tip.textContent.includes('Tap Damage below'),'buy toast points at Damage, without pausing');
+ok(upTab==='atk'&&btns.dmg.classList.contains('hint')&&shown(btns.dmg),'Power tab shown, Damage button pulses');
+btns.dmg.click();ui();ok(!shown(tip)&&!btns.dmg.classList.contains('hint')&&S.lv.dmg===1,'buying Damage dismisses the toast and the pulse');
 S.en=[];S.left=99;S.sp=99;for(let i=0;i<3;i++)enemy(20,i*3,2,99);
 step(.05);ok(shown(tip)&&S.tip==='nova'&&S.pause&&nb.classList.contains('hint'),'crowded: nova card, paused, button pulses');
 ok($('tipok').textContent==='Fire BLAST','overwhelmed card button says Fire BLAST');

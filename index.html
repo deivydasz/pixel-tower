@@ -197,7 +197,7 @@ button b{display:block;font-weight:400}
 #tip.toast{bottom:58px;pointer-events:none}
 #tip b{color:#ffd166;font-weight:400}
 #tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
-#nova.hint{animation:pulse .8s steps(2) infinite}
+#nova.hint,#ups button.hint{animation:pulse .8s steps(2) infinite}
 @keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
 #got{display:none;color:var(--gold)}
 #gnew{width:min(360px,92vw);box-sizing:border-box;border:2px solid #c4a7ff;padding:8px;font-size:8px;line-height:1.7;display:none}
@@ -563,6 +563,7 @@ for(const k in UP){
     if(S.over||S.px<c||!upOpen(k))return;
     S.px-=c;S.lv[k]++;sfx('buy');flashBtn(b);S.ft.push({t:GAIN[k],life:1});
     if(S.toast>0){S.toast=0;closeTip()}
+    if(k==='dmg')S.dmgHint=false;
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
   };
   ups.appendChild(b);btns[k]=b;
@@ -716,7 +717,7 @@ function nova(){
 // Cards pause the game until "Got it"; toasts show briefly without pausing.
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
-  buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
+  buy:{t:'<span>You have enough pixels! Tap <b>Damage</b> below to hit harder.</span>'},
   boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Every 16 waves (two bytes make a word) the glitch compiles a new one.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with a BLAST to break the shield for '+BOSS.shieldDown+'s.</span>'},
   nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap the BLAST button to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
@@ -738,7 +739,8 @@ function tipsCheck(){
   if(bo&&!M.tips.boss)return showTip('boss');
   if(bo&&bo.t.shield&&!M.tips.warden)return showTip('warden');
   if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
-  if(!M.tips.buy&&S.px>=Math.min(...openUps().map(cost)))return showTip('buy');
+  // first buy: point at Damage (its button pulses until bought)
+  if(!M.tips.buy&&S.px>=cost('dmg')){S.dmgHint=true;upTab='atk';return showTip('buy')}
 }
 // Ends the run (tower destroyed, or stopped by the player): records best and history, shows game over.
 function endRun(stopped){
@@ -1082,7 +1084,7 @@ function ui(){
     setD(btns[k],UP[k].cat===upTab?'':'none');
     const c=cost(k);
     const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+(UP[k].needs&&!UP[k].needs()?UP[k].needTxt:UP[k].run?'Run wave '+UP[k].w:'Reach wave '+UP[k].w)+'</span>&nbsp;';
-    setH(btns[k],h);btns[k].classList.toggle('lkup',!op);
+    setH(btns[k],h);btns[k].classList.toggle('lkup',!op);if(k==='dmg')btns[k].classList.toggle('hint',!!S.dmgHint&&inRun());
     setDis(btns[k],S.over||!op||S.px<c);
   }
 }
@@ -1448,7 +1450,8 @@ function catDraw(){
   if(word&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';const bw=g.measureText(word).width+8;
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
-idleCheck();reset();showHome();
+// a brand-new player starts playing right away (the first tip card explains the game); everyone else sees the menu
+idleCheck();if(!M.hist.length&&!M.best)startRun(false);else{reset();showHome()}
 save();track('open',{m:trackSnap()});  // one per page load (also saves a newly made uid)
 ui();lockUpsHeight();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we

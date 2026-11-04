@@ -1,5 +1,9 @@
 const hs=()=>shown($('home'));
-ok(hs()&&S.menu&&S.pause,'game opens on home menu, not running');
+// a brand-new player goes straight into a run: the start tip card pauses it until the first tap
+step(.05);ok(!hs()&&!S.menu&&S.tip==='start'&&S.pause&&shown($('tip')),'first ever load starts a run with the start tip');
+// returning players get the menu
+M.hist=[{t:Date.now(),w:3,k:'Grunt',c:1,d:30,n:0}];M.tips={};reset();showHome();M.hist=[];M.best=0;showHome();
+ok(hs()&&S.menu&&S.pause,'returning player: game opens on home menu, not running');
 const w0=S.wave;step(3);ok(S.wave===w0&&!S.en.length,'nothing happens behind the menu');
 ok(!shown($('tip')),'no tip card behind the menu');
 ok($('hst').textContent.startsWith('Defend'),'new player sees intro line');
