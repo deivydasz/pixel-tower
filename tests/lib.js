@@ -1,5 +1,7 @@
 // Test helpers, loaded after the game script. Game globals (S, M, update, nova, ...) are directly accessible.
 const RES=[];
+// Glitch offers pick the first choice by themselves in tests (glitches.test.js turns this off to test the panel).
+GLITCH.auto=true;
 function ok(cond,msg){RES.push((cond?'PASS ':'FAIL ')+msg)}
 // Advance the game deterministically by `sec` seconds at 60 fps.
 function step(sec){for(let i=0;i<Math.round(sec*60);i++)update(1/60)}

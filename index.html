@@ -20,6 +20,10 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #bw{color:var(--gold)}
 #bw.dl{color:var(--violet)}
 #hud{font-size:8px}
+#bits{position:absolute;left:6px;right:6px;top:22px;display:flex;gap:3px;pointer-events:none}
+#bits i{flex:1;height:3px;background:rgba(232,236,245,.18)}
+#bits i.on{background:#ffd166}
+#bits.byte i{background:#5ef0ff}
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px solid var(--bd)}
@@ -153,14 +157,15 @@ button b{display:block;font-weight:400}
 #bb{position:absolute;left:4px;right:4px;top:22px;height:12px;background:#3a4160;border:2px solid #0d1019;pointer-events:none;display:none}
 #bbf{height:100%;background:#ff6b6b}
 #bbt{position:absolute;inset:0;white-space:nowrap;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;text-shadow:1px 1px 0 #0d1019}
-#stage.bossup #leg{top:40px}
-#spd{position:absolute;left:4px;top:26px;min-width:44px;min-height:30px;padding:4px 6px;font-size:8px;color:#e8ecf5;background:rgba(13,16,25,.6);border-color:rgba(143,163,214,.7);display:none}
+#stage.bossup #leg{top:46px}
+#stage.bossup #bits{top:39px}
+#spd{position:absolute;left:4px;top:30px;min-width:44px;min-height:30px;padding:4px 6px;font-size:8px;color:#e8ecf5;background:rgba(13,16,25,.6);border-color:rgba(143,163,214,.7);display:none}
 #spd.on{color:#0d1019;background:#ffd166;border-color:#0d1019}
-#stage.bossup #spd{top:40px}
+#stage.bossup #spd{top:46px}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
 #hpt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;text-shadow:1px 1px 0 #0d1019}
-#leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
+#leg{position:absolute;right:4px;top:30px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
 #leg.fade{opacity:.2}
 #leg div{display:flex;flex-direction:column}
 #leg span:first-child{display:flex;align-items:center}
@@ -172,6 +177,12 @@ button b{display:block;font-weight:400}
 #tip.card{top:50%;transform:translateY(-50%)}
 .pnl{position:absolute;left:10px;right:10px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;padding:12px;background:#0d1019;color:#e8ecf5;border:2px solid #e8ecf5;font-size:8px;line-height:1.8;text-align:center}
 .pnl h2{margin:0 0 4px;font:inherit;font-size:12px}
+#gl{border-color:#ff4fd8;box-shadow:3px 0 0 #5ef0ff,-3px 0 0 #ff4fd8}
+#gl h2{color:#ff4fd8;text-shadow:2px 0 0 #5ef0ff}
+#glo{display:grid;gap:6px}
+#glo button{text-align:left;line-height:1.7;padding:8px}
+#glo b{display:flex;justify-content:space-between;font-weight:400;color:#5ef0ff}
+#glo small{opacity:.75}
 #pzd{color:#c4a7ff}
 #pzd:empty{display:none}
 #tip.dl{border-color:#c4a7ff}
@@ -201,8 +212,8 @@ button b{display:block;font-weight:400}
 </style>
 </head>
 <body>
-<div id="hud"><span class="hs"><span id="px">0 px</span><span id="w">Wave 1</span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
-<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><button id="spd" aria-label="Game speed">1x</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><span id="pzd"></span><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
+<div id="hud"><span class="hs"><span id="px">0 px</span><span id="w"><span id="wn">Wave 1</span></span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
+<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bits" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><button id="spd" aria-label="Game speed">1x</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><span id="pzd"></span><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="gl" class="pnl" role="dialog" aria-labelledby="glh"><h2 id="glh">BYTE!</h2><span>You cleared 8 bit waves. They compiled into a byte, and the pixels glitched. Keep one glitch for this run:</span><div id="glo"></div></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="upt"></div><div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="gnm"></p>
 <div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
@@ -226,6 +237,7 @@ button b{display:block;font-weight:400}
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
 <p>After your first run, the tower also keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
+<p>Every wave is a bit. Clear 8 bit waves and they compile into a byte (the bits next to the wave number fill up): the pixels glitch and you keep one of three Glitches, small boosts for the rest of the run. Pick the same one again to stack it.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
@@ -288,7 +300,7 @@ function testStart(host,proto,search){
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(daily){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[],fx:[],sfl:0,bin:0};
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[],fx:[],sfl:0,bin:0,gl:{},gpick:null,gfx:0};
   if(daily){S.dday=today();S.daily=DAILY_MODS[dailyModIx(S.dday)];S.rng=mulberry(hash32(S.dday*7919+1))}
   S.hp=stat.max();
   closeTip();
@@ -302,11 +314,43 @@ const ML=k=>S&&S.daily?0:(M.lv[k]||0);
 const RL=k=>S&&S.daily?((S.daily.res||{})[k]||0):(M.res[k]||0);
 const skinB=k=>S&&S.daily?0:skinBonus(k);
 const dmod=k=>S&&S.daily&&S.daily[k]||1;
+// Glitches: run-only perks. Every wave is a bit; 8 cleared bit waves compile into a byte (wave 8, 16, 24...): the screen glitches and offers
+// GLITCH.choices random ones (seeded in daily runs); the player keeps one for this run. Picking the same one again stacks it
+// up to max. w = how often it is offered (rarer when strong). The game waits for the pick (auto-picked while the tab is hidden).
+const GLITCH={first:8,every:8,choices:3,auto:false};
+// v = effect per level (used by gv()). Halved after the first campaign sim (stronger values made late runs ~75% longer); not re-simulated yet.
+const GLITCHES={
+  sharp:{n:'Sharp Pixels',v:.15,d:'+15% damage',max:5},
+  turbo:{n:'Turbo Bit',v:.12,d:'+12% fire rate',max:5},
+  wide:{n:'Widescreen',v:8,d:'+8 range',max:3},
+  alias:{n:'Anti-Aliasing',v:.08,d:'Enemy hits deal 8% less',max:3},
+  scan:{n:'Scanlines',v:.15,d:'+15% tower HP',max:3},
+  rain:{n:'Pixel Rain',v:.2,d:'+20% pixels per kill',max:5},
+  zip:{n:'Compression',v:.08,d:'Upgrades 8% cheaper',max:3},
+  refresh:{n:'Refresh Rate',v:.2,d:'Blast recharges 20% faster',max:3},
+  dither:{n:'Dither Shot',v:.04,d:'+4% chance of a x3 hit',max:3},
+  stray:{n:'Stray Bit',v:1,d:'+1 bullet per shot',max:1,w:.3},
+  save:{n:'Save State',v:.5,d:'Survive one killing blow with half HP',max:1,w:.5}
+};
+const GL_KEYS=Object.keys(GLITCHES);
+const G=k=>S&&S.gl&&S.gl[k]|0;  // glitch level this run
+const gv=k=>G(k)*GLITCHES[k].v;  // its total effect
+// bits lit in the HUD byte meter: waves cleared since the last byte (8 while a byte is being picked)
+const byteBits=()=>!inRun()||S.wave<1?0:S.gpick?GLITCH.every:(S.paid?S.wave:S.wave-1)%GLITCH.every;
+const glitchWave=w=>w>=GLITCH.first&&(w-GLITCH.first)%GLITCH.every===0;
+// GLITCH.choices different glitches that can still level up, weighted by w
+function glitchOffer(){const pool=GL_KEYS.filter(k=>G(k)<GLITCHES[k].max),out=[];
+  while(out.length<GLITCH.choices&&pool.length){const tot=pool.reduce((a,k)=>a+(GLITCHES[k].w||1),0);let r=drand()*tot,i=0;
+    for(;i<pool.length-1;i++){r-=GLITCHES[pool[i]].w||1;if(r<0)break}out.push(pool.splice(i,1)[0])}
+  return out}
+function pickGlitch(i){const k=S.gpick&&S.gpick[i];if(!k)return false;const m0=stat.max();
+  S.gl[k]=G(k)+1;if(k==='scan')S.hp+=stat.max()-m0;S.gpick=null;S.bonus=2;S.bt1='GLITCH';S.bt=GLITCHES[k].n+(G(k)>1?' x'+G(k):'');sfx('buy');return true}
+const glitchList=()=>GL_KEYS.filter(k=>G(k)).map(k=>GLITCHES[k].n+(G(k)>1?' x'+G(k):'')).join(', ');
 const stat={
-  dmg:()=>(1+S.lv.dmg+.5*ML('dmg'))*Math.pow(1.2,RL('depth'))*(1+skinB('t'))*dmod('dmg'),
-  rate:()=>1+.4*S.lv.rate+.2*ML('rate'),
-  range:()=>50+8*S.lv.range+4*ML('range'),
-  max:()=>(20+10*S.lv.hp+5*ML('hp'))*dmod('hp'),
+  dmg:()=>(1+S.lv.dmg+.5*ML('dmg'))*Math.pow(1.2,RL('depth'))*(1+skinB('t'))*dmod('dmg')*(1+gv('sharp')),
+  rate:()=>(1+.4*S.lv.rate+.2*ML('rate'))*(1+gv('turbo')),
+  range:()=>50+8*S.lv.range+4*ML('range')+gv('wide'),
+  max:()=>(20+10*S.lv.hp+5*ML('hp'))*dmod('hp')*(1+gv('scan')),
   armor:()=>.5*S.lv.armor+.25*ML('armor'),
   // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
   magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*ML('magnet'),
@@ -318,10 +362,10 @@ const stat={
 };
 const MAGNET={run:.15,meta:.1};
 const BANK={run:.03,meta:.015,capRun:25,capMeta:12};
-const critChance=()=>.05*RL('crit');
+const critChance=()=>.05*RL('crit')+gv('dither');
 const CRIT_POP=.6,CRIT_MAX=8;  // crit damage numbers: seconds on screen, most at once
-const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast');
-const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost'));
+const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast')*(1-gv('refresh'));
+const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost')*(1-gv('zip')));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
 // t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: level 1 RES_FIRST chips and no cores; then 1 core + 1 per 2 levels, chips 25 x 1.6^level.
 // req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
@@ -486,7 +530,7 @@ sndUI();
 const EN={hpGrow:1.11,dmgEvery:5,dmgStep:.1,minK:0};
 const ehp=t=>Math.max(1,Math.round(2*Math.pow(EN.hpGrow,Math.max(1,S.wave))*t.hp*dmod('ehp')));
 const edmgRaw=t=>t.d*(1+EN.dmgStep*Math.floor(Math.max(1,S.wave)/EN.dmgEvery));
-const edmg=t=>{const r=edmgRaw(t);return Math.max(.2,r*EN.minK,r-stat.armor())};
+const edmg=t=>{const r=edmgRaw(t)*(1-gv('alias'));return Math.max(.2,r*EN.minK,r-stat.armor())};
 // Compact counts for chips/pixels: 9999, 12.3k, 456k, 1.23M.
 const big=n=>{n=Math.floor(n);return n<1e4?String(n):n<1e6?(+(n/1e3).toFixed(n<1e5?1:0))+'k':(+(n/1e6).toFixed(n<1e7?2:1))+'M'};
 // Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
@@ -600,7 +644,7 @@ function endDaily(stopped){
   const pay=Math.max(0,dailyChips(D.best,D.streak)-D.paid);D.paid+=pay;M.chips+=pay;S.earn=pay;S.dpay=pay;
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:pay,d:Math.round(S.time),n:S.novas,b:S.bosses,r:0,dl:1}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
-  track('daily',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:pay,n:S.novas,x:S.daily.n,s:D.streak,r:S.drec?1:0,m:trackSnap()});
+  track('daily',{gl:Object.assign({},S.gl),w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:pay,n:S.novas,x:S.daily.n,s:D.streak,r:S.drec?1:0,m:trackSnap()});
 }
 function idleCheck(now){
   now=now||Date.now();const away=Math.max(0,now-(M.seen||now));M.seen=now;
@@ -632,7 +676,7 @@ function kill(e){
   else{ring(e.x,e.y,e.t.s/2,6,e.t.c,.22);sparks(e.x,e.y,4,e.t.c,45,.25)}
   if(e.boss&&S.daily){S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='What a daily run!';sfx('wave');buzz([40,30,40])}
   else if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
-  const np=e.t.px*(1+stat.magnet())*(1+skinB('e')),n=Math.floor(np)+(Math.random()<np%1?1:0);
+  const np=e.t.px*(1+stat.magnet())*(1+skinB('e'))*(1+gv('rain')),n=Math.floor(np)+(Math.random()<np%1?1:0);
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,v=20+Math.random()*30;
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
@@ -651,7 +695,7 @@ function sparks(x,y,n,c,sp,life){for(let i=0;i<n;i++){const a=Math.random()*Math
   S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+Math.random()*.6),max:life,c})}fxCap()}
 function ring(x,y,r,grow,c,life){S.fx.push({x,y,r,grow,c,life,max:life,k:'r'});fxCap()}
 function nova(){
-  if(S.over||S.pause||S.nova>0)return false;
+  if(S.over||S.pause||S.gpick||S.nova>0)return false;
   S.nova=novaCd();S.nfx=0;S.novas++;S.shake=.15;S.sfl=.18;sfx('nova');buzz(40);
   for(let i=0;i<28;i++){const a=i/28*Math.PI*2,v=110+Math.random()*40;S.fx.push({x:CX,y:CY,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.4,max:.4,c:i%2?'#5ec8ff':'#e8ecf5'})}fxCap();
   for(const e of S.en){
@@ -700,7 +744,7 @@ function endRun(stopped){
   S.prevBest=M.best;S.record=M.best>0&&S.wave>M.best;M.best=Math.max(M.best,S.wave);
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:S.earn,d:Math.round(S.time),n:S.novas,b:S.bosses,r:S.record?1:0}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
-  track('run',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:S.earn,n:S.novas,b:S.bosses,r:S.record?1:0,spd:Math.min(M.spd,maxSpeed()),up:Object.assign({},S.lv),m:trackSnap()});
+  track('run',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:S.earn,n:S.novas,b:S.bosses,r:S.record?1:0,spd:Math.min(M.spd,maxSpeed()),up:Object.assign({},S.lv),gl:Object.assign({},S.gl),m:trackSnap()});
 }
 const ZOOM_MIN=.5;
 const zoomTarget=()=>Math.max(ZOOM_MIN,Math.min(1,(W/2-6)/stat.range()));
@@ -718,7 +762,8 @@ function update(dt){
   for(const f of S.ft)f.life-=rt;S.ft=S.ft.filter(f=>f.life>0);
   for(const f of S.cp)f.life-=rt;S.cp=S.cp.filter(f=>f.life>0);
   if(S.fx.length){const dr=Math.pow(.02,rt);for(const f of S.fx){f.life-=rt;if(f.k)continue;f.x+=f.vx*rt;f.y+=f.vy*rt;f.vx*=dr;f.vy*=dr}S.fx=S.fx.filter(f=>f.life>0)}
-  S.sfl=Math.max(0,S.sfl-rt);S.bin=Math.max(0,S.bin-rt);
+  S.sfl=Math.max(0,S.sfl-rt);S.bin=Math.max(0,S.bin-rt);S.gfx=Math.max(0,S.gfx-rt);
+  if(S.gpick&&!S.over){if(GLITCH.auto||document.hidden)pickGlitch(0);else return}
   if(S.over){S.ot+=dt;return}
   S.time+=dt;
   S.nova=Math.max(0,S.nova-dt);
@@ -731,6 +776,7 @@ function update(dt){
     if(S.wave>0&&!S.paid){S.paid=true;const sb=1+skinB('b'),cr=S.daily?0:(1+Math.floor(S.wave/5))*sb+(S.cf||0),p=Math.round((5+S.wave*2)*sb),c=Math.floor(cr+1e-9);S.cf=cr-c;const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
     S.px+=p+it;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px'+(S.daily?'':' +'+c+' chips');
     if(!S.daily&&S.wave%10===0&&S.wave>M.cert){M.cert=S.wave;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1='CERTIFICATE: '+certName(S.wave);S.bt='Collect it on the menu'}
+    if(glitchWave(S.wave)){const o=glitchOffer();if(o.length){S.gpick=o;S.gfx=.6;sfx('boss');S.bonus=2;S.bt1='BYTE '+S.wave/GLITCH.every;S.bt='8 bit waves compiled'}}
     save()}
     S.gap-=dt;
     if(S.gap<=0){startWave();S.gap=1.5}
@@ -748,6 +794,7 @@ function update(dt){
     else if(d<8){e.dead=true;e.reached=true;S.hp-=edmg(e.t);S.killer=e.t;S.flash=.15;S.shake=.2;sparks(e.x,e.y,4,'#ff6b6b',40,.25);sparks(e.x,e.y,3,e.t.c,35,.25);sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
+  if(S.hp<=0&&G('save')&&!S.saved){S.saved=1;S.hp=stat.max()*GLITCHES.save.v;S.bonus=2.5;S.bt1='SAVE STATE LOADED';S.bt='Back to half HP';S.sfl=.2;sfx('wave')}
   if(S.hp<=0){S.hp=0;endRun(false);return}
   S.flash=Math.max(0,S.flash-dt);if(S.mf)S.mf=Math.max(0,S.mf-dt);
   // tower fire
@@ -760,7 +807,7 @@ function update(dt){
   S.target=target;
   if(target&&S.cd<=0){
     const d=Math.hypot(target.x-CX,target.y-CY);
-    const a0=Math.atan2(target.y-CY,target.x-CX),n=1+RL('spray');
+    const a0=Math.atan2(target.y-CY,target.x-CX),n=1+RL('spray')+G('stray');
     // Spray and Pray: bullet 0 always flies straight at the target; extras fan out alternately right, left, wider right...
     for(let i=0;i<n;i++){const k=i===0?0:Math.ceil(i/2)*(i%2?1:-1),a=a0+k*.14;
       S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:RL('pierce'),hits:[],crit:Math.random()<critChance()})}
@@ -884,7 +931,7 @@ function drawTower(){const t=tier('hp'),n=towerN(),h=(n-1)/2,z=WZ,ts=TSK[sk('t')
   [[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,ra).forEach(([sx,sy],i)=>{const x=CX+sx*(h+1),y=CY+sy*(h+1);R(x,y,1,1,'#c3cde6');R(x+sx,y+sy,1,1,(blink+i)%2?'#7ee8a8':'#2f6b4f')});
   // turret: barrel(s) towards the target; longer with Damage; one barrel per Spray and Pray bullet, fanned wider so they read
   const ang=S.target?Math.atan2(S.target.y-CY,S.target.x-CX):(S.aim!=null?S.aim:-Math.PI/2);
-  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray'),bw=dt>=2&&nb===1?2:1;
+  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray')+G('stray'),bw=dt>=2&&nb===1?2:1;
   const fan=[];for(let i=0;i<nb;i++)fan.push(ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38);
   const pts=a=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
   fan.forEach(a=>{for(const[x,y]of pts(a))R(x-1,y-1,bw+2,bw+2,ts.out)});          // outline first
@@ -965,6 +1012,9 @@ function draw(){
   // Blast / boss kill flash and the boss entrance warning (red pulsing edges); skipped with reduced motion
   if(!RM.matches){
     if(S.sfl>0){g.fillStyle='rgba(200,240,255,'+Math.min(.18,S.sfl)+')';g.fillRect(0,0,W,H)}
+    // glitch offer: a moment of torn, colour-split scan lines
+    if(S.gfx>0)for(let i=0;i<9;i++){const y=Math.floor(Math.random()*H),h=1+Math.floor(Math.random()*4),dx=Math.round((Math.random()*2-1)*8*S.gfx/.6);
+      g.drawImage(cv,0,y,W,h,dx,y,W,h);g.fillStyle=['rgba(255,60,200,.35)','rgba(60,240,255,.35)','rgba(255,255,255,.25)'][i%3];g.fillRect(0,y,W,1)}
     if(S.bin>0){const a=(.25+.2*Math.sin(S.bin*12))*Math.min(1,S.bin/.5);
       for(let i=0;i<4;i++){g.fillStyle='rgba(255,60,80,'+(a*(1-i/4))+')';g.fillRect(i*2,0,2,H);g.fillRect(W-2-i*2,0,2,H);g.fillRect(0,i*2,W,2);g.fillRect(0,H-2-i*2,W,2)}}}
   catDraw();
@@ -987,13 +1037,16 @@ function setD(el,v){if(el.style.display!==v)el.style.display=v}
 function setDis(el,v){v=!!v;if(el.disabled!==v)el.disabled=v}
 function setH(el,v){if(el._h!==v){el._h=v;el.innerHTML=v}}  // only ui() writes these buttons
 function ui(){
-  setT($id('w'),'Wave '+Math.max(1,S.wave));
+  setT($id('wn'),'Wave '+Math.max(1,S.wave));
+  // byte meter: waves cleared toward the next byte (8 bit waves = 1 byte = a glitch); all lit while a byte is being picked
+  {const n=byteBits(),bs=$id('bits');if(bs._n!==n){bs._n=n;[...bs.children].forEach((b,i)=>b.className=i<n?'on':'');bs.classList.toggle('byte',n>=GLITCH.every)}}
   setT($id('px'),big(S.px)+' px');
   setT($id('ch'),big(M.chips)+' chips');
   // no best-wave number during a run (it read like a second wave counter); just a gold "New best!" once you pass it
   {const b=$id('bw'),db=M.daily.best,nb=S.daily?inRun()&&db>0&&S.wave>db:inRun()&&M.best>0&&S.wave>M.best,cl=S.daily&&!nb?'dl':'';
   setT(b,S.daily?(nb?'Daily best!':'Daily'):nb?'New best!':'');if(b.className!==cl)b.className=cl}
-  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'');show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
+  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),[S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'',glitchList()?'Glitches: '+glitchList():''].filter(Boolean).join(' / '));
+  const gOn=!!S.gpick&&!S.over&&!S.menu;show('gl',gOn);if(gOn)setH($id('glo'),S.gpick.map((k,i)=>'<button data-i="'+i+'"><b><span>'+GLITCHES[k].n+'</span><small>'+(G(k)?'Lv '+G(k)+' > '+(G(k)+1):'New')+'</small></b>'+GLITCHES[k].d+'</button>').join(''));show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
   checkResearch();
   if($id('home').style.display==='flex'&&M.rq)hbtTile();
   if($id('bt').style.display==='flex')btTick();
@@ -1300,12 +1353,14 @@ document.getElementById('gof').onclick=()=>openFoundry('go');
 document.getElementById('fyc').onclick=()=>{show('fy',0);if(fyFrom==='home')showHome();else showGO()};
 // Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
 const pb=document.getElementById('pb');
-function setPause(on){if(S.over||S.tip||S.menu)return;S.pause=on;if(!on)S.confirm=false;if(on&&S.toast>0){S.toast=0;closeTip()}}
+function setPause(on){if(S.over||S.tip||S.menu||S.gpick)return;S.pause=on;if(!on)S.confirm=false;if(on&&S.toast>0){S.toast=0;closeTip()}}
 document.getElementById('pzr').onclick=()=>setPause(false);
 document.getElementById('pzs').onclick=()=>{S.confirm=true};
 document.getElementById('cfk').onclick=()=>{S.confirm=false};
 document.getElementById('cfs').onclick=()=>{if(!S.over&&!S.menu)endRun(true)};
 pb.onclick=()=>setPause(!S.pause);
+document.getElementById('glo').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&pickGlitch(+b.dataset.i))ui()});
+addEventListener('keydown',e=>{if(S&&S.gpick&&/^[1-9]$/.test(e.key))pickGlitch(+e.key-1)});
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
 const novab=document.getElementById('nova'),spdb=document.getElementById('spd');
 // speed button cycles 1x, 1.5x ... up to the Overclock level, then back to 1x; the choice is saved
