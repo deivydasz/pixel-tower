@@ -6,7 +6,7 @@ M.best=50;M.lv.dmg=10;M.lv.hp=10;M.res.depth=5;M.res.spray=3;M.cert=70;M.claim=7
 const zdMod=DAILY_MODS[dailyModIx(today())];
 ok(zdCard()&&!zdCard().disabled&&zdCard().textContent.includes('New today!')&&zdCard().textContent.includes(zdMod.n),'card open: New today! and the twist ('+zdMod.n+')');
 click(zdCard());ok(shown($('dy'))&&!shown($('home'))&&$('dyt').textContent.includes(zdMod.n)&&$('dyt').textContent.includes('New twist in'),'Daily screen shows today\'s twist and the countdown');
-ok($('dyr').textContent.includes('up to '+dailyChips(DAILY.top,1)+' chips at wave '+DAILY.top),'screen shows the reward: '+$('dyr').textContent);
+ok($('dyr').textContent.includes('up to '+dailyChips(DAILY.top,1)+' chips for beating the wave '+BOSS.first+' boss'),'screen shows the reward: '+$('dyr').textContent);
 // fresh tower: Foundry, research and skin bonuses off (use a twist without stat changes)
 TEST.twist=5;click($('dyp'));
 ok(S.daily&&S.daily.n==='Blast party'&&!shown($('dy'))&&S.bt1==='DAILY RUN'&&S.bt==='Blast party','Play starts the daily run with a banner');
@@ -25,7 +25,7 @@ ok(M.best===50,'daily run never changes the best wave');
 ok(M.daily.best===12&&M.daily.streak===1&&M.daily.last===today()&&M.chips===dailyChips(12,1)&&S.dpay===dailyChips(12,1),'pays chips for wave 12: '+S.dpay);
 const zdEv=trackLog.filter(e=>e.type==='daily').pop();ok(zdEv&&zdEv.data.w===12&&zdEv.data.x==='Blast party'&&zdEv.data.c===S.dpay&&!trackLog.some(e=>e.type==='run'&&e.data.w===12),'sends a daily stats event, not a run');
 ok(M.hist[0].dl===1&&M.hist[0].w===12&&M.hist[0].c===S.dpay,'saved to History as a daily run');
-ok(shown($('go'))&&$('goh').textContent==='Daily run over'&&$('gor').textContent==='Try again'&&!shown($('goal'))&&!shown($('gos'))&&$('gnm').textContent.includes('+'+S.dpay+' chips'),'game over shows the daily result');
+ok(shown($('go'))&&$('goh').textContent==='Daily run over'&&$('gor').textContent==='Try again'&&!shown($('goal'))&&$('gnm').textContent.includes('+'+S.dpay+' chips'),'game over shows the daily result');
 ok(!shown($('gnew')),'no "Unlocked this run" card');
 // retry: lower wave pays nothing, higher wave pays the difference
 click($('gor'));ok(S.daily&&S.wave===0,'Try again starts another daily run');S.wave=8;die();
@@ -46,7 +46,7 @@ clock.now=zdNow;showDaily();const zdOld=$('dyt').textContent;clock.now=()=>zdNow
 ok($('dyt').textContent!==zdOld||DAILY_MODS[dailyModIx(today())].n===DAILY_MODS[dailyModIx(today()-1)].n,'open Daily screen updates after midnight');click($('dyc'));
 ok(M.daily.best===0&&zdCard().textContent.includes('New today!'),'a new day resets today\'s best');
 M.chips=0;click(zdCard());ok($('dyr').textContent.includes('Streak: 1 day (+10% chips)'),'screen shows the streak bonus: '+$('dyr').textContent);
-click($('dyp'));S.wave=10;die();ok(M.daily.streak===2&&S.dpay===dailyChips(10,2)&&dailyChips(10,2)===Math.round(dailyFull()*.5*1.1),'day 2 of a streak: +10%');
+click($('dyp'));S.wave=10;die();ok(M.daily.streak===2&&S.dpay===dailyChips(10,2)&&dailyChips(10,2)===Math.round(dailyFull()*10/DAILY.top*1.1),'day 2 of a streak: +10%');
 clock.now=()=>zdNow()+3*864e5;ok(streakNow()===0&&streakNext()===1,'missing a day breaks the streak');
 M.daily.streak=9;M.daily.last=today()-1;ok(streakMul(streakNext())===1+DAILY.streak*DAILY.streakMax,'streak bonus capped at +'+100*DAILY.streak*DAILY.streakMax+'%');
 clock.now=zdNow;

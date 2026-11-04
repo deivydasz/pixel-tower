@@ -38,7 +38,7 @@ Waves get bigger and tougher: wave *n* has 4 + 2*n* enemies, their HP grows abou
 The legend at the top right of the game shows each enemy's current HP and the damage it will do after your armor.
 
 ### Bosses
-A boss arrives at waves 20, 40, 60 and 80, then every 10 waves from wave 100, together with that wave's normal enemies.
+Two bytes make a word: a boss arrives every 16 waves (16, 32, 48, 64...), together with that wave's normal enemies. The screen glitches as it is compiled, and beating it finishes a byte, so a glitch pick follows.
 Bosses never give up: one that reaches the tower stays there and hits it every second until either the boss or the tower is destroyed. Destroy it to earn **1 boss core** and bonus chips (5 + 1 per 10 waves). The first boss is a real wall: in simulations it takes about Foundry level 4 in every upgrade to beat it reliably.
 
 | Boss | Trait |
@@ -50,12 +50,12 @@ Bosses never give up: one that reaches the tower stays there and hits it every s
 Boss cores pay for Bit Theory research.
 
 ## Bit Theory
-Study the pixels to find their deeper meaning. Bit Theory opens on the home menu once you have beaten a boss.
+Study the pixels to find their deeper meaning. Bit Theory opens on the home menu after your first run. The first Critical bits study is free (10% crit chance, then +5% per level); level 1 of other research costs 10 chips and no cores; higher levels need boss cores.
 Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
 
 | Research | Each level | Max level | Available when |
 |---|---|---|---|
-| Critical bits | +5% chance of a x3 critical hit | 10 | right away |
+| Critical bits | chance of a x3 critical hit: 10% at Lv 1 (free study), +5% per level | 10 | right away |
 | Piercing bits | Bullets pass through +1 enemy | 5 | right away |
 | Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
 | Blast tech | Blast recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |
@@ -88,19 +88,20 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 Heavy rounds and Crit power are late-run upgrades: every run starts without them, even if you reached those waves before.
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
-After a run, the game over screen suggests two Foundry upgrades: the cheapest one, and the one that best counters what killed you.
+When your chips can buy a Foundry upgrade, the Foundry button on the game over screen and the home menu lights up with "Upgrade ready!".
 
 ## Progression
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
 - **Certificates:** completing wave 10, 20, 30... for the first time earns a certificate. Collect its one-time chips on the Certificates screen (the menu shows "Reward ready!"): Pixel Apprentice (10, +8), Bit Cadet (20, +20), Byte Guard (30, +38), Sprite Sentinel (40, +60), Raster Knight (50, +88), Vector Captain (60, +120), Palette Master (70, +158), Shader Sage (80, +200), Render Lord (90, +248), Pixel Legend (100, +300), then "Wave N Master". Boss waves count once the boss is beaten. See them from the menu under Progress.
 - **Boss attempts:** if a run ends while a boss is alive, you get chips for the share of its HP you took (up to its full chip reward, no core), and game over shows how much HP it had left.
-- **Idle income** (after your first boss): while the game is closed the tower keeps earning, up to 4 hours. 4 hours pays the chips of one run to your best wave, plus a head start of 10 px per best wave for your next run (it waits until you press Play and never holds more than one 4-hour batch). Under 5 minutes away pays nothing. The menu shows the rate and a "While you were away" card.
+- **Idle income** (after your first run): while the game is closed the tower keeps earning, up to 4 hours. 4 hours pays the chips of one run to your best wave, plus a head start of 10 px per best wave for your next run (it waits until you press Play and never holds more than one 4-hour batch). Under 5 minutes away pays nothing. The menu shows the rate and a "While you were away" card.
 - **So close:** game over points out the nearest goal: a few waves short of your best, a certificate within 5 waves, or a Foundry upgrade you are just a few chips short of.
 - **Best wave** is shown on the menu, the game over screen and in History. During a run the HUD shows a gold "New best!" once you pass it; beating it shows "New record!" at game over.
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
 - **Skins:** the certificates for waves 30, 50 and 70 each unlock a set of skins (Bug Hunt, Neon, Crystal) for the enemies, the tower and the background. Collect the certificate to get the skins. Every skin you own gives a bonus, whichever look you wear: enemy skins +5/10/15% pixels per kill, tower skins +3/6/9% damage, background skins +5/10/15% pixels and chips per wave clear. Skinned towers grow as you buy upgrades during a run. Pick the look on the Skins screen from the menu.
-- **Unlocks:** the Bosses tracker opens at best wave 20 and shows bosses beaten and cores. Skins open with the wave 30 certificate. The Daily run opens at best wave 25. The next-unlock card on the menu tracks your progress.
-- **Daily run:** one challenge a day, the same for everyone (the twist and the enemy spawns come from the date). You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count, so a run takes 5-10 minutes. Seven twists (Glass cannon, Swarm, Rush hour, Spray day, Blast party, Bargain bin, Lucky bits); each appears once every 7 days, never twice in a row. Retry as often as you like: you earn chips for today's best wave, paid as it improves, up to half a run to your best wave at wave 20, plus 10% per day in a row (max +50%). Daily runs never change your best wave and give no normal chips, cores or certificates.
+- **Unlocks:** the Bosses tracker opens at best wave 16 and shows bosses beaten and cores. Skins open with the wave 30 certificate. The Daily run opens at best wave 25. The next-unlock card on the menu tracks your progress.
+- **Bytes and glitches:** every wave is a bit; 8 cleared bit waves compile into a byte (wave 8, 16, 24...; the bits next to the wave number fill up). The pixels glitch and you keep one of three random boosts for the rest of the run (Sharp Pixels, Turbo Bit, Widescreen, Anti-Aliasing, Scanlines, Pixel Rain, Compression, Refresh Rate, Dither Shot, Stray Bit, Save State). Picking one again stacks it.
+- **Daily run:** one challenge a day, the same for everyone (the twist and the enemy spawns come from the date). You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count, so a run takes 5-10 minutes. Seven twists (Glass cannon, Swarm, Rush hour, Spray day, Blast party, Bargain bin, Lucky bits); each appears once every 7 days, never twice in a row. Retry as often as you like: you earn chips for today's best wave, paid as it improves, up to half a run to your best wave for beating the wave 16 boss, plus 10% per day in a row (max +50%). Daily runs never change your best wave and give no normal chips, cores or certificates.
 - A grey cat sometimes visits the game screen: it peeks in from the side and blinks, or walks along the bottom (and sits down for a moment). Tap it and it answers (Meow!, Purrr, Mrrp?...). Sometimes it heals your tower: 10% chance of +5 HP, otherwise 30% chance of +1 HP. Now and then it yawns or chirps by itself.
 - New players get a few one-time tips: the basics, buying an upgrade, using Blast and the Foundry.
 

@@ -12,7 +12,7 @@ const fd=$('fyl').querySelector('button').textContent;
 ok(fd.includes('2.5 > 3')&&!fd.includes('Now'),'Foundry shows current > next damage, no "Now": '+fd);
 ok($('fyl').textContent.includes('1.75 > 2'),'Foundry shows current > next absorb');
 ok([...$('fyl').querySelectorAll('button')].every(b=>/\d\S* > \S*\d/.test(b.textContent)),'every Foundry upgrade shows current > next');
-click($('fyc'));ok([...$('gos').querySelectorAll('button')].every(b=>/\d\S* > \S*\d/.test(b.textContent)&&!b.textContent.includes('Now')),'game over suggestions show current > next');
+click($('fyc'));
 S.px=45678;ui();ok($('px').textContent==='45.7k px','HUD shows compact pixels');
 ok(getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()!=='','theme accent colours defined');
 done();

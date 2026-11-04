@@ -20,6 +20,10 @@ body{background:var(--bg);color:var(--fg);font:9px/1.5 "Press Start 2P",monospac
 #bw{color:var(--gold)}
 #bw.dl{color:var(--violet)}
 #hud{font-size:8px}
+#bits{position:absolute;left:6px;right:6px;top:22px;display:flex;gap:3px;pointer-events:none}
+#bits i{flex:1;height:3px;background:rgba(232,236,245,.18)}
+#bits i.on{background:#ffd166}
+#bits.byte i{background:#5ef0ff}
 #hud .hs{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;white-space:nowrap;overflow:hidden}
 #hud .hb{display:flex;gap:6px}
 canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px solid var(--bd)}
@@ -91,7 +95,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm #hcen.rdy{color:var(--gold);opacity:1}
-#hm #hfyn.rdy{color:var(--gold);opacity:1}
+#hm #hfy small.rdy,#gm #gof small.rdy{color:var(--gold);opacity:1}
+#hm #hfy.rdy,#gm #gof.rdy{border-color:#ffd166;animation:pulse 1.2s steps(2) infinite}
+#gm #gof small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
 #hm .lk:disabled{opacity:var(--dim,.45)}
 #hm .lk.tr:disabled{opacity:1;border-color:#ff8c42}
@@ -106,6 +112,7 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hook i,.goal i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
 #hook b,.goal b{display:block;height:100%;background:#ffd166;width:0}
 #home p,#how p{text-align:center}
+body.noboss .bx{display:none}
 #how p{text-align:left}
 #hi p{margin:0;font-size:8px;text-align:center;width:min(360px,92vw)}
 #hil{width:min(360px,92vw);max-height:60vh;overflow-y:auto;border:2px solid var(--bd);font-size:7px;line-height:1.6}
@@ -148,19 +155,19 @@ button b{display:block;font-weight:400}
 .lkup svg{flex:none;width:9px;height:10px}
 #fyl .lkup b{display:flex;align-items:center;gap:5px}
 #fyl button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#gos button{font-size:8px}
 #stage{position:relative}
 #bb{position:absolute;left:4px;right:4px;top:22px;height:12px;background:#3a4160;border:2px solid #0d1019;pointer-events:none;display:none}
 #bbf{height:100%;background:#ff6b6b}
 #bbt{position:absolute;inset:0;white-space:nowrap;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;text-shadow:1px 1px 0 #0d1019}
-#stage.bossup #leg{top:40px}
-#spd{position:absolute;left:4px;top:26px;min-width:44px;min-height:30px;padding:4px 6px;font-size:8px;color:#e8ecf5;background:rgba(13,16,25,.6);border-color:rgba(143,163,214,.7);display:none}
+#stage.bossup #leg{top:46px}
+#stage.bossup #bits{top:39px}
+#spd{position:absolute;left:4px;top:30px;min-width:44px;min-height:30px;padding:4px 6px;font-size:8px;color:#e8ecf5;background:rgba(13,16,25,.6);border-color:rgba(143,163,214,.7);display:none}
 #spd.on{color:#0d1019;background:#ffd166;border-color:#0d1019}
-#stage.bossup #spd{top:40px}
+#stage.bossup #spd{top:46px}
 #hpb{position:absolute;left:4px;right:4px;top:4px;height:14px;background:#3a4160;border:2px solid #0d1019;pointer-events:none}
 #hpf{height:100%;width:100%;background:#6ee7a0}
 #hpt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;text-shadow:1px 1px 0 #0d1019}
-#leg{position:absolute;right:4px;top:26px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
+#leg{position:absolute;right:4px;top:30px;display:flex;flex-direction:column;gap:6px;padding:5px;background:rgba(13,16,25,.6);color:#e8ecf5;font-size:7px;line-height:1.5;pointer-events:none;transition:opacity .2s}
 #leg.fade{opacity:.2}
 #leg div{display:flex;flex-direction:column}
 #leg span:first-child{display:flex;align-items:center}
@@ -172,6 +179,12 @@ button b{display:block;font-weight:400}
 #tip.card{top:50%;transform:translateY(-50%)}
 .pnl{position:absolute;left:10px;right:10px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;padding:12px;background:#0d1019;color:#e8ecf5;border:2px solid #e8ecf5;font-size:8px;line-height:1.8;text-align:center}
 .pnl h2{margin:0 0 4px;font:inherit;font-size:12px}
+#gl{border-color:#ff4fd8;box-shadow:3px 0 0 #5ef0ff,-3px 0 0 #ff4fd8}
+#gl h2{color:#ff4fd8;text-shadow:2px 0 0 #5ef0ff}
+#glo{display:grid;gap:6px}
+#glo button{text-align:left;line-height:1.7;padding:8px}
+#glo b{display:flex;justify-content:space-between;font-weight:400;color:#5ef0ff}
+#glo small{opacity:.75}
 #pzd{color:#c4a7ff}
 #pzd:empty{display:none}
 #tip.dl{border-color:#c4a7ff}
@@ -185,7 +198,7 @@ button b{display:block;font-weight:400}
 #tip.toast{bottom:58px;pointer-events:none}
 #tip b{color:#ffd166;font-weight:400}
 #tip button{align-self:flex-end;min-height:36px;padding:6px 14px}
-#nova.hint{animation:pulse .8s steps(2) infinite}
+#nova.hint,#ups button.hint{animation:pulse .8s steps(2) infinite}
 @keyframes pulse{50%{outline:3px solid #ffd166;outline-offset:2px}}
 #got{display:none;color:var(--gold)}
 #gnew{width:min(360px,92vw);box-sizing:border-box;border:2px solid #c4a7ff;padding:8px;font-size:8px;line-height:1.7;display:none}
@@ -195,14 +208,12 @@ button b{display:block;font-weight:400}
 #gst{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--bd);background:var(--btn)}
 #gst div{padding:6px 8px;font-size:11px;border:1px solid rgba(128,128,128,.25)}
 #gst small{display:block;font-size:7px;opacity:.7;margin-bottom:3px}
-#gos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-#gos button{font-size:8px}
 #nova:disabled{opacity:1;color:rgba(232,236,245,.8);background:rgba(13,16,25,.45);border-color:rgba(58,65,96,.8)}
 </style>
 </head>
 <body>
-<div id="hud"><span class="hs"><span id="px">0 px</span><span id="w">Wave 1</span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
-<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><button id="spd" aria-label="Game speed">1x</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><span id="pzd"></span><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
+<div id="hud"><span class="hs"><span id="px">0 px</span><span id="w"><span id="wn">Wave 1</span></span><span id="ch">0 chips</span><span id="bw"></span></span><span class="hb"><button id="pb">Pause</button><button id="snd" aria-pressed="true">Sound</button></span></div>
+<div id="stage"><canvas id="c" aria-label="Idle Pixel Tower game"></canvas><div id="hpb"><div id="hpf"></div><span id="hpt"></span></div><div id="bits" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div id="bb"><div id="bbf"></div><span id="bbt"></span></div><div id="leg" aria-label="Enemy types"></div><button id="nova">BLAST</button><button id="spd" aria-label="Game speed">1x</button><div id="tip" role="status"></div><div id="pz" class="pnl"><h2>Paused</h2><span id="pzd"></span><button id="pzr" class="pri">Resume</button><button id="pzs">Stop run</button><button id="pzm" class="mus"></button></div><div id="gl" class="pnl" role="dialog" aria-labelledby="glh"><h2 id="glh">BYTE!</h2><span>You cleared 8 bit waves. They compiled into a byte, and the pixels glitched. Keep one glitch for this run:</span><div id="glo"></div></div><div id="cf" class="pnl" role="alertdialog" aria-labelledby="cfh"><h2 id="cfh">Stop this run?</h2><span>It is saved to History and you keep your chips.</span><div class="row"><button id="cfk" class="pri">Keep playing</button><button id="cfs" class="dng">Stop run</button></div></div></div>
 <div id="upt"></div><div id="ups"></div>
 <div id="go"><div id="goh">Game over</div><p id="gop"></p><p id="gnm"></p>
 <div id="gnew"><div class="nt">Unlocked this run</div><ul id="gnl"></ul></div>
@@ -210,29 +221,29 @@ button b{display:block;font-weight:400}
 <button id="gor">Play again</button><button id="gdl"></button>
 <div id="goal" class="goal"><span id="goalt"></span><i><b id="goalb"></b></i></div>
 <p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p>
-<div class="hg" id="gsl"></div><div id="gos"></div>
 <button id="gof">Foundry</button><button id="gbt">Bit Theory</button><button id="gom">Main menu</button></div></div>
 <div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><div id="idl"><b>While you were away</b><span id="idlt"></span><button id="idlk">Nice!</button></div><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
-<div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button><button id="hce">Certificates<small id="hcen"></small></button>
+<div class="hg">Progress</div><button id="hfy">Foundry<small></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button><button id="hce">Certificates<small id="hcen"></small></button>
 <div class="hg">Unlocks</div><span id="hlk" style="display:contents"></span>
 <button id="hhow">How to play</button><button id="hmus" class="mus"></button></div></div>
 <div id="how"><div id="howh">How to play</div>
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
-<p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
-<p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
+<p class="bx">Two bytes make a word: every 16 waves the glitch compiles a boss. Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
+<p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
-<p>After you beat your first boss, the tower keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
+<p>After your first run, the tower also keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
+<p>Every wave is a bit. Clear 8 bit waves and they compile into a byte (the bits next to the wave number fill up): the pixels glitch and you keep one of three Glitches, small boosts for the rest of the run. Pick the same one again to stack it.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="dy"><div id="dyh">Daily run</div><p>A new challenge every day, the same for everyone. You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count. Try as often as you like.</p><div id="dyt"></div><p id="dyr"></p><button id="dyp">Play today's run</button><button id="dyc">Back</button></div>
 <div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
-<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here. Boss waves count once the boss is beaten.</p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
+<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here.<span class="bx"> Boss waves count once the boss is beaten.</span></p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
@@ -279,34 +290,66 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?fresh=1 wipes the save once (a brand-new player; the URL is cleaned so a reload keeps the new save), ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
   const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
-  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),away:n('away'),fast:q.get('fast')==='1',cat:q.get('cat')==='1',twist:n('twist')};
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),away:n('away'),fast:q.get('fast')==='1',cat:q.get('cat')==='1',twist:n('twist'),fresh:q.get('fresh')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(daily){
-  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[],fx:[],sfl:0,bin:0};
+  S={hp:20,px:0,wave:0,en:[],pr:[],pt:[],left:0,sp:0,gap:.5,cd:0,over:false,flash:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0,heavy:0,critx:0},ot:0,pause:false,earn:0,shake:0,ft:[],nova:0,nfx:-1,time:0,novas:0,bosses:0,zoom:1,cp:[],fx:[],sfl:0,bin:0,gl:{},gpick:null,gfx:0};
   if(daily){S.dday=today();S.daily=DAILY_MODS[dailyModIx(S.dday)];S.rng=mulberry(hash32(S.dday*7919+1))}
   S.hp=stat.max();
   closeTip();
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
   // progress snapshot, compared at game over to list what this run unlocked
-  S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
+  S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked(),idle:idleOpen()};
 }
 // Daily runs use a fresh tower: no Foundry levels, research or skin bonuses (only today's twist, S.daily).
 const ML=k=>S&&S.daily?0:(M.lv[k]||0);
 const RL=k=>S&&S.daily?((S.daily.res||{})[k]||0):(M.res[k]||0);
 const skinB=k=>S&&S.daily?0:skinBonus(k);
 const dmod=k=>S&&S.daily&&S.daily[k]||1;
+// Glitches: run-only perks. Every wave is a bit; 8 cleared bit waves compile into a byte (wave 8, 16, 24...): the screen glitches and offers
+// GLITCH.choices random ones (seeded in daily runs); the player keeps one for this run. Picking the same one again stacks it
+// up to max. w = how often it is offered (rarer when strong). The game waits for the pick (auto-picked while the tab is hidden).
+const GLITCH={first:8,every:8,choices:3,auto:false};
+// v = effect per level (used by gv()). Halved after the first campaign sim (stronger values made late runs ~75% longer); not re-simulated yet.
+const GLITCHES={
+  sharp:{n:'Sharp Pixels',v:.15,d:'+15% damage',max:5},
+  turbo:{n:'Turbo Bit',v:.12,d:'+12% fire rate',max:5},
+  wide:{n:'Widescreen',v:8,d:'+8 range',max:3},
+  alias:{n:'Anti-Aliasing',v:.08,d:'Enemy hits deal 8% less',max:3},
+  scan:{n:'Scanlines',v:.15,d:'+15% tower HP',max:3},
+  rain:{n:'Pixel Rain',v:.2,d:'+20% pixels per kill',max:5},
+  zip:{n:'Compression',v:.08,d:'Upgrades 8% cheaper',max:3},
+  refresh:{n:'Refresh Rate',v:.2,d:'Blast recharges 20% faster',max:3},
+  dither:{n:'Dither Shot',v:.04,d:'+4% chance of a x3 hit',max:3},
+  stray:{n:'Stray Bit',v:1,d:'+1 bullet per shot',max:1,w:.3},
+  save:{n:'Save State',v:.5,d:'Survive one killing blow with half HP',max:1,w:.5}
+};
+const GL_KEYS=Object.keys(GLITCHES);
+const G=k=>S&&S.gl&&S.gl[k]|0;  // glitch level this run
+const gv=k=>G(k)*GLITCHES[k].v;  // its total effect
+// bits lit in the HUD byte meter: waves cleared since the last byte (8 while a byte is being picked)
+const byteBits=()=>!inRun()||S.wave<1?0:S.gpick?GLITCH.every:(S.paid?S.wave:S.wave-1)%GLITCH.every;
+const glitchWave=w=>w>=GLITCH.first&&(w-GLITCH.first)%GLITCH.every===0;
+// GLITCH.choices different glitches that can still level up, weighted by w
+function glitchOffer(){const pool=GL_KEYS.filter(k=>G(k)<GLITCHES[k].max),out=[];
+  while(out.length<GLITCH.choices&&pool.length){const tot=pool.reduce((a,k)=>a+(GLITCHES[k].w||1),0);let r=drand()*tot,i=0;
+    for(;i<pool.length-1;i++){r-=GLITCHES[pool[i]].w||1;if(r<0)break}out.push(pool.splice(i,1)[0])}
+  return out}
+function pickGlitch(i){const k=S.gpick&&S.gpick[i];if(!k)return false;const m0=stat.max();
+  S.gl[k]=G(k)+1;if(k==='scan')S.hp+=stat.max()-m0;S.gpick=null;S.bonus=2;S.bt1='GLITCH';S.bt=GLITCHES[k].n+(G(k)>1?' x'+G(k):'');sfx('buy');return true}
+const glitchList=()=>GL_KEYS.filter(k=>G(k)).map(k=>GLITCHES[k].n+(G(k)>1?' x'+G(k):'')).join(', ');
 const stat={
-  dmg:()=>(1+S.lv.dmg+.5*ML('dmg'))*Math.pow(1.2,RL('depth'))*(1+skinB('t'))*dmod('dmg'),
-  rate:()=>1+.4*S.lv.rate+.2*ML('rate'),
-  range:()=>50+8*S.lv.range+4*ML('range'),
-  max:()=>(20+10*S.lv.hp+5*ML('hp'))*dmod('hp'),
+  dmg:()=>(1+S.lv.dmg+.5*ML('dmg'))*Math.pow(1.2,RL('depth'))*(1+skinB('t'))*dmod('dmg')*(1+gv('sharp')),
+  rate:()=>(1+.4*S.lv.rate+.2*ML('rate'))*(1+gv('turbo')),
+  range:()=>50+8*S.lv.range+4*ML('range')+gv('wide'),
+  max:()=>(20+10*S.lv.hp+5*ML('hp'))*dmod('hp')*(1+gv('scan')),
   armor:()=>.5*S.lv.armor+.25*ML('armor'),
   // Pixel magnet: extra pixels per kill (fraction). Economy only; healing upgrades made the tower immortal in simulations.
   magnet:()=>MAGNET.run*(S.lv.magnet||0)+MAGNET.meta*ML('magnet'),
@@ -318,15 +361,17 @@ const stat={
 };
 const MAGNET={run:.15,meta:.1};
 const BANK={run:.03,meta:.015,capRun:25,capMeta:12};
-const critChance=()=>.05*RL('crit');
+// Critical bits: Lv1 = 10% (the free first study), +5% per level after that (Lv10 = 55%)
+const critPct=lv=>lv>0?.05*(lv+1):0;
+const critChance=()=>critPct(RL('crit'))+gv('dither');
 const CRIT_POP=.6,CRIT_MAX=8;  // crit damage numbers: seconds on screen, most at once
-const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast');
-const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost'));
+const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast')*(1-gv('refresh'));
+const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost')*(1-gv('zip')));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
-// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: 1 core + 1 per 2 levels, chips 25 x 1.6^level.
+// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: level 1 RES_FIRST chips and no cores (Critical bits Lv1 free); then 1 core + 1 per 2 levels, chips 25 x 1.6^level.
 // req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
 const BITS={
-  crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit',req:{}},
+  crit:{n:'Critical bits',max:10,t:15,d:'A chance of a x3 critical hit (10%, then +5% per level)',req:{}},
   pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy',req:{}},
   spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out',req:{res:{pierce:2},bk:3}},
   nova:{n:'Blast tech',max:4,t:20,d:'Blast recharges 15s faster',req:{best:35,bk:2}},
@@ -339,7 +384,10 @@ const BIT_KEYS=Object.keys(BITS);
 const maxSpeed=()=>1+.5*(M.res.speed||0);
 const gameSpeed=()=>inRun()&&!S.pause?Math.min(M.spd||1,maxSpeed()):1;
 const resMin=(k,lv)=>BITS[k].time?BITS[k].time[Math.min(lv|0,BITS[k].time.length-1)]:Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
-const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return {cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}};
+// level 1 of a research costs RES_FIRST chips and no cores; the very first Critical bits study is free, so every new player
+// starts a timer after the first run (a reason to come back)
+const RES_FIRST=10;
+const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return lv?{cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}:{cores:0,chips:k==='crit'?0:RES_FIRST}};
 const clock={now:()=>Date.now()};
 // Save format version. Saves without `v` are v0 (same shape as v1).
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
@@ -367,6 +415,7 @@ function loadMeta(m){
   M.claim=(m.v|0)>=13?Math.min(M.cert,Math.floor((m.claim|0)/10)*10):M.cert;  // older saves were paid when earned
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
+if(TEST.fresh){try{localStorage.removeItem('pixelTowerMeta')}catch(e){}history.replaceState(null,'',location.pathname)}
 try{loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')))}catch(e){}
 if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
@@ -484,7 +533,7 @@ sndUI();
 const EN={hpGrow:1.11,dmgEvery:5,dmgStep:.1,minK:0};
 const ehp=t=>Math.max(1,Math.round(2*Math.pow(EN.hpGrow,Math.max(1,S.wave))*t.hp*dmod('ehp')));
 const edmgRaw=t=>t.d*(1+EN.dmgStep*Math.floor(Math.max(1,S.wave)/EN.dmgEvery));
-const edmg=t=>{const r=edmgRaw(t);return Math.max(.2,r*EN.minK,r-stat.armor())};
+const edmg=t=>{const r=edmgRaw(t)*(1-gv('alias'));return Math.max(.2,r*EN.minK,r-stat.armor())};
 // Compact counts for chips/pixels: 9999, 12.3k, 456k, 1.23M.
 const big=n=>{n=Math.floor(n);return n<1e4?String(n):n<1e6?(+(n/1e3).toFixed(n<1e5?1:0))+'k':(+(n/1e6).toFixed(n<1e7?2:1))+'M'};
 // Number display: under 10 at most 2 decimals, under 100 at most 1, from 100 whole numbers.
@@ -515,6 +564,7 @@ for(const k in UP){
     if(S.over||S.px<c||!upOpen(k))return;
     S.px-=c;S.lv[k]++;sfx('buy');flashBtn(b);S.ft.push({t:GAIN[k],life:1});
     if(S.toast>0){S.toast=0;closeTip()}
+    if(k==='dmg')S.dmgHint=false;
     if(k==='hp')S.hp=Math.min(stat.max(),S.hp+10);
   };
   ups.appendChild(b);btns[k]=b;
@@ -524,17 +574,18 @@ cv.addEventListener('pointerdown',e=>{if(S.over)return;
   if(b&&gx>=b.x-3&&gx<=b.x+b.w+3&&gy>=b.y-3&&gy<=b.y+b.h+3){catTap();return}
   if(S.pause)setPause(false)});  // Blast fires only from the BLAST button (or Space), not from tapping the screen
 
-// Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
+// Bosses: every 16 waves forever (2 bytes = a word: 16, 32, 48...). Moved from 20/40/60/80 + every 10 from 100
+// on 2026-11-04 (the user's idea) to match the bits/bytes theme; not re-simulated yet. Types rotate. Killing one gives a core + bonus chips;
 // a boss that reaches the tower stays and hits it every BOSS.hitEvery seconds until one of them is destroyed. hpK multiplies the wave's base enemy HP.
-// Balance (30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
+// Old balance note (boss at wave 20; 30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
 // The fight at the tower is a damage race, so results change sharply between Foundry levels: the first boss is a wall to grow past.
 const BOSSES=[
   {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:15,d:12,px:30,up:'dmg'},
   {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:10.5,d:10,px:30,up:'range',spawn:3},
   {n:'Warden',c:'#7dd3fc',s:12,sp:6,hpK:9,d:12,px:30,up:'dmg',shield:.25}
 ];
-const BOSS={first:20,every:20,fastFrom:100,fastEvery:10,shieldDown:8,push:.3,hitEvery:1};
-const isBossWave=w=>w>=BOSS.first&&(w<BOSS.fastFrom?w%BOSS.every===0:w%BOSS.fastEvery===0);
+const BOSS={first:16,every:16,shieldDown:8,push:.3,hitEvery:1};
+const isBossWave=w=>w>=BOSS.first&&w%BOSS.every===0;
 function bossFor(w){let i=0;for(let x=BOSS.first;x<=w;x++)if(isBossWave(x))i++;return BOSSES[(i-1)%BOSSES.length]}
 const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
 const bossChips=w=>5+Math.floor(w/10);
@@ -548,11 +599,11 @@ const certName=w=>CERT_NAMES[w/10-1]||'Wave '+w+' Master';
 const certReady=()=>M.cert>M.claim;
 function claimCert(){if(!certReady())return 0;const w=M.claim+10;M.claim=w;M.chips+=certChips(w);save();return w}
 const certChips=w=>Math.round(w*(1+w/20)/2);
-// Idle income (unlocks after the first boss): while the game is closed (or hidden outside a run) the tower keeps
+// Idle income (unlocks after the first finished run): while the game is closed (or hidden outside a run) the tower keeps
 // earning. A full IDLE.hours away pays one run's worth of chips to your best wave, plus starting pixels for the next
 // run (IDLE.px per best wave). Nothing for under IDLE.minMin minutes; the stash never holds more than one full period.
 const IDLE={hours:4,minMin:5,px:10};
-const idleOpen=()=>M.bk>0;
+const idleOpen=()=>M.hist.length>0||M.bk>0;
 const runChips=b=>{let c=0;for(let i=1;i<b;i++)c+=1+Math.floor(i/5);return c};
 const idleFull=()=>({chips:runChips(M.best),px:IDLE.px*M.best});
 let idleMsg=null;
@@ -561,7 +612,8 @@ let idleMsg=null;
 // and enemy spawns from a seed of the date. Free retries. Reward: chips for today's best wave, paid as it improves:
 // DAILY.k of a whole run to your best wave at wave DAILY.top (less below it), +DAILY.streak for each day in a row
 // (up to DAILY.streakMax days). No normal chips, cores or certificates in daily runs, and they never change the best wave.
-const DAILY={w:25,top:20,k:.5,streak:.1,streakMax:5};
+// top: the full reward needs wave top = beating the first boss (fresh towers mostly stop at it: daily sims 2026-11-04)
+const DAILY={w:25,top:BOSS.first+1,k:.5,streak:.1,streakMax:5};
 const DAILY_MODS=[
   {n:'Glass cannon',d:'Double damage, half the tower HP',dmg:2,hp:.5},
   {n:'Swarm',d:'Twice the enemies, half their HP',cnt:2,ehp:.5},
@@ -569,7 +621,7 @@ const DAILY_MODS=[
   {n:'Spray day',d:'Three bullets per shot',res:{spray:2}},
   {n:'Blast party',d:'Blast recharges 3x faster',blast:3},
   {n:'Bargain bin',d:'Upgrades 40% cheaper, enemies 20% tougher',cost:.6,ehp:1.2},
-  {n:'Lucky bits',d:'20% critical hits (x3 damage)',res:{crit:4}}
+  {n:'Lucky bits',d:'20% critical hits (x3 damage)',res:{crit:3}}
 ];
 const dayNum=t=>{const d=new Date(t);return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)};
 const today=()=>dayNum(clock.now());
@@ -598,7 +650,7 @@ function endDaily(stopped){
   const pay=Math.max(0,dailyChips(D.best,D.streak)-D.paid);D.paid+=pay;M.chips+=pay;S.earn=pay;S.dpay=pay;
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:pay,d:Math.round(S.time),n:S.novas,b:S.bosses,r:0,dl:1}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
-  track('daily',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:pay,n:S.novas,x:S.daily.n,s:D.streak,r:S.drec?1:0,m:trackSnap()});
+  track('daily',{gl:Object.assign({},S.gl),w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:pay,n:S.novas,x:S.daily.n,s:D.streak,r:S.drec?1:0,m:trackSnap()});
 }
 function idleCheck(now){
   now=now||Date.now();const away=Math.max(0,now-(M.seen||now));M.seen=now;
@@ -611,7 +663,7 @@ function idleCheck(now){
 function startWave(){
   S.wave++;S.left=(4+S.wave*2)*dmod('cnt');S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
   for(const k in UP)if(UP[k].w===S.wave&&(UP[k].run?upOpen(k):M.best<S.wave)){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
-  if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' incoming';sfx('boss')}
+  if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' compiled!';S.gfx=.6;sfx('boss')}
 }
 function spawn(){
   if(S.boss&&!S.en.some(e=>e.boss)&&!S.bossDone){
@@ -630,7 +682,7 @@ function kill(e){
   else{ring(e.x,e.y,e.t.s/2,6,e.t.c,.22);sparks(e.x,e.y,4,e.t.c,45,.25)}
   if(e.boss&&S.daily){S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='What a daily run!';sfx('wave');buzz([40,30,40])}
   else if(e.boss){const c=bossChips(S.wave);M.cores++;M.bk++;M.chips+=c;S.earn+=c;S.bosses++;S.bonus=2.5;S.bt1='BOSS DOWN!';S.bt='+1 core +'+c+' chips';sfx('wave');buzz([40,30,40]);save()}
-  const np=e.t.px*(1+stat.magnet())*(1+skinB('e')),n=Math.floor(np)+(Math.random()<np%1?1:0);
+  const np=e.t.px*(1+stat.magnet())*(1+skinB('e'))*(1+gv('rain')),n=Math.floor(np)+(Math.random()<np%1?1:0);
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,v=20+Math.random()*30;
     S.pt.push({x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:e.t.c,t:0});
@@ -649,7 +701,7 @@ function sparks(x,y,n,c,sp,life){for(let i=0;i<n;i++){const a=Math.random()*Math
   S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+Math.random()*.6),max:life,c})}fxCap()}
 function ring(x,y,r,grow,c,life){S.fx.push({x,y,r,grow,c,life,max:life,k:'r'});fxCap()}
 function nova(){
-  if(S.over||S.pause||S.nova>0)return false;
+  if(S.over||S.pause||S.gpick||S.nova>0)return false;
   S.nova=novaCd();S.nfx=0;S.novas++;S.shake=.15;S.sfl=.18;sfx('nova');buzz(40);
   for(let i=0;i<28;i++){const a=i/28*Math.PI*2,v=110+Math.random()*40;S.fx.push({x:CX,y:CY,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.4,max:.4,c:i%2?'#5ec8ff':'#e8ecf5'})}fxCap();
   for(const e of S.en){
@@ -666,8 +718,8 @@ function nova(){
 // Cards pause the game until "Got it"; toasts show briefly without pausing.
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
-  buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
+  buy:{t:'<span>You have enough pixels! Tap <b>Damage</b> below to hit harder.</span>'},
+  boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Every 16 waves (two bytes make a word) the glitch compiles a new one.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with a BLAST to break the shield for '+BOSS.shieldDown+'s.</span>'},
   nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap the BLAST button to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };
@@ -688,7 +740,8 @@ function tipsCheck(){
   if(bo&&!M.tips.boss)return showTip('boss');
   if(bo&&bo.t.shield&&!M.tips.warden)return showTip('warden');
   if(!M.tips.nova&&S.nova===0&&(S.hp<=.7*stat.max()||S.en.filter(e=>Math.hypot(e.x-CX,e.y-CY)<35).length>=3))return showTip('nova');
-  if(!M.tips.buy&&S.px>=Math.min(...openUps().map(cost)))return showTip('buy');
+  // first buy: point at Damage (its button pulses until bought)
+  if(!M.tips.buy&&S.px>=cost('dmg')){S.dmgHint=true;upTab='atk';return showTip('buy')}
 }
 // Ends the run (tower destroyed, or stopped by the player): records best and history, shows game over.
 function endRun(stopped){
@@ -698,7 +751,7 @@ function endRun(stopped){
   S.prevBest=M.best;S.record=M.best>0&&S.wave>M.best;M.best=Math.max(M.best,S.wave);
   M.hist=[{t:Date.now(),w:S.wave,k:stopped?'Stopped':S.killer?S.killer.n:'',c:S.earn,d:Math.round(S.time),n:S.novas,b:S.bosses,r:S.record?1:0}].concat(M.hist).slice(0,HIST_MAX);
   save();if(!stopped){sfx('over');buzz([60,40,120])}showGO();
-  track('run',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:S.earn,n:S.novas,b:S.bosses,r:S.record?1:0,spd:Math.min(M.spd,maxSpeed()),up:Object.assign({},S.lv),m:trackSnap()});
+  track('run',{w:S.wave,k:M.hist[0].k,d:M.hist[0].d,c:S.earn,n:S.novas,b:S.bosses,r:S.record?1:0,spd:Math.min(M.spd,maxSpeed()),up:Object.assign({},S.lv),gl:Object.assign({},S.gl),m:trackSnap()});
 }
 const ZOOM_MIN=.5;
 const zoomTarget=()=>Math.max(ZOOM_MIN,Math.min(1,(W/2-6)/stat.range()));
@@ -716,7 +769,8 @@ function update(dt){
   for(const f of S.ft)f.life-=rt;S.ft=S.ft.filter(f=>f.life>0);
   for(const f of S.cp)f.life-=rt;S.cp=S.cp.filter(f=>f.life>0);
   if(S.fx.length){const dr=Math.pow(.02,rt);for(const f of S.fx){f.life-=rt;if(f.k)continue;f.x+=f.vx*rt;f.y+=f.vy*rt;f.vx*=dr;f.vy*=dr}S.fx=S.fx.filter(f=>f.life>0)}
-  S.sfl=Math.max(0,S.sfl-rt);S.bin=Math.max(0,S.bin-rt);
+  S.sfl=Math.max(0,S.sfl-rt);S.bin=Math.max(0,S.bin-rt);S.gfx=Math.max(0,S.gfx-rt);
+  if(S.gpick&&!S.over){if(GLITCH.auto||document.hidden)pickGlitch(0);else return}
   if(S.over){S.ot+=dt;return}
   S.time+=dt;
   S.nova=Math.max(0,S.nova-dt);
@@ -729,6 +783,7 @@ function update(dt){
     if(S.wave>0&&!S.paid){S.paid=true;const sb=1+skinB('b'),cr=S.daily?0:(1+Math.floor(S.wave/5))*sb+(S.cf||0),p=Math.round((5+S.wave*2)*sb),c=Math.floor(cr+1e-9);S.cf=cr-c;const it=Math.min(Math.floor(S.px*stat.bank()),stat.bankCap());if(it>0)S.ft.push({t:'Bank +'+it+' px',life:1.6});
     S.px+=p+it;M.chips+=c;S.earn+=c;S.bonus=1.2;sfx('wave');S.bt1='Wave '+S.wave+' clear';S.bt='+'+p+' px'+(S.daily?'':' +'+c+' chips');
     if(!S.daily&&S.wave%10===0&&S.wave>M.cert){M.cert=S.wave;S.certs=(S.certs||[]).concat(S.wave);S.bonus=2.5;S.bt1='CERTIFICATE: '+certName(S.wave);S.bt='Collect it on the menu'}
+    if(glitchWave(S.wave)){const o=glitchOffer();if(o.length){S.gpick=o;S.gfx=.6;sfx('boss');S.bonus=2;S.bt1='BYTE '+S.wave/GLITCH.every;S.bt='8 bit waves compiled'}}
     save()}
     S.gap-=dt;
     if(S.gap<=0){startWave();S.gap=1.5}
@@ -746,6 +801,7 @@ function update(dt){
     else if(d<8){e.dead=true;e.reached=true;S.hp-=edmg(e.t);S.killer=e.t;S.flash=.15;S.shake=.2;sparks(e.x,e.y,4,'#ff6b6b',40,.25);sparks(e.x,e.y,3,e.t.c,35,.25);sfx('hit');buzz(30)}
   }
   S.en=S.en.filter(e=>!e.dead);
+  if(S.hp<=0&&G('save')&&!S.saved){S.saved=1;S.hp=stat.max()*GLITCHES.save.v;S.bonus=2.5;S.bt1='SAVE STATE LOADED';S.bt='Back to half HP';S.sfl=.2;sfx('wave')}
   if(S.hp<=0){S.hp=0;endRun(false);return}
   S.flash=Math.max(0,S.flash-dt);if(S.mf)S.mf=Math.max(0,S.mf-dt);
   // tower fire
@@ -758,7 +814,7 @@ function update(dt){
   S.target=target;
   if(target&&S.cd<=0){
     const d=Math.hypot(target.x-CX,target.y-CY);
-    const a0=Math.atan2(target.y-CY,target.x-CX),n=1+RL('spray');
+    const a0=Math.atan2(target.y-CY,target.x-CX),n=1+RL('spray')+G('stray');
     // Spray and Pray: bullet 0 always flies straight at the target; extras fan out alternately right, left, wider right...
     for(let i=0;i<n;i++){const k=i===0?0:Math.ceil(i/2)*(i%2?1:-1),a=a0+k*.14;
       S.pr.push({x:CX,y:CY,vx:Math.cos(a)*130,vy:Math.sin(a)*130,life:1.5,pierce:RL('pierce'),hits:[],crit:Math.random()<critChance()})}
@@ -882,7 +938,7 @@ function drawTower(){const t=tier('hp'),n=towerN(),h=(n-1)/2,z=WZ,ts=TSK[sk('t')
   [[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,ra).forEach(([sx,sy],i)=>{const x=CX+sx*(h+1),y=CY+sy*(h+1);R(x,y,1,1,'#c3cde6');R(x+sx,y+sy,1,1,(blink+i)%2?'#7ee8a8':'#2f6b4f')});
   // turret: barrel(s) towards the target; longer with Damage; one barrel per Spray and Pray bullet, fanned wider so they read
   const ang=S.target?Math.atan2(S.target.y-CY,S.target.x-CX):(S.aim!=null?S.aim:-Math.PI/2);
-  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray'),bw=dt>=2&&nb===1?2:1;
+  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray')+G('stray'),bw=dt>=2&&nb===1?2:1;
   const fan=[];for(let i=0;i<nb;i++)fan.push(ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38);
   const pts=a=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
   fan.forEach(a=>{for(const[x,y]of pts(a))R(x-1,y-1,bw+2,bw+2,ts.out)});          // outline first
@@ -963,6 +1019,9 @@ function draw(){
   // Blast / boss kill flash and the boss entrance warning (red pulsing edges); skipped with reduced motion
   if(!RM.matches){
     if(S.sfl>0){g.fillStyle='rgba(200,240,255,'+Math.min(.18,S.sfl)+')';g.fillRect(0,0,W,H)}
+    // glitch offer: a moment of torn, colour-split scan lines
+    if(S.gfx>0)for(let i=0;i<9;i++){const y=Math.floor(Math.random()*H),h=1+Math.floor(Math.random()*4),dx=Math.round((Math.random()*2-1)*8*S.gfx/.6);
+      g.drawImage(cv,0,y,W,h,dx,y,W,h);g.fillStyle=['rgba(255,60,200,.35)','rgba(60,240,255,.35)','rgba(255,255,255,.25)'][i%3];g.fillRect(0,y,W,1)}
     if(S.bin>0){const a=(.25+.2*Math.sin(S.bin*12))*Math.min(1,S.bin/.5);
       for(let i=0;i<4;i++){g.fillStyle='rgba(255,60,80,'+(a*(1-i/4))+')';g.fillRect(i*2,0,2,H);g.fillRect(W-2-i*2,0,2,H);g.fillRect(0,i*2,W,2);g.fillRect(0,H-2-i*2,W,2)}}}
   catDraw();
@@ -985,13 +1044,16 @@ function setD(el,v){if(el.style.display!==v)el.style.display=v}
 function setDis(el,v){v=!!v;if(el.disabled!==v)el.disabled=v}
 function setH(el,v){if(el._h!==v){el._h=v;el.innerHTML=v}}  // only ui() writes these buttons
 function ui(){
-  setT($id('w'),'Wave '+Math.max(1,S.wave));
+  setT($id('wn'),'Wave '+Math.max(1,S.wave));
+  // byte meter: waves cleared toward the next byte (8 bit waves = 1 byte = a glitch); all lit while a byte is being picked
+  {const n=byteBits(),bs=$id('bits');if(bs._n!==n){bs._n=n;[...bs.children].forEach((b,i)=>b.className=i<n?'on':'');bs.classList.toggle('byte',n>=GLITCH.every)}}
   setT($id('px'),big(S.px)+' px');
   setT($id('ch'),big(M.chips)+' chips');
   // no best-wave number during a run (it read like a second wave counter); just a gold "New best!" once you pass it
   {const b=$id('bw'),db=M.daily.best,nb=S.daily?inRun()&&db>0&&S.wave>db:inRun()&&M.best>0&&S.wave>M.best,cl=S.daily&&!nb?'dl':'';
   setT(b,S.daily?(nb?'Daily best!':'Daily'):nb?'New best!':'');if(b.className!==cl)b.className=cl}
-  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'');show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
+  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),[S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'',glitchList()?'Glitches: '+glitchList():''].filter(Boolean).join(' / '));
+  const gOn=!!S.gpick&&!S.over&&!S.menu;show('gl',gOn);if(gOn)setH($id('glo'),S.gpick.map((k,i)=>'<button data-i="'+i+'"><b><span>'+GLITCHES[k].n+'</span><small>'+(G(k)?'Lv '+G(k)+' > '+(G(k)+1):'New')+'</small></b>'+GLITCHES[k].d+'</button>').join(''));show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
   checkResearch();
   if($id('home').style.display==='flex'&&M.rq)hbtTile();
   if($id('bt').style.display==='flex')btTick();
@@ -1023,7 +1085,7 @@ function ui(){
     setD(btns[k],UP[k].cat===upTab?'':'none');
     const c=cost(k);
     const op=upOpen(k),h=op?'<b>'+UP[k].n+'</b>'+info[k]+'<br>'+big(c)+' px':'<b>'+UP[k].n+'</b><span class="lw">'+LOCK_SVG+(UP[k].needs&&!UP[k].needs()?UP[k].needTxt:UP[k].run?'Run wave '+UP[k].w:'Reach wave '+UP[k].w)+'</span>&nbsp;';
-    setH(btns[k],h);btns[k].classList.toggle('lkup',!op);
+    setH(btns[k],h);btns[k].classList.toggle('lkup',!op);if(k==='dmg')btns[k].classList.toggle('hint',!!S.dmgHint&&inRun());
     setDis(btns[k],S.over||!op||S.px<c);
   }
 }
@@ -1045,7 +1107,7 @@ function fyUI(){
 }
 function showGO(){
   checkResearch();
-  for(const id of ['goal','gsl','gos'])document.getElementById(id).style.display=S.daily?'none':'';
+  document.getElementById('goal').style.display=S.daily?'none':'';
   if(S.daily)return showDailyGO();
   const gd=document.getElementById('gdl'),dOn=dailyOpen()&&dailyNow().best===0;gd.style.display=dOn?'block':'none';
   if(dOn)gd.textContent='Daily run ready: '+DAILY_MODS[dailyModIx(today())].n;
@@ -1063,19 +1125,7 @@ function showGO(){
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.earn))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Best',M.best);
   document.getElementById('gnm').innerHTML=nearMiss().map(esc).join('<br>');
   goalUI('goalt','goalb');
-  document.getElementById('gsl').textContent='Suggested upgrades · you have '+big(M.chips)+' chips';
-  const s=document.getElementById('gos');s.innerHTML='';
-  const ks=openUps().sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
-  if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
-  else if(kt&&upOpen(kt.up))pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
-  else pick.push({k:ks[1],why:'Next cheapest'});
-  pick.forEach(({k,why})=>{
-    const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+big(c)+' chips';
-    b.disabled=M.chips<c;
-    b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');track('foundry',{k,lv:M.lv[k],c,from:'gameover'});showGO()};
-    s.appendChild(b);
-  });
+  fyTile(document.getElementById('gof'));
   document.getElementById('go').style.display='flex';
 }
 // Daily run over: today's twist, best and the chips it paid
@@ -1088,10 +1138,10 @@ function showDailyGO(){
   document.getElementById('gop').textContent=S.daily.n+': '+(S.stopped?'you stopped on wave '+S.wave:'killed by a '+kn+' on wave '+S.wave)+(S.drec&&S.dprev?', beating today\'s best of '+S.dprev:'')+'.';
   const sm=streakMul(D.streak),more=D.best<DAILY.top;
   document.getElementById('gnm').innerHTML=[S.dpay?'+'+big(S.dpay)+' chips for today\'s best wave'+(sm>1?' (streak '+D.streak+' days, +'+Math.round(100*(sm-1))+'%)':''):'Beat wave '+D.best+' to earn more chips today',
-    more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips at wave '+DAILY.top:'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
+    more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips for beating the wave '+BOSS.first+' boss':'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
   const gb=document.getElementById('gbt'),bo=resUnlocked();gb.disabled=!bo;gb.className='';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory';
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.dpay))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Today',D.best);
-  setT(document.getElementById('gor'),'Try again');
+  setT(document.getElementById('gor'),'Try again');fyTile(document.getElementById('gof'));
   document.getElementById('go').style.display='flex';
 }
 // Game over "so close" lines: the boss attempt (if the run ended at a boss), then the single nearest goal.
@@ -1115,23 +1165,31 @@ const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="c
 // Next-unlock goal card (home menu and game over): text plus progress bar toward the next locked mode.
 function goalUI(tid,bid){
   const next=LOCKED.find(m=>!lockOpen(m)),hb=document.getElementById(bid);
-  const goalTxt=m=>m.cert&&M.cert>=m.w?'Next unlock: '+m.n+'. Collect your '+certName(m.w)+' certificate.':
-    (m.boss?'Next: bosses appear at wave ':m.cert?'Next unlock: '+m.n+'. Clear wave ':'Next unlock: '+m.n+'. Reach wave ')+m.w+(M.best?' (best '+M.best+')':'')+'.';
+  const bst=M.best?' (best '+M.best+')':'';
+  // the first boss is a mystery until it is met
+  const goalTxt=m=>m.boss?'Something is waiting for you at wave '+m.w+bst+'...':m.cert&&M.cert>=m.w?'Next unlock: '+m.n+'. Collect your '+certName(m.w)+' certificate.':
+    'Next unlock: '+m.n+'. '+(m.cert?'Clear':'Reach')+' wave '+m.w+bst+'.';
   document.getElementById(tid).textContent=next?goalTxt(next):'All modes unlocked! Keep pushing your best wave.';
   hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
 }
+// bosses stay a mystery (??? on the menu, no boss text in How to play / Certificates / Bit Theory) until the first one is met
+const bossSeen=()=>M.best>=BOSS.first||M.bk>0;
+// Foundry buttons (home and game over): highlighted with "Upgrade ready!" when the chips buy something, else show the chips
+const fyReady=()=>META_UPS.some(k=>upOpen(k)&&M.chips>=mcost(k));
+function fyTile(b){const rdy=fyReady();b.classList.toggle('rdy',rdy);b.innerHTML='Foundry<small'+(rdy?' class="rdy">Upgrade ready!':'>'+big(M.chips)+' chips')+'</small>'}
 function homeUI(){
+  document.body.classList.toggle('noboss',!bossSeen());
   checkResearch();hbtTile();
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
     if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.daily&&open){const D=dailyNow(),fresh=D.best===0;return '<button class="lk tr dl'+(fresh?' new':'')+'" id="hdl">'+m.n+'<small'+(fresh?' class="rdy">New today!':'>'+(D.best>=DAILY.top?'Done: wave ':'Today: wave ')+D.best)+'<br>'+esc(DAILY_MODS[dailyModIx(D.d)].n)+'</small></button>'}
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
-    return '<button class="lk" disabled>'+LOCK_SVG+m.n+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
+    return '<button class="lk" disabled>'+LOCK_SVG+(m.boss?'???':m.n)+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
   if(idleMsg)document.getElementById('idlt').textContent='Your tower kept defending for '+fmtDur(Math.min(idleMsg.away/1000,IDLE.hours*3600))+(idleMsg.away>IDLE.hours*3600000?' (max '+IDLE.hours+'h)':'')+': '+[idleMsg.chips?'+'+big(idleMsg.chips)+' chips':'',idleMsg.px||M.stash?big(M.stash)+' px head start for your next run':''].filter(Boolean).join(' and ')+'.';
   const cn=document.getElementById('hcen');setT(cn,certReady()?'Reward ready!':M.cert?(M.cert/10)+' earned':'Wave 10');cn.className=certReady()?'rdy':'';
   goalUI('hookt','hookb');
-  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':big(M.chips)+' chips';fn.className=rdy?'rdy':'';
+  fyTile(document.getElementById('hfy'));
 }
 function showHome(){
   homeUI();
@@ -1154,7 +1212,7 @@ function showDaily(){
   const D=dailyNow(),mod=DAILY_MODS[dailyModIx(D.d)],sn=streakNext(),full=dailyChips(DAILY.top,sn),s0=streakNow();
   document.getElementById('dyt').innerHTML="<b>Today's twist: "+esc(mod.n)+'</b>'+esc(mod.d)+'<small id="dyn"></small>';dyTick();
   document.getElementById('dyr').innerHTML=[D.best?"Today's best: <b>wave "+D.best+'</b> · earned '+big(D.paid)+' chips'+(D.best>=DAILY.top?' (full reward)':''):'Not played today yet.',
-    'Reward: chips for today\'s best wave, up to <b>'+big(full)+' chips</b> at wave '+DAILY.top+'.',
+    'Reward: chips for today\'s best wave, up to <b>'+big(full)+' chips</b> for beating the wave '+BOSS.first+' boss.',
     s0?'Streak: <b>'+s0+' day'+(s0===1?'':'s')+'</b>'+(streakMul(sn)>1?' (+'+Math.round(100*(streakMul(sn)-1))+'% chips)':'')+'. Play every day for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'%.':'Play on days in a row for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'% chips.',
     D.top?'Your best daily run: wave '+D.top+'.':''].filter(Boolean).map(t=>'<span>'+t+'</span>').join('');
   setT(document.getElementById('dyp'),D.best?'Try again':"Play today's run");
@@ -1219,12 +1277,13 @@ document.getElementById('idlk').onclick=()=>{idleMsg=null;homeUI()};
 document.getElementById('cec').onclick=()=>{show('ce',0);showHome()};
 // ---- Bit Theory screen and timers
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
-const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
-const resUnlocked=()=>M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
+const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:Math.round(100*critPct(lv))+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
+// Bit Theory opens after the first finished run (a reason to come back on day one)
+const resUnlocked=()=>M.hist.length>0||M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
 // Requirement list for a research: [{t:label, have, need}], all must have >= need.
 function resReqs(k){const r=BITS[k].req,out=[];
   for(const x in r.res||{})out.push({t:BITS[x].n+' Lv '+r.res[x],have:M.res[x],need:r.res[x]});
-  if(r.bk)out.push({t:r.bk+' bosses beaten',have:M.bk,need:r.bk});
+  if(r.bk)out.push({t:bossSeen()?r.bk+' bosses beaten':'??? at wave '+BOSS.first,have:M.bk,need:r.bk});
   if(r.best)out.push({t:'Best wave '+r.best,have:M.best,need:r.best});
   return out}
 const resOpen=k=>resReqs(k).every(q=>q.have>=q.need);
@@ -1247,7 +1306,7 @@ function btUI(){
     const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
     if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
-    const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
+    const foot=max?'Fully studied':now?'Studying...':!c.cores&&!c.chips?'Free · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1)):(c.cores?c.cores+' core'+(c.cores===1?'':'s')+' · ':'')+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
   }).join('');
@@ -1264,7 +1323,7 @@ function hbtTile(){
   const b=document.getElementById('hbt'),n=document.getElementById('hbtn'),open=resUnlocked();b.disabled=!open;
   b.innerHTML=(open?'':LOCK_SVG)+'Bit Theory';b.appendChild(n);
   const rdy=open&&!M.rq&&BIT_KEYS.some(resCanAfford);
-  n.textContent=!open?'Beat a boss':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
+  n.textContent=!open?'Finish a run':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
 }
 // What this run unlocked (game over card). bt: show the "Open Bit Theory" button.
 function runNews(){
@@ -1273,9 +1332,9 @@ function runNews(){
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
   for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.n+' unlocked');
   for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect +'+certChips(w)+' chips'+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
-  if(!a.bk&&M.bk>0)items.push('Idle income: your tower now earns chips and starting pixels while you are away');
+  if(!a.idle&&idleOpen())items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
-  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
+  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: your first study is free, and it keeps running while you are away');
   const opened=BIT_KEYS.filter(k=>!a.open.includes(k)&&resOpen(k));
   if(!btNew)for(const k of opened)items.push(BITS[k].n+' can now be studied');
   for(const k of BIT_KEYS)if(M.res[k]>a.res[k])items.push(BITS[k].n+' Lv '+M.res[k]+' finished');
@@ -1297,12 +1356,14 @@ document.getElementById('gof').onclick=()=>openFoundry('go');
 document.getElementById('fyc').onclick=()=>{show('fy',0);if(fyFrom==='home')showHome();else showGO()};
 // Pause: HUD button, P/Escape, or auto when the tab/app is hidden. Tap the canvas to resume.
 const pb=document.getElementById('pb');
-function setPause(on){if(S.over||S.tip||S.menu)return;S.pause=on;if(!on)S.confirm=false;if(on&&S.toast>0){S.toast=0;closeTip()}}
+function setPause(on){if(S.over||S.tip||S.menu||S.gpick)return;S.pause=on;if(!on)S.confirm=false;if(on&&S.toast>0){S.toast=0;closeTip()}}
 document.getElementById('pzr').onclick=()=>setPause(false);
 document.getElementById('pzs').onclick=()=>{S.confirm=true};
 document.getElementById('cfk').onclick=()=>{S.confirm=false};
 document.getElementById('cfs').onclick=()=>{if(!S.over&&!S.menu)endRun(true)};
 pb.onclick=()=>setPause(!S.pause);
+document.getElementById('glo').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&pickGlitch(+b.dataset.i))ui()});
+addEventListener('keydown',e=>{if(S&&S.gpick&&/^[1-9]$/.test(e.key))pickGlitch(+e.key-1)});
 addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P'||e.key==='Escape')&&!e.repeat)setPause(!S.pause)});
 const novab=document.getElementById('nova'),spdb=document.getElementById('spd');
 // speed button cycles 1x, 1.5x ... up to the Overclock level, then back to 1x; the choice is saved
@@ -1381,7 +1442,8 @@ function catDraw(){
   if(word&&cat.box){const b=cat.box;g.font='7px "Press Start 2P",monospace';g.textAlign='center';const bw=g.measureText(word).width+8;
     const tx=Math.min(W-bw/2-1,Math.max(bw/2+1,b.x+b.w/2)),ty=Math.max(12,b.y-4);g.fillStyle='#fff';g.fillRect(Math.round(tx-bw/2),ty-8,Math.round(bw),10);g.fillStyle='#1b2033';g.fillText(word,tx,ty)}
 }
-idleCheck();reset();showHome();
+// a brand-new player starts playing right away (the first tip card explains the game); everyone else sees the menu
+idleCheck();if(!M.hist.length&&!M.best)startRun(false);else{reset();showHome()}
 save();track('open',{m:trackSnap()});  // one per page load (also saves a newly made uid)
 ui();lockUpsHeight();fit();  // size the game screen again now that the upgrade grid has its real height
 // The game keeps running when the tab is hidden: browsers stop animation frames there, so we
