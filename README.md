@@ -50,12 +50,12 @@ Bosses never give up: one that reaches the tower stays there and hits it every s
 Boss cores pay for Bit Theory research.
 
 ## Bit Theory
-Study the pixels to find their deeper meaning. Bit Theory opens on the home menu after your first run. Level 1 of a research costs 10 chips and no cores; higher levels need boss cores.
+Study the pixels to find their deeper meaning. Bit Theory opens on the home menu after your first run. The first Critical bits study is free (10% crit chance, then +5% per level); level 1 of other research costs 10 chips and no cores; higher levels need boss cores.
 Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
 
 | Research | Each level | Max level | Available when |
 |---|---|---|---|
-| Critical bits | +5% chance of a x3 critical hit | 10 | right away |
+| Critical bits | chance of a x3 critical hit: 10% at Lv 1 (free study), +5% per level | 10 | right away |
 | Piercing bits | Bullets pass through +1 enemy | 5 | right away |
 | Spray and Pray | +1 bullet per shot, fanned out | 4 | Piercing bits Lv 2 and 3 bosses beaten |
 | Blast tech | Blast recharges 15s faster (down to 60s) | 4 | best wave 35 and 2 bosses beaten |

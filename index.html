@@ -363,15 +363,17 @@ const stat={
 };
 const MAGNET={run:.15,meta:.1};
 const BANK={run:.03,meta:.015,capRun:25,capMeta:12};
-const critChance=()=>.05*RL('crit')+gv('dither');
+// Critical bits: Lv1 = 10% (the free first study), +5% per level after that (Lv10 = 55%)
+const critPct=lv=>lv>0?.05*(lv+1):0;
+const critChance=()=>critPct(RL('crit'))+gv('dither');
 const CRIT_POP=.6,CRIT_MAX=8;  // crit damage numbers: seconds on screen, most at once
 const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast')*(1-gv('refresh'));
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost')*(1-gv('zip')));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
-// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: level 1 RES_FIRST chips and no cores; then 1 core + 1 per 2 levels, chips 25 x 1.6^level.
+// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: level 1 RES_FIRST chips and no cores (Critical bits Lv1 free); then 1 core + 1 per 2 levels, chips 25 x 1.6^level.
 // req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
 const BITS={
-  crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit',req:{}},
+  crit:{n:'Critical bits',max:10,t:15,d:'A chance of a x3 critical hit (10%, then +5% per level)',req:{}},
   pierce:{n:'Piercing bits',max:5,t:10,d:'Bullets pass through +1 enemy',req:{}},
   spray:{n:'Spray and Pray',max:4,t:10,d:'+1 bullet per shot, fanned out',req:{res:{pierce:2},bk:3}},
   nova:{n:'Blast tech',max:4,t:20,d:'Blast recharges 15s faster',req:{best:35,bk:2}},
@@ -384,9 +386,10 @@ const BIT_KEYS=Object.keys(BITS);
 const maxSpeed=()=>1+.5*(M.res.speed||0);
 const gameSpeed=()=>inRun()&&!S.pause?Math.min(M.spd||1,maxSpeed()):1;
 const resMin=(k,lv)=>BITS[k].time?BITS[k].time[Math.min(lv|0,BITS[k].time.length-1)]:Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
-// level 1 of a research costs RES_FIRST chips and no cores, so a new player can start a study after the first run
+// level 1 of a research costs RES_FIRST chips and no cores; the very first Critical bits study is free, so every new player
+// starts a timer after the first run (a reason to come back)
 const RES_FIRST=10;
-const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return lv?{cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}:{cores:0,chips:RES_FIRST}};
+const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return lv?{cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}:{cores:0,chips:k==='crit'?0:RES_FIRST}};
 const clock={now:()=>Date.now()};
 // Save format version. Saves without `v` are v0 (same shape as v1).
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
@@ -620,7 +623,7 @@ const DAILY_MODS=[
   {n:'Spray day',d:'Three bullets per shot',res:{spray:2}},
   {n:'Blast party',d:'Blast recharges 3x faster',blast:3},
   {n:'Bargain bin',d:'Upgrades 40% cheaper, enemies 20% tougher',cost:.6,ehp:1.2},
-  {n:'Lucky bits',d:'20% critical hits (x3 damage)',res:{crit:4}}
+  {n:'Lucky bits',d:'20% critical hits (x3 damage)',res:{crit:3}}
 ];
 const dayNum=t=>{const d=new Date(t);return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)};
 const today=()=>dayNum(clock.now());
@@ -1285,7 +1288,7 @@ document.getElementById('idlk').onclick=()=>{idleMsg=null;homeUI()};
 document.getElementById('cec').onclick=()=>{show('ce',0);showHome()};
 // ---- Bit Theory screen and timers
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
-const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
+const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:Math.round(100*critPct(lv))+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
 // Bit Theory opens after the first finished run (a reason to come back on day one)
 const resUnlocked=()=>M.hist.length>0||M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
 // Requirement list for a research: [{t:label, have, need}], all must have >= need.
@@ -1314,7 +1317,7 @@ function btUI(){
     const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
     if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
-    const foot=max?'Fully studied':now?'Studying...':(c.cores?c.cores+' core'+(c.cores===1?'':'s')+' · ':'')+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
+    const foot=max?'Fully studied':now?'Studying...':!c.cores&&!c.chips?'Free · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1)):(c.cores?c.cores+' core'+(c.cores===1?'':'s')+' · ':'')+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
   }).join('');
@@ -1342,7 +1345,7 @@ function runNews(){
   for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect +'+certChips(w)+' chips'+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
   if(!a.idle&&idleOpen())items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
-  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: start your first study, it keeps running while you are away');
+  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: your first study is free, and it keeps running while you are away');
   const opened=BIT_KEYS.filter(k=>!a.open.includes(k)&&resOpen(k));
   if(!btNew)for(const k of opened)items.push(BITS[k].n+' can now be studied');
   for(const k of BIT_KEYS)if(M.res[k]>a.res[k])items.push(BITS[k].n+' Lv '+M.res[k]+' finished');

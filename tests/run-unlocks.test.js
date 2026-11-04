@@ -2,7 +2,7 @@
 skipTips();const items=()=>[...$('gnl').children].map(li=>li.textContent);
 // very first run: new upgrades, plus Bit Theory and idle income open (reasons to come back on day one)
 M.best=3;M.bk=0;M.cores=0;play();S.start.best=3;S.wave=9;die();
-ok(shown($('gnew'))&&items().join('|')==='New upgrade: Fire rate|New upgrade: Range|Idle income: your tower now earns chips and starting pixels while you are away|Bit Theory unlocked: start your first study, it keeps running while you are away','first run: upgrades, idle income and Bit Theory listed: '+items().join(' / '));
+ok(shown($('gnew'))&&items().join('|')==='New upgrade: Fire rate|New upgrade: Range|Idle income: your tower now earns chips and starting pixels while you are away|Bit Theory unlocked: your first study is free, and it keeps running while you are away','first run: upgrades, idle income and Bit Theory listed: '+items().join(' / '));
 ok(!$('gbt').disabled&&$('gbt').classList.contains('hl')&&$('gbt').textContent==='Bit TheoryNew!','Bit Theory button highlighted with New!');
 // nothing new: card hidden
 M.chips=0;click($('gor'));S.wave=7;die();ok(!shown($('gnew'))&&!$('gbt').classList.contains('hl'),'no news: card hidden, no highlight');
