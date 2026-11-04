@@ -110,6 +110,7 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hook i,.goal i{display:block;height:6px;margin-top:6px;background:rgba(128,128,128,.35)}
 #hook b,.goal b{display:block;height:100%;background:#ffd166;width:0}
 #home p,#how p{text-align:center}
+body.noboss .bx{display:none}
 #how p{text-align:left}
 #hi p{margin:0;font-size:8px;text-align:center;width:min(360px,92vw)}
 #hil{width:min(360px,92vw);max-height:60vh;overflow-y:auto;border:2px solid var(--bd);font-size:7px;line-height:1.6}
@@ -232,7 +233,7 @@ button b{display:block;font-weight:400}
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
-<p>Two bytes make a word: every 16 waves the glitch compiles a boss. Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
+<p class="bx">Two bytes make a word: every 16 waves the glitch compiles a boss. Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
 <p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
@@ -244,7 +245,7 @@ button b{display:block;font-weight:400}
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="dy"><div id="dyh">Daily run</div><p>A new challenge every day, the same for everyone. You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count. Try as often as you like.</p><div id="dyt"></div><p id="dyr"></p><button id="dyp">Play today's run</button><button id="dyc">Back</button></div>
 <div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
-<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here. Boss waves count once the boss is beaten.</p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
+<div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here.<span class="bx"> Boss waves count once the boss is beaten.</span></p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
 <div id="fy"><div id="fyh"></div><p>Pixel chips come from clearing waves: 1 per wave, plus 1 more for every 5 waves reached. Spend them here on permanent boosts that carry into every future run.</p><div id="fyl"></div><button id="fyc">Back</button></div>
 <script>
@@ -1173,18 +1174,23 @@ const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="c
 // Next-unlock goal card (home menu and game over): text plus progress bar toward the next locked mode.
 function goalUI(tid,bid){
   const next=LOCKED.find(m=>!lockOpen(m)),hb=document.getElementById(bid);
-  const goalTxt=m=>m.cert&&M.cert>=m.w?'Next unlock: '+m.n+'. Collect your '+certName(m.w)+' certificate.':
-    (m.boss?'Next: bosses appear at wave ':m.cert?'Next unlock: '+m.n+'. Clear wave ':'Next unlock: '+m.n+'. Reach wave ')+m.w+(M.best?' (best '+M.best+')':'')+'.';
+  const bst=M.best?' (best '+M.best+')':'';
+  // the first boss is a mystery until it is met
+  const goalTxt=m=>m.boss?'Something is waiting for you at wave '+m.w+bst+'...':m.cert&&M.cert>=m.w?'Next unlock: '+m.n+'. Collect your '+certName(m.w)+' certificate.':
+    'Next unlock: '+m.n+'. '+(m.cert?'Clear':'Reach')+' wave '+m.w+bst+'.';
   document.getElementById(tid).textContent=next?goalTxt(next):'All modes unlocked! Keep pushing your best wave.';
   hb.parentNode.style.display=next?'block':'none';if(next)hb.style.width=Math.min(100,100*M.best/next.w)+'%';
 }
+// bosses stay a mystery (??? on the menu, no boss text in How to play / Certificates / Bit Theory) until the first one is met
+const bossSeen=()=>M.best>=BOSS.first||M.bk>0;
 function homeUI(){
+  document.body.classList.toggle('noboss',!bossSeen());
   checkResearch();hbtTile();
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
     if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.daily&&open){const D=dailyNow(),fresh=D.best===0;return '<button class="lk tr dl'+(fresh?' new':'')+'" id="hdl">'+m.n+'<small'+(fresh?' class="rdy">New today!':'>'+(D.best>=DAILY.top?'Done: wave ':'Today: wave ')+D.best)+'<br>'+esc(DAILY_MODS[dailyModIx(D.d)].n)+'</small></button>'}
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
-    return '<button class="lk" disabled>'+LOCK_SVG+m.n+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
+    return '<button class="lk" disabled>'+LOCK_SVG+(m.boss?'???':m.n)+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
   if(idleMsg)document.getElementById('idlt').textContent='Your tower kept defending for '+fmtDur(Math.min(idleMsg.away/1000,IDLE.hours*3600))+(idleMsg.away>IDLE.hours*3600000?' (max '+IDLE.hours+'h)':'')+': '+[idleMsg.chips?'+'+big(idleMsg.chips)+' chips':'',idleMsg.px||M.stash?big(M.stash)+' px head start for your next run':''].filter(Boolean).join(' and ')+'.';
   const cn=document.getElementById('hcen');setT(cn,certReady()?'Reward ready!':M.cert?(M.cert/10)+' earned':'Wave 10');cn.className=certReady()?'rdy':'';
@@ -1283,7 +1289,7 @@ const resUnlocked=()=>M.hist.length>0||M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(
 // Requirement list for a research: [{t:label, have, need}], all must have >= need.
 function resReqs(k){const r=BITS[k].req,out=[];
   for(const x in r.res||{})out.push({t:BITS[x].n+' Lv '+r.res[x],have:M.res[x],need:r.res[x]});
-  if(r.bk)out.push({t:r.bk+' bosses beaten',have:M.bk,need:r.bk});
+  if(r.bk)out.push({t:bossSeen()?r.bk+' bosses beaten':'??? at wave '+BOSS.first,have:M.bk,need:r.bk});
   if(r.best)out.push({t:'Best wave '+r.best,have:M.best,need:r.best});
   return out}
 const resOpen=k=>resReqs(k).every(q=>q.have>=q.need);
