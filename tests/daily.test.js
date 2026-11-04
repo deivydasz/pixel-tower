@@ -13,6 +13,9 @@ ok(S.daily&&S.daily.n==='Blast party'&&!shown($('dy'))&&S.bt1==='DAILY RUN'&&S.b
 ok(stat.dmg()===1&&stat.max()===20&&S.hp===20&&RL('spray')===0&&critChance()===0,'fresh tower: Foundry, research and skins do not count');
 ok(Math.abs(novaCd()-NOVA.cd/3)<1e-9,'Blast party: Blast recharges 3x faster');
 ui();ok($('bw').textContent==='Daily','HUD says Daily');
+ok(shown($('tip'))&&$('tip').className==='toast dl'&&$('tip').textContent.includes('Blast recharges 3x faster')&&!S.pause,'a toast explains the twist without pausing');
+step(4.5);ok(!shown($('tip')),'twist toast goes away by itself');
+dailyToast();setPause(true);ok(!shown($('tip')),'pausing hides the twist toast');ui();ok(shown($('pz'))&&$('pzd').textContent==='Daily run · Blast party: Blast recharges 3x faster','pause panel shows the twist');S.pause=false;ui();
 // no chips or certificate at a wave clear
 const zdC0=M.chips;S.wave=9;S.left=0;S.en=[];S.paid=false;S.gap=9;step(.05);
 ok(M.chips===zdC0&&S.bt==='+'+Math.round(5+9*2)+' px','wave clear pays pixels only');
@@ -20,6 +23,7 @@ S.wave=10;S.paid=false;M.cert=0;M.claim=0;step(.05);ok(M.cert===0,'no certificat
 S.wave=12;die();
 ok(M.best===50,'daily run never changes the best wave');
 ok(M.daily.best===12&&M.daily.streak===1&&M.daily.last===today()&&M.chips===dailyChips(12,1)&&S.dpay===dailyChips(12,1),'pays chips for wave 12: '+S.dpay);
+const zdEv=trackLog.filter(e=>e.type==='daily').pop();ok(zdEv&&zdEv.data.w===12&&zdEv.data.x==='Blast party'&&zdEv.data.c===S.dpay&&!trackLog.some(e=>e.type==='run'&&e.data.w===12),'sends a daily stats event, not a run');
 ok(M.hist[0].dl===1&&M.hist[0].w===12&&M.hist[0].c===S.dpay,'saved to History as a daily run');
 ok(shown($('go'))&&$('goh').textContent==='Daily run over'&&$('gor').textContent==='Try again'&&!shown($('goal'))&&!shown($('gos'))&&$('gnm').textContent.includes('+'+S.dpay+' chips'),'game over shows the daily result');
 ok(!shown($('gnew')),'no "Unlocked this run" card');
@@ -29,9 +33,17 @@ ok(S.dpay===0&&M.chips===dailyChips(12,1)&&M.daily.best===12,'worse retry pays n
 click($('gor'));S.wave=DAILY.top+5;ui();ok($('bw').textContent==='Daily best!','HUD flags beating today\'s best');die();
 ok(M.chips===dailyChips(DAILY.top,1)&&M.daily.top===DAILY.top+5&&$('goh').textContent==='Daily best!','better retry tops up to the full reward (capped at wave '+DAILY.top+')');
 // home card after playing
-click($('gom'));ok(zdCard().textContent.includes('Today: wave '+(DAILY.top+5)),'card shows today\'s best');
+click($('gom'));ok(zdCard().textContent.includes('Done: wave '+(DAILY.top+5)),'card shows today\'s best, done once the full reward is earned');
+click(zdCard());ok($('dyr').textContent.includes('(full reward)')&&$('dyp').textContent==='Try again','screen says the full reward is earned');click($('dyc'));
 // next day: streak grows, best resets
-const zdNow=clock.now;clock.now=()=>zdNow()+864e5;showHome();
+// normal game over offers today's daily run until it is played
+play();die();ok(!shown($('gdl')),'no daily shortcut once played today');click($('gom'));
+const zdNow=clock.now;clock.now=()=>zdNow()+864e5;play();die();
+ok(shown($('gdl'))&&$('gdl').textContent==='Daily run ready: '+DAILY_MODS[dailyModIx(today())].n,'normal game over offers the new daily run');
+click($('gdl'));ok(shown($('dy'))&&!shown($('go')),'shortcut opens the Daily screen');click($('dyc'));
+// the open Daily screen rolls over at midnight
+clock.now=zdNow;showDaily();const zdOld=$('dyt').textContent;clock.now=()=>zdNow()+864e5;ui();
+ok($('dyt').textContent!==zdOld||DAILY_MODS[dailyModIx(today())].n===DAILY_MODS[dailyModIx(today()-1)].n,'open Daily screen updates after midnight');click($('dyc'));
 ok(M.daily.best===0&&zdCard().textContent.includes('New today!'),'a new day resets today\'s best');
 M.chips=0;click(zdCard());ok($('dyr').textContent.includes('Streak: 1 day (+10% chips)'),'screen shows the streak bonus: '+$('dyr').textContent);
 click($('dyp'));S.wave=10;die();ok(M.daily.streak===2&&S.dpay===dailyChips(10,2)&&dailyChips(10,2)===Math.round(dailyFull()*.5*1.1),'day 2 of a streak: +10%');
