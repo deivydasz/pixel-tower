@@ -232,7 +232,7 @@ button b{display:block;font-weight:400}
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
-<p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
+<p>Two bytes make a word: every 16 waves the glitch compiles a boss (from wave 96, every byte, so every 8 waves). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
 <p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
@@ -570,16 +570,17 @@ cv.addEventListener('pointerdown',e=>{if(S.over)return;
   if(b&&gx>=b.x-3&&gx<=b.x+b.w+3&&gy>=b.y-3&&gy<=b.y+b.h+3){catTap();return}
   if(S.pause)setPause(false)});  // Blast fires only from the BLAST button (or Space), not from tapping the screen
 
-// Bosses: wave 20, 40, 60, 80, then every 10 waves from 100. Types rotate. Killing one gives a core + bonus chips;
+// Bosses: every 16 waves (2 bytes = a word: 16, 32, 48...), then every byte (8 waves) from 96. Moved from 20/40/60/80 + every 10 from 100
+// on 2026-11-04 (the user's idea) to match the bits/bytes theme; not re-simulated yet. Types rotate. Killing one gives a core + bonus chips;
 // a boss that reaches the tower stays and hits it every BOSS.hitEvery seconds until one of them is destroyed. hpK multiplies the wave's base enemy HP.
-// Balance (30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
+// Old balance note (boss at wave 20; 30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
 // The fight at the tower is a damage race, so results change sharply between Foundry levels: the first boss is a wall to grow past.
 const BOSSES=[
   {n:'Brute',c:'#ff8c42',s:13,sp:6,hpK:15,d:12,px:30,up:'dmg'},
   {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:10.5,d:10,px:30,up:'range',spawn:3},
   {n:'Warden',c:'#7dd3fc',s:12,sp:6,hpK:9,d:12,px:30,up:'dmg',shield:.25}
 ];
-const BOSS={first:20,every:20,fastFrom:100,fastEvery:10,shieldDown:8,push:.3,hitEvery:1};
+const BOSS={first:16,every:16,fastFrom:96,fastEvery:8,shieldDown:8,push:.3,hitEvery:1};
 const isBossWave=w=>w>=BOSS.first&&(w<BOSS.fastFrom?w%BOSS.every===0:w%BOSS.fastEvery===0);
 function bossFor(w){let i=0;for(let x=BOSS.first;x<=w;x++)if(isBossWave(x))i++;return BOSSES[(i-1)%BOSSES.length]}
 const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
@@ -657,7 +658,7 @@ function idleCheck(now){
 function startWave(){
   S.wave++;S.left=(4+S.wave*2)*dmod('cnt');S.sp=0;S.paid=false;S.boss=isBossWave(S.wave);S.bossDone=false;
   for(const k in UP)if(UP[k].w===S.wave&&(UP[k].run?upOpen(k):M.best<S.wave)){S.bonus=2.5;S.bt1='NEW UPGRADE';S.bt=UP[k].n;sfx('wave')}
-  if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' incoming';sfx('boss')}
+  if(S.boss){const t=bossFor(S.wave);S.bonus=2;S.bt1='BOSS WAVE';S.bt=t.n+' compiled!';S.gfx=.6;sfx('boss')}
 }
 function spawn(){
   if(S.boss&&!S.en.some(e=>e.boss)&&!S.bossDone){
@@ -713,7 +714,7 @@ function nova(){
 const TIPS={
   start:{card:1,t:'<b>Defend the tower!</b><span>It shoots enemies by itself. Enemies come from every side. Destroyed enemies burst into pixels: spend them on upgrades below.</span>'},
   buy:{t:'<span>You have enough pixels for an upgrade. Tap one below!</span>'},
-  boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Bosses come every 20 waves.</span>'},
+  boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Every 16 waves (two bytes make a word) the glitch compiles a new one.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with a BLAST to break the shield for '+BOSS.shieldDown+'s.</span>'},
   nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap the BLAST button to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };

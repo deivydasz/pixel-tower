@@ -1,11 +1,12 @@
 // Bosses: schedule, rotation, rewards, escapes, Warden shield, Queen spawns, UI, saves.
-ok([19,20,21,40,50,60,80,90,100,105,110,120].map(isBossWave).join()==='false,true,false,true,false,true,true,false,true,false,true,true','boss waves: 20/40/60/80, then every 10 from 100');
-ok([20,40,60,80,100,110].map(w=>bossFor(w).n).join()==='Brute,Swarm Queen,Warden,Brute,Swarm Queen,Warden','boss types rotate');
+ok([8,15,16,17,24,32,40,48,64,80,88,96,100,104,112,120].map(isBossWave).join()==='false,false,true,false,false,true,false,true,true,true,false,true,false,true,true,true','boss waves: every 16 (a word = 2 bytes), then every 8 from 96');
+ok(LOCKED[0].w===16&&glitchWave(16)&&glitchWave(32),'boss waves are byte waves; Bosses tracker opens at 16');
+ok([16,32,48,64,80,96].map(w=>bossFor(w).n).join()==='Brute,Swarm Queen,Warden,Brute,Swarm Queen,Warden','boss types rotate');
 M.tips={start:1,buy:1,nova:1,foundry:1};play();
-S.wave=19;S.left=0;S.en=[];S.gap=0;S.paid=true;step(.05);
-ok(S.wave===20&&S.boss&&S.bt1==='BOSS WAVE','wave 20 announced as boss wave');
+S.wave=15;S.left=0;S.en=[];S.gap=0;S.paid=true;step(.05);
+ok(S.wave===16&&S.boss&&S.bt1==='BOSS WAVE'&&S.bt==='Brute compiled!'&&S.gfx>0,'wave 16 announced as boss wave, with a screen tear');
 step(.1);let b=S.en.find(e=>e.boss);
-ok(b&&b.t.n==='Brute'&&b.hp===bossHp(b.t,20)&&b.max===b.hp,'Brute spawns first with HP '+(b&&b.hp));
+ok(b&&b.t.n==='Brute'&&b.hp===bossHp(b.t,16)&&b.max===b.hp,'Brute spawns first with HP '+(b&&b.hp));
 ok(S.tip==='boss'&&S.pause,'first boss shows boss tip');click($('tipok'));
 ui();ok(shown($('bb'))&&$('bbt').textContent.startsWith('BRUTE')&&$('stage').classList.contains('bossup'),'boss HP bar shown, legend moved down');
 // Blast on a boss inside range: pushed only part of the way to the edge
@@ -13,7 +14,7 @@ S.nova=0;b.x=CX+20;b.y=CY;const sp0=b.t;b.t={...b.t,sp:0};nova();step(NOVA.kb+.0
 ok(Math.abs(d1-(20+(stat.range()-20)*BOSS.push))<.5,'Blast pushes bosses only '+BOSS.push*100+'% of the way to the range edge');
 // kill it
 const c0=M.chips,k0=M.cores;b.hp=1;b.x=CX+20;b.y=CY;S.pr=[{x:CX+20,y:CY,vx:0,vy:0,life:1}];step(.02);
-ok(!S.en.includes(b)&&M.cores===k0+1&&M.bk===1&&M.chips===c0+bossChips(20)&&S.bosses===1,'killing the boss gives a core and '+bossChips(20)+' chips');
+ok(!S.en.includes(b)&&M.cores===k0+1&&M.bk===1&&M.chips===c0+bossChips(16)&&S.bosses===1,'killing the boss gives a core and '+bossChips(16)+' chips');
 ok(S.bt1==='BOSS DOWN!'&&JSON.parse(localStorage.getItem('pixelTowerMeta')).cores===k0+1,'BOSS DOWN banner, core saved');
 ui();ok(!shown($('bb')),'boss bar hidden after kill');
 // only one boss per wave

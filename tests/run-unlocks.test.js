@@ -7,7 +7,7 @@ ok(!$('gbt').disabled&&$('gbt').classList.contains('hl')&&$('gbt').textContent==
 // nothing new: card hidden
 M.chips=0;click($('gor'));S.wave=7;die();ok(!shown($('gnew'))&&!$('gbt').classList.contains('hl'),'no news: card hidden, no highlight');
 // first boss ever: bosses tracker and core
-M.best=19;M.bk=0;M.cores=0;click($('gor'));S.wave=19;S.left=0;S.en=[];S.paid=true;S.gap=0;step(.05);step(.1);
+M.best=BOSS.first-1;M.bk=0;M.cores=0;click($('gor'));S.wave=BOSS.first-1;S.left=0;S.en=[];S.paid=true;S.gap=0;step(.05);step(.1);
 const b=S.en.find(e=>e.boss);b.hp=1;b.x=CX+20;b.y=CY;S.pr=[{x:CX+20,y:CY,vx:0,vy:0,life:1}];step(.02);S.en=[];die();
 ok(items().includes('Bosses unlocked: track them on the menu')&&items().includes('+1 boss core'),'first boss: bosses and core listed: '+items().join(' / '));
 click($('gbt'));ok(shown($('bt'))&&!shown($('go')),'Bit Theory opens from game over');click($('btc'));ok(shown($('go'))&&!shown($('bt')),'Back returns to game over');
