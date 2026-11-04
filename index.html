@@ -95,7 +95,9 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #hm .hg,#gm .hg{font-size:7px;opacity:.7;margin-top:6px}
 #hm small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm #hcen.rdy{color:var(--gold);opacity:1}
-#hm #hfyn.rdy{color:var(--gold);opacity:1}
+#hm #hfy small.rdy,#gm #gof small.rdy{color:var(--gold);opacity:1}
+#hm #hfy.rdy,#gm #gof.rdy{border-color:#ffd166;animation:pulse 1.2s steps(2) infinite}
+#gm #gof small{display:block;font-size:7px;opacity:.8;margin-top:2px}
 #hm .lk{grid-column:span 2;font-size:7px;padding:6px 2px;line-height:1.5}
 #hm .lk:disabled{opacity:var(--dim,.45)}
 #hm .lk.tr:disabled{opacity:1;border-color:#ff8c42}
@@ -153,7 +155,6 @@ button b{display:block;font-weight:400}
 .lkup svg{flex:none;width:9px;height:10px}
 #fyl .lkup b{display:flex;align-items:center;gap:5px}
 #fyl button{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#gos button{font-size:8px}
 #stage{position:relative}
 #bb{position:absolute;left:4px;right:4px;top:22px;height:12px;background:#3a4160;border:2px solid #0d1019;pointer-events:none;display:none}
 #bbf{height:100%;background:#ff6b6b}
@@ -207,8 +208,6 @@ button b{display:block;font-weight:400}
 #gst{display:grid;grid-template-columns:repeat(3,1fr);border:2px solid var(--bd);background:var(--btn)}
 #gst div{padding:6px 8px;font-size:11px;border:1px solid rgba(128,128,128,.25)}
 #gst small{display:block;font-size:7px;opacity:.7;margin-bottom:3px}
-#gos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-#gos button{font-size:8px}
 #nova:disabled{opacity:1;color:rgba(232,236,245,.8);background:rgba(13,16,25,.45);border-color:rgba(58,65,96,.8)}
 </style>
 </head>
@@ -222,11 +221,10 @@ button b{display:block;font-weight:400}
 <button id="gor">Play again</button><button id="gdl"></button>
 <div id="goal" class="goal"><span id="goalt"></span><i><b id="goalb"></b></i></div>
 <p id="got">Tip: chips stay with you between runs. Spend them in the Foundry for permanent boosts.</p>
-<div class="hg" id="gsl"></div><div id="gos"></div>
 <button id="gof">Foundry</button><button id="gbt">Bit Theory</button><button id="gom">Main menu</button></div></div>
 <div id="home"><div id="homeh">IDLE<br>PIXEL<br>TOWER</div><p id="hst"></p><div id="hm"><div id="idl"><b>While you were away</b><span id="idlt"></span><button id="idlk">Nice!</button></div><button id="hplay">Play</button>
 <div id="hook"><span id="hookt"></span><i><b id="hookb"></b></i></div>
-<div class="hg">Progress</div><button id="hfy">Foundry<small id="hfyn"></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button><button id="hce">Certificates<small id="hcen"></small></button>
+<div class="hg">Progress</div><button id="hfy">Foundry<small></small></button><button id="hbt">Bit Theory<small id="hbtn"></small></button><button id="hhi">History<small>Past runs</small></button><button id="hce">Certificates<small id="hcen"></small></button>
 <div class="hg">Unlocks</div><span id="hlk" style="display:contents"></span>
 <button id="hhow">How to play</button><button id="hmus" class="mus"></button></div></div>
 <div id="how"><div id="howh">How to play</div>
@@ -1109,7 +1107,7 @@ function fyUI(){
 }
 function showGO(){
   checkResearch();
-  for(const id of ['goal','gsl','gos'])document.getElementById(id).style.display=S.daily?'none':'';
+  document.getElementById('goal').style.display=S.daily?'none':'';
   if(S.daily)return showDailyGO();
   const gd=document.getElementById('gdl'),dOn=dailyOpen()&&dailyNow().best===0;gd.style.display=dOn?'block':'none';
   if(dOn)gd.textContent='Daily run ready: '+DAILY_MODS[dailyModIx(today())].n;
@@ -1127,19 +1125,7 @@ function showGO(){
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.earn))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Best',M.best);
   document.getElementById('gnm').innerHTML=nearMiss().map(esc).join('<br>');
   goalUI('goalt','goalb');
-  document.getElementById('gsl').textContent='Suggested upgrades · you have '+big(M.chips)+' chips';
-  const s=document.getElementById('gos');s.innerHTML='';
-  const ks=openUps().sort((a,b)=>mcost(a)-mcost(b)),kt=S.killer,pick=[{k:ks[0],why:'Cheapest'}];
-  if(kt&&kt.up===ks[0]){pick[0].why='Cheapest, and counters '+kt.n+'s';pick.push({k:ks[1],why:'Next cheapest'})}
-  else if(kt&&upOpen(kt.up))pick.push({k:kt.up,why:'Counters '+kt.n+'s'});
-  else pick.push({k:ks[1],why:'Next cheapest'});
-  pick.forEach(({k,why})=>{
-    const c=mcost(k),b=document.createElement('button');
-    b.innerHTML='<b>'+UP[k].n+'</b>Lv '+M.lv[k]+' · '+why+'<br>'+nowNext(k)+'<br>'+big(c)+' chips';
-    b.disabled=M.chips<c;
-    b.onclick=()=>{if(M.chips<c)return;M.chips-=c;M.lv[k]++;save();sfx('buy');track('foundry',{k,lv:M.lv[k],c,from:'gameover'});showGO()};
-    s.appendChild(b);
-  });
+  fyTile(document.getElementById('gof'));
   document.getElementById('go').style.display='flex';
 }
 // Daily run over: today's twist, best and the chips it paid
@@ -1155,7 +1141,7 @@ function showDailyGO(){
     more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips for beating the wave '+BOSS.first+' boss':'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
   const gb=document.getElementById('gbt'),bo=resUnlocked();gb.disabled=!bo;gb.className='';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory';
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.dpay))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Today',D.best);
-  setT(document.getElementById('gor'),'Try again');
+  setT(document.getElementById('gor'),'Try again');fyTile(document.getElementById('gof'));
   document.getElementById('go').style.display='flex';
 }
 // Game over "so close" lines: the boss attempt (if the run ended at a boss), then the single nearest goal.
@@ -1188,6 +1174,9 @@ function goalUI(tid,bid){
 }
 // bosses stay a mystery (??? on the menu, no boss text in How to play / Certificates / Bit Theory) until the first one is met
 const bossSeen=()=>M.best>=BOSS.first||M.bk>0;
+// Foundry buttons (home and game over): highlighted with "Upgrade ready!" when the chips buy something, else show the chips
+const fyReady=()=>META_UPS.some(k=>upOpen(k)&&M.chips>=mcost(k));
+function fyTile(b){const rdy=fyReady();b.classList.toggle('rdy',rdy);b.innerHTML='Foundry<small'+(rdy?' class="rdy">Upgrade ready!':'>'+big(M.chips)+' chips')+'</small>'}
 function homeUI(){
   document.body.classList.toggle('noboss',!bossSeen());
   checkResearch();hbtTile();
@@ -1200,7 +1189,7 @@ function homeUI(){
   if(idleMsg)document.getElementById('idlt').textContent='Your tower kept defending for '+fmtDur(Math.min(idleMsg.away/1000,IDLE.hours*3600))+(idleMsg.away>IDLE.hours*3600000?' (max '+IDLE.hours+'h)':'')+': '+[idleMsg.chips?'+'+big(idleMsg.chips)+' chips':'',idleMsg.px||M.stash?big(M.stash)+' px head start for your next run':''].filter(Boolean).join(' and ')+'.';
   const cn=document.getElementById('hcen');setT(cn,certReady()?'Reward ready!':M.cert?(M.cert/10)+' earned':'Wave 10');cn.className=certReady()?'rdy':'';
   goalUI('hookt','hookb');
-  const rdy=openUps().some(k=>M.chips>=mcost(k)),fn=document.getElementById('hfyn');fn.textContent=rdy?'Upgrade ready!':big(M.chips)+' chips';fn.className=rdy?'rdy':'';
+  fyTile(document.getElementById('hfy'));
 }
 function showHome(){
   homeUI();

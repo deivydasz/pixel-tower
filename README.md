@@ -88,7 +88,7 @@ You start with Damage and Tower HP. The others unlock when you first reach their
 Heavy rounds and Crit power are late-run upgrades: every run starts without them, even if you reached those waves before.
 
 Each level costs more than the last. Every hit still does at least 0.2 damage, however much armor you have.
-After a run, the game over screen suggests two Foundry upgrades: the cheapest one, and the one that best counters what killed you.
+When your chips can buy a Foundry upgrade, the Foundry button on the game over screen and the home menu lights up with "Upgrade ready!".
 
 ## Progression
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.

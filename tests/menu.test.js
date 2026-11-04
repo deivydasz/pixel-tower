@@ -6,10 +6,10 @@ ok(lk().map(b=>b.textContent).join('|')===LOCKED.map(m=>(m.boss?'???':m.n)+'Wave
 ok(document.body.classList.contains('noboss')&&!shown(document.querySelector('#how .bx')),'boss text hidden until the first boss is met');
 ok(resReqs('spray').some(q=>q.t==='??? at wave '+BOSS.first),'Bit Theory requirement says ??? instead of bosses');
 ok($('hookt').textContent==='Something is waiting for you at wave '+LOCKED[0].w+'...'&&$('hookb').style.width==='0%','new player hook points at first unlock');
-ok($('hfyn').textContent==='0 chips','Foundry shows chips when nothing affordable');
+ok($('hfy').textContent==='Foundry0 chips'&&!$('hfy').classList.contains('rdy'),'Foundry shows chips when nothing affordable');
 const W0=LOCKED[0].w,W1=LOCKED[1].w;M.best=Math.round(W0*.8);M.chips=3;showHome();
 ok($('hookt').textContent==='Something is waiting for you at wave '+W0+' (best '+M.best+')...'&&Math.abs(parseFloat($('hookb').style.width)-100*M.best/W0)<.01,'hook shows progress toward first unlock');
-ok($('hfyn').textContent==='Upgrade ready!','Foundry flags an affordable upgrade');
+ok($('hfy').textContent==='FoundryUpgrade ready!'&&$('hfy').classList.contains('rdy'),'Foundry is highlighted when an upgrade is affordable');
 M.best=W0+2;showHome();ok(!document.body.classList.contains('noboss'),'boss text shown once wave '+W0+' is reached');
 ok(!lk()[0].querySelector('svg')&&lk()[0].textContent==='Bosses0 beaten0 cores'&&lk()[0].classList.contains('tr')&&lk()[1].querySelector('svg'),'wave 20 turns the first slot into the boss tracker, others stay locked');
 ok($('hookt').textContent.startsWith('Next unlock: '+LOCKED[1].n+'. Reach wave '+W1),'hook moves to next unlock');

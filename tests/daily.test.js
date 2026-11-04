@@ -25,7 +25,7 @@ ok(M.best===50,'daily run never changes the best wave');
 ok(M.daily.best===12&&M.daily.streak===1&&M.daily.last===today()&&M.chips===dailyChips(12,1)&&S.dpay===dailyChips(12,1),'pays chips for wave 12: '+S.dpay);
 const zdEv=trackLog.filter(e=>e.type==='daily').pop();ok(zdEv&&zdEv.data.w===12&&zdEv.data.x==='Blast party'&&zdEv.data.c===S.dpay&&!trackLog.some(e=>e.type==='run'&&e.data.w===12),'sends a daily stats event, not a run');
 ok(M.hist[0].dl===1&&M.hist[0].w===12&&M.hist[0].c===S.dpay,'saved to History as a daily run');
-ok(shown($('go'))&&$('goh').textContent==='Daily run over'&&$('gor').textContent==='Try again'&&!shown($('goal'))&&!shown($('gos'))&&$('gnm').textContent.includes('+'+S.dpay+' chips'),'game over shows the daily result');
+ok(shown($('go'))&&$('goh').textContent==='Daily run over'&&$('gor').textContent==='Try again'&&!shown($('goal'))&&$('gnm').textContent.includes('+'+S.dpay+' chips'),'game over shows the daily result');
 ok(!shown($('gnew')),'no "Unlocked this run" card');
 // retry: lower wave pays nothing, higher wave pays the difference
 click($('gor'));ok(S.daily&&S.wave===0,'Try again starts another daily run');S.wave=8;die();
