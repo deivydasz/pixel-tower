@@ -222,10 +222,10 @@ button b{display:block;font-weight:400}
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
 <p>Every 20 waves a boss arrives (every 10 from wave 100). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
-<p>Boss cores and chips pay for Bit Theory: timed research that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
+<p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
-<p>After you beat your first boss, the tower keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
+<p>After your first run, the tower also keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
 <div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
@@ -295,7 +295,7 @@ function reset(daily){
   if(TEST.wave)S.wave=TEST.wave-1;
   if(TEST.px)S.px=TEST.px;
   // progress snapshot, compared at game over to list what this run unlocked
-  S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked()};
+  S.start={bk:M.bk,best:M.best,cores:M.cores,res:Object.assign({},M.res),open:BIT_KEYS.filter(resOpen),bt:resUnlocked(),idle:idleOpen()};
 }
 // Daily runs use a fresh tower: no Foundry levels, research or skin bonuses (only today's twist, S.daily).
 const ML=k=>S&&S.daily?0:(M.lv[k]||0);
@@ -323,7 +323,7 @@ const CRIT_POP=.6,CRIT_MAX=8;  // crit damage numbers: seconds on screen, most a
 const novaCd=()=>Math.max(60,NOVA.cd-15*RL('nova'))/dmod('blast');
 const cost=k=>Math.round(UP[k].base*Math.pow(1.6,S.lv[k])*dmod('cost'));
 // Bit Theory: timed research paid with boss cores + chips. One study at a time, runs in real time (even with the game closed).
-// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: 1 core + 1 per 2 levels, chips 25 x 1.6^level.
+// t = minutes for level 1; each level takes 1.4x longer (max 24h). Cost: level 1 RES_FIRST chips and no cores; then 1 core + 1 per 2 levels, chips 25 x 1.6^level.
 // req: what must be true before a research can be studied: bk = bosses beaten (total), best = best wave, res = other research levels.
 const BITS={
   crit:{n:'Critical bits',max:10,t:15,d:'+5% chance of a x3 critical hit',req:{}},
@@ -339,7 +339,9 @@ const BIT_KEYS=Object.keys(BITS);
 const maxSpeed=()=>1+.5*(M.res.speed||0);
 const gameSpeed=()=>inRun()&&!S.pause?Math.min(M.spd||1,maxSpeed()):1;
 const resMin=(k,lv)=>BITS[k].time?BITS[k].time[Math.min(lv|0,BITS[k].time.length-1)]:Math.min(24*60,Math.round(BITS[k].t*Math.pow(1.4,lv)));
-const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return {cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}};
+// level 1 of a research costs RES_FIRST chips and no cores, so a new player can start a study after the first run
+const RES_FIRST=10;
+const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return lv?{cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}:{cores:0,chips:RES_FIRST}};
 const clock={now:()=>Date.now()};
 // Save format version. Saves without `v` are v0 (same shape as v1).
 // v2 adds `best` (highest wave reached) and `tips` (tutorial tips already shown); defaults fill them in.
@@ -548,11 +550,11 @@ const certName=w=>CERT_NAMES[w/10-1]||'Wave '+w+' Master';
 const certReady=()=>M.cert>M.claim;
 function claimCert(){if(!certReady())return 0;const w=M.claim+10;M.claim=w;M.chips+=certChips(w);save();return w}
 const certChips=w=>Math.round(w*(1+w/20)/2);
-// Idle income (unlocks after the first boss): while the game is closed (or hidden outside a run) the tower keeps
+// Idle income (unlocks after the first finished run): while the game is closed (or hidden outside a run) the tower keeps
 // earning. A full IDLE.hours away pays one run's worth of chips to your best wave, plus starting pixels for the next
 // run (IDLE.px per best wave). Nothing for under IDLE.minMin minutes; the stash never holds more than one full period.
 const IDLE={hours:4,minMin:5,px:10};
-const idleOpen=()=>M.bk>0;
+const idleOpen=()=>M.hist.length>0||M.bk>0;
 const runChips=b=>{let c=0;for(let i=1;i<b;i++)c+=1+Math.floor(i/5);return c};
 const idleFull=()=>({chips:runChips(M.best),px:IDLE.px*M.best});
 let idleMsg=null;
@@ -1220,7 +1222,8 @@ document.getElementById('cec').onclick=()=>{show('ce',0);showHome()};
 // ---- Bit Theory screen and timers
 const fmtDur=sec=>{sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?h+'h '+m+'m':m?m+'m '+String(x).padStart(2,'0')+'s':x+'s'};
 const resFx=(k,lv)=>({spray:(1+lv)+' bullet'+(lv?'s':''),pierce:'pierce '+lv,crit:(5*lv)+'% crit',nova:Math.max(60,NOVA.cd-15*lv)+'s Blast',depth:'x'+(+Math.pow(1.2,lv).toFixed(2))+' dmg',speed:'up to '+fmt(1+.5*lv)+'x'})[k];
-const resUnlocked=()=>M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
+// Bit Theory opens after the first finished run (a reason to come back on day one)
+const resUnlocked=()=>M.hist.length>0||M.bk>0||M.cores>0||!!M.rq||BIT_KEYS.some(k=>M.res[k]>0);
 // Requirement list for a research: [{t:label, have, need}], all must have >= need.
 function resReqs(k){const r=BITS[k].req,out=[];
   for(const x in r.res||{})out.push({t:BITS[x].n+' Lv '+r.res[x],have:M.res[x],need:r.res[x]});
@@ -1247,7 +1250,7 @@ function btUI(){
     const r=BITS[k],lv=M.res[k],max=lv>=r.max,now=M.rq&&M.rq.k===k,c=resCost(k,lv);
     if(!max&&!now&&!resOpen(k))return '<button data-k="'+k+'" class="lkd" disabled><b><span>'+LOCK_SVG+' '+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
-    const foot=max?'Fully studied':now?'Studying...':c.cores+' core'+(c.cores===1?'':'s')+' · '+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
+    const foot=max?'Fully studied':now?'Studying...':(c.cores?c.cores+' core'+(c.cores===1?'':'s')+' · ':'')+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
       '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
   }).join('');
@@ -1264,7 +1267,7 @@ function hbtTile(){
   const b=document.getElementById('hbt'),n=document.getElementById('hbtn'),open=resUnlocked();b.disabled=!open;
   b.innerHTML=(open?'':LOCK_SVG)+'Bit Theory';b.appendChild(n);
   const rdy=open&&!M.rq&&BIT_KEYS.some(resCanAfford);
-  n.textContent=!open?'Beat a boss':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
+  n.textContent=!open?'Finish a run':M.rq?fmtDur((M.rq.end-clock.now())/1000)+' left':rdy?'Ready to study':'Idle';n.className=rdy?'rdy':'';
 }
 // What this run unlocked (game over card). bt: show the "Open Bit Theory" button.
 function runNews(){
@@ -1273,9 +1276,9 @@ function runNews(){
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
   for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.n+' unlocked');
   for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect +'+certChips(w)+' chips'+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
-  if(!a.bk&&M.bk>0)items.push('Idle income: your tower now earns chips and starting pixels while you are away');
+  if(!a.idle&&idleOpen())items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
-  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: study the pixels with your cores');
+  const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: start your first study, it keeps running while you are away');
   const opened=BIT_KEYS.filter(k=>!a.open.includes(k)&&resOpen(k));
   if(!btNew)for(const k of opened)items.push(BITS[k].n+' can now be studied');
   for(const k of BIT_KEYS)if(M.res[k]>a.res[k])items.push(BITS[k].n+' Lv '+M.res[k]+' finished');

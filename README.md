@@ -50,7 +50,7 @@ Bosses never give up: one that reaches the tower stays there and hits it every s
 Boss cores pay for Bit Theory research.
 
 ## Bit Theory
-Study the pixels to find their deeper meaning. Bit Theory opens on the home menu once you have beaten a boss.
+Study the pixels to find their deeper meaning. Bit Theory opens on the home menu after your first run. Level 1 of a research costs 10 chips and no cores; higher levels need boss cores.
 Each research level costs boss cores and chips and takes **real time**: about 10 to 30 minutes for the first level, 1.4x longer for each level after (24 hours at most). The timer keeps running while the game is closed. You can study one thing at a time.
 
 | Research | Each level | Max level | Available when |
@@ -94,7 +94,7 @@ After a run, the game over screen suggests two Foundry upgrades: the cheapest on
 - **Chips per cleared wave:** 1, plus 1 more for every 5 waves reached.
 - **Certificates:** completing wave 10, 20, 30... for the first time earns a certificate. Collect its one-time chips on the Certificates screen (the menu shows "Reward ready!"): Pixel Apprentice (10, +8), Bit Cadet (20, +20), Byte Guard (30, +38), Sprite Sentinel (40, +60), Raster Knight (50, +88), Vector Captain (60, +120), Palette Master (70, +158), Shader Sage (80, +200), Render Lord (90, +248), Pixel Legend (100, +300), then "Wave N Master". Boss waves count once the boss is beaten. See them from the menu under Progress.
 - **Boss attempts:** if a run ends while a boss is alive, you get chips for the share of its HP you took (up to its full chip reward, no core), and game over shows how much HP it had left.
-- **Idle income** (after your first boss): while the game is closed the tower keeps earning, up to 4 hours. 4 hours pays the chips of one run to your best wave, plus a head start of 10 px per best wave for your next run (it waits until you press Play and never holds more than one 4-hour batch). Under 5 minutes away pays nothing. The menu shows the rate and a "While you were away" card.
+- **Idle income** (after your first run): while the game is closed the tower keeps earning, up to 4 hours. 4 hours pays the chips of one run to your best wave, plus a head start of 10 px per best wave for your next run (it waits until you press Play and never holds more than one 4-hour batch). Under 5 minutes away pays nothing. The menu shows the rate and a "While you were away" card.
 - **So close:** game over points out the nearest goal: a few waves short of your best, a certificate within 5 waves, or a Foundry upgrade you are just a few chips short of.
 - **Best wave** is shown on the menu, the game over screen and in History. During a run the HUD shows a gold "New best!" once you pass it; beating it shows "New record!" at game over.
 - **History** keeps your last 50 runs: date, wave, killer, chips earned, time and Blasts used.
