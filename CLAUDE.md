@@ -39,7 +39,7 @@ The whole game is one file: `index.html` (HTML + CSS + vanilla JavaScript, Canva
 - Stats: the game sends anonymous events with `track(type,data)` (`open`, `run`, `research`, `foundry`) using the save's random `uid`; no names or IPs. Live site only (preview runs never count; the server rejects anything else). The dashboard is at /stats behind nginx basic auth. No in-game privacy note (my choice). New events need a type in `TYPES` in stats.py and a line on the dashboard.
 - Pixel look: low-res internal canvas scaled up, `image-rendering: pixelated`.
 - Must work on desktop and phones: touch-friendly buttons, no horizontal scroll, page padding, safe-area insets.
-- Support light and dark mode for page chrome.
+- Always dark theme (decided 2026-11-04): the page ignores the phone's light/dark setting, because light page chrome around the dark game screen looked bad. No light mode.
 - Saved data lives in localStorage under `pixelTowerMeta`. Do not break existing saves when changing the data shape; add new fields with defaults. The save has a version `v` (`SAVE_V` in code); bump it and add a migration step in `loadMeta` when the shape changes.
 - Test by opening `index.html` in a browser (`open index.html` on macOS).
 - Before handing work to me, test it: run `tests/run.sh` (headless Chrome, see `tests/README.md`) and add or update tests for the change. Check the layout at phone widths with `tests/shot.sh` (390px and 320px). For balance changes, run `tests/balance.sim.js` and report the numbers.

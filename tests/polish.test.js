@@ -22,5 +22,7 @@ setTimeout(()=>{
   S.en=[];ui();ok(!leg.classList.contains('fade'),'legend returns when the enemy leaves');
   // NOVA button sits in the bottom-right corner, not over the middle
   const nr=$('nova').getBoundingClientRect(),cr=$('c').getBoundingClientRect();ok(nr.right>cr.right-12&&nr.left>cr.left+cr.width/2,'NOVA button in the bottom-right corner');
-  done();
+  // always dark, even when the phone asks for light mode
+document.documentElement.dataset.theme='light';ok(getComputedStyle(document.body).backgroundColor==='rgb(13, 16, 25)'&&getComputedStyle(document.documentElement).colorScheme==='dark','page is always dark');delete document.documentElement.dataset.theme;
+done();
 },0);
