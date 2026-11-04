@@ -1,5 +1,5 @@
 // Bosses: schedule, rotation, rewards, escapes, Warden shield, Queen spawns, UI, saves.
-ok([8,15,16,17,24,32,40,48,64,80,88,96,100,104,112,120].map(isBossWave).join()==='false,false,true,false,false,true,false,true,true,true,false,true,false,true,true,true','boss waves: every 16 (a word = 2 bytes), then every 8 from 96');
+ok([8,15,16,17,24,32,40,48,64,80,88,96,100,104,112,120,128].map(isBossWave).join()==='false,false,true,false,false,true,false,true,true,true,false,true,false,false,true,false,true','boss waves: every 16 (a word = 2 bytes), also after 96');
 ok(LOCKED[0].w===16&&glitchWave(16)&&glitchWave(32),'boss waves are byte waves; Bosses tracker opens at 16');
 ok([16,32,48,64,80,96].map(w=>bossFor(w).n).join()==='Brute,Swarm Queen,Warden,Brute,Swarm Queen,Warden','boss types rotate');
 M.tips={start:1,buy:1,nova:1,foundry:1};play();

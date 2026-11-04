@@ -232,7 +232,7 @@ button b{display:block;font-weight:400}
 <p>Your tower stands in the middle and shoots the nearest enemy by itself. Enemies come from every side, in waves that keep getting stronger.</p>
 <p>Destroyed enemies burst into pixels. Spend pixels on the upgrades under the game. You start with Damage and Tower HP; Fire rate, Range, Dmg sponge (blocks damage per hit) and Pixel magnet (more pixels per kill) unlock as you reach new waves.</p>
 <p>Tap the BLAST button (or press Space) to blast every enemy on screen. It takes a while to recharge, so save it for emergencies.</p>
-<p>Two bytes make a word: every 16 waves the glitch compiles a boss (from wave 96, every byte, so every 8 waves). Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
+<p>Two bytes make a word: every 16 waves the glitch compiles a boss. Destroy it to earn a boss core and bonus chips. Wardens are shielded: a Blast breaks the shield for a few seconds.</p>
 <p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
@@ -570,7 +570,7 @@ cv.addEventListener('pointerdown',e=>{if(S.over)return;
   if(b&&gx>=b.x-3&&gx<=b.x+b.w+3&&gy>=b.y-3&&gy<=b.y+b.h+3){catTap();return}
   if(S.pause)setPause(false)});  // Blast fires only from the BLAST button (or Space), not from tapping the screen
 
-// Bosses: every 16 waves (2 bytes = a word: 16, 32, 48...), then every byte (8 waves) from 96. Moved from 20/40/60/80 + every 10 from 100
+// Bosses: every 16 waves forever (2 bytes = a word: 16, 32, 48...). Moved from 20/40/60/80 + every 10 from 100
 // on 2026-11-04 (the user's idea) to match the bits/bytes theme; not re-simulated yet. Types rotate. Killing one gives a core + bonus chips;
 // a boss that reaches the tower stays and hits it every BOSS.hitEvery seconds until one of them is destroyed. hpK multiplies the wave's base enemy HP.
 // Old balance note (boss at wave 20; 30 bot runs each, all six Foundry upgrades at that level): the wave 20 Brute is beaten by ~30% at lv3 and ~100% from lv4.
@@ -580,8 +580,8 @@ const BOSSES=[
   {n:'Swarm Queen',c:'#f472b6',s:12,sp:7,hpK:10.5,d:10,px:30,up:'range',spawn:3},
   {n:'Warden',c:'#7dd3fc',s:12,sp:6,hpK:9,d:12,px:30,up:'dmg',shield:.25}
 ];
-const BOSS={first:16,every:16,fastFrom:96,fastEvery:8,shieldDown:8,push:.3,hitEvery:1};
-const isBossWave=w=>w>=BOSS.first&&(w<BOSS.fastFrom?w%BOSS.every===0:w%BOSS.fastEvery===0);
+const BOSS={first:16,every:16,shieldDown:8,push:.3,hitEvery:1};
+const isBossWave=w=>w>=BOSS.first&&w%BOSS.every===0;
 function bossFor(w){let i=0;for(let x=BOSS.first;x<=w;x++)if(isBossWave(x))i++;return BOSSES[(i-1)%BOSSES.length]}
 const bossHp=(t,w)=>Math.max(1,Math.round(2*Math.pow(1.12,w)*t.hpK));
 const bossChips=w=>5+Math.floor(w/10);
@@ -608,7 +608,8 @@ let idleMsg=null;
 // and enemy spawns from a seed of the date. Free retries. Reward: chips for today's best wave, paid as it improves:
 // DAILY.k of a whole run to your best wave at wave DAILY.top (less below it), +DAILY.streak for each day in a row
 // (up to DAILY.streakMax days). No normal chips, cores or certificates in daily runs, and they never change the best wave.
-const DAILY={w:25,top:20,k:.5,streak:.1,streakMax:5};
+// top: the full reward needs wave top = beating the first boss (fresh towers mostly stop at it: daily sims 2026-11-04)
+const DAILY={w:25,top:BOSS.first+1,k:.5,streak:.1,streakMax:5};
 const DAILY_MODS=[
   {n:'Glass cannon',d:'Double damage, half the tower HP',dmg:2,hp:.5},
   {n:'Swarm',d:'Twice the enemies, half their HP',cnt:2,ehp:.5},
@@ -1144,7 +1145,7 @@ function showDailyGO(){
   document.getElementById('gop').textContent=S.daily.n+': '+(S.stopped?'you stopped on wave '+S.wave:'killed by a '+kn+' on wave '+S.wave)+(S.drec&&S.dprev?', beating today\'s best of '+S.dprev:'')+'.';
   const sm=streakMul(D.streak),more=D.best<DAILY.top;
   document.getElementById('gnm').innerHTML=[S.dpay?'+'+big(S.dpay)+' chips for today\'s best wave'+(sm>1?' (streak '+D.streak+' days, +'+Math.round(100*(sm-1))+'%)':''):'Beat wave '+D.best+' to earn more chips today',
-    more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips at wave '+DAILY.top:'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
+    more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips for beating the wave '+BOSS.first+' boss':'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
   const gb=document.getElementById('gbt'),bo=resUnlocked();gb.disabled=!bo;gb.className='';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory';
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.dpay))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Today',D.best);
   setT(document.getElementById('gor'),'Try again');
@@ -1210,7 +1211,7 @@ function showDaily(){
   const D=dailyNow(),mod=DAILY_MODS[dailyModIx(D.d)],sn=streakNext(),full=dailyChips(DAILY.top,sn),s0=streakNow();
   document.getElementById('dyt').innerHTML="<b>Today's twist: "+esc(mod.n)+'</b>'+esc(mod.d)+'<small id="dyn"></small>';dyTick();
   document.getElementById('dyr').innerHTML=[D.best?"Today's best: <b>wave "+D.best+'</b> · earned '+big(D.paid)+' chips'+(D.best>=DAILY.top?' (full reward)':''):'Not played today yet.',
-    'Reward: chips for today\'s best wave, up to <b>'+big(full)+' chips</b> at wave '+DAILY.top+'.',
+    'Reward: chips for today\'s best wave, up to <b>'+big(full)+' chips</b> for beating the wave '+BOSS.first+' boss.',
     s0?'Streak: <b>'+s0+' day'+(s0===1?'':'s')+'</b>'+(streakMul(sn)>1?' (+'+Math.round(100*(streakMul(sn)-1))+'% chips)':'')+'. Play every day for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'%.':'Play on days in a row for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'% chips.',
     D.top?'Your best daily run: wave '+D.top+'.':''].filter(Boolean).map(t=>'<span>'+t+'</span>').join('');
   setT(document.getElementById('dyp'),D.best?'Try again':"Play today's run");
