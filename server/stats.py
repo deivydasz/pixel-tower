@@ -236,7 +236,7 @@ def player(env, pid, now=None):
             what = 'Foundry: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
         elif r['type'] == 'daily':
             what = 'Daily run (%s): wave %s, %s, %s, +%s chips, +%s packets, streak %s%s' % (
-                d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('nb') or 0, d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
+                d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('pk') or 0, d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
         elif r['type'] == 'bot':
             what = 'Drivers: %s %s, size %s power %s (%s packets)' % (dict(BOTS).get(d.get('k'), d.get('k')), {'b': 'built', 's': 'Size up', 'p': 'Power up'}.get(d.get('t'), 'upgraded'), d.get('s'), d.get('p'), d.get('c'))
         elif r['type'] == 'idle':

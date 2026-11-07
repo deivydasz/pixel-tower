@@ -10,6 +10,11 @@ ok($('hst').textContent.startsWith('Defend'),'new player sees intro line');
 key('p');ok(S.pause&&S.menu,'P key does not unpause the menu');
 S.nova=0;key(' ','Space');ok(S.nova===0,'Space does not fire Nova on the menu');
 click($('hhow'));ok(shown($('how'))&&!hs(),'How to play opens');
+{const vis=u=>shown(document.querySelector('#how p[data-u="'+u+'"]'));
+ok(['boss','bt','daily','drv','idle','gl'].every(u=>!vis(u))&&shown($('howm')),'How to play: a new player sees no locked mechanics, and a note that more comes');
+click($('howc'));const b0=M.best;M.best=30;M.hist.push({t:Date.now(),w:30,k:'Grunt',c:1,d:60,n:0});click($('hhow'));
+ok(['boss','bt','daily','drv','idle','gl'].every(vis)&&!shown($('howm')),'How to play shows each part once it is unlocked');
+click($('howc'));M.best=b0;M.hist.pop()}
 click($('howc'));ok(hs(),'Back returns to menu');
 click($('hfy'));ok(shown($('fy'))&&!hs(),'Foundry opens from menu');
 click($('fyc'));ok(hs()&&!shown($('go')),'Foundry Back returns to menu (not game over)');
