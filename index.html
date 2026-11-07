@@ -255,7 +255,7 @@ button b{display:block;font-weight:400}
 <p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
-<p>Daily runs (and certificates from wave 30) also pay packets. Spend them on Drivers: helper robots that fly with your tower in normal runs. The Cache Driver makes enemies drop more pixels, the Lag Driver freezes enemies with lag spikes and the Debug Driver makes enemies take more damage. Upgrade each one's Size (its field) and Power.</p>
+<p>Daily runs (and certificates from wave 30) also pay packets. Spend them on Drivers: install them to empower your tower in normal runs. The Cache Driver makes enemies drop more pixels, the Lag Driver freezes enemies with lag spikes and the Debug Driver makes enemies take more damage. Upgrade each one's Size (its field) and Power.</p>
 <p>After your first run, the tower also keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
 <p>Every wave is a bit. Clear 8 bit waves and they compile into a byte (the bits next to the wave number fill up): the pixels glitch and you keep one of three Glitches, small boosts for the rest of the run. Pick the same one again to stack it.</p>
 <p>Pause with the Pause button, P or Esc.</p>
@@ -263,7 +263,7 @@ button b{display:block;font-weight:400}
 <div id="bt"><div id="bth">Bit Theory</div><p>Find the deeper meaning in pixels. Studies run in real time, even while the game is closed. One at a time.</p><p id="btw"></p>
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="dy"><div id="dyh">Daily run</div><p>A new challenge every day, the same for everyone. You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count. Try as often as you like.</p><div id="dyt"></div><p id="dyr"></p><button id="dyp">Play today's run</button><button id="dyc">Back</button></div>
-<div id="rb"><div id="rbh">Drivers</div><p>Helper robots that fly with your tower in normal runs. Build them and upgrade Size and Power with <b>packets</b>, paid by Daily runs and certificates from wave 30.</p><p id="rbn"></p><div id="rbl"></div><button id="rbc">Back</button></div>
+<div id="rb"><div id="rbh">Drivers</div><p>Install these drivers to empower your tower in normal runs. Upgrade each one's Size and Power with <b>packets</b>, paid by Daily runs and certificates from wave 30.</p><p id="rbn"></p><div id="rbl"></div><button id="rbc">Back</button></div>
 <div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
 <div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here.<span class="bx"> Boss waves count once the boss is beaten.</span></p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
@@ -1285,7 +1285,7 @@ function homeUI(){
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
     if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.daily&&open){const D=dailyNow(),fresh=D.best===0;return '<button class="lk tr dl'+(fresh?' new':'')+'" id="hdl">'+m.n+'<small'+(fresh?' class="rdy">New today!':'>'+(D.best>=DAILY.top?'Done: wave ':'Today: wave ')+D.best)+'<br>'+esc(DAILY_MODS[dailyModIx(D.d)].n)+'</small></button>'}
-    if(m.bots&&open){const rd=botAny(),nb=BOT_KEYS.filter(botBuilt).length;return '<button class="lk tr rb" id="hrb">'+m.n+'<small'+(rd?' class="rdy">Upgrade ready!':'>'+big(M.nib)+' packet'+(M.nib===1?'':'s'))+'<br>'+(nb||M.nib?nb+' of '+BOT_KEYS.length+' built':'From Daily runs')+'</small></button>'}
+    if(m.bots&&open){const rd=botAny(),nb=BOT_KEYS.filter(botBuilt).length;return '<button class="lk tr rb" id="hrb">'+m.n+'<small'+(rd?' class="rdy">Upgrade ready!':'>'+big(M.nib)+' packet'+(M.nib===1?'':'s'))+'<br>'+(nb||M.nib?nb+' of '+BOT_KEYS.length+' installed':'From Daily runs')+'</small></button>'}
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+LOCK_SVG+(m.boss?'???':m.n)+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
@@ -1356,7 +1356,7 @@ function collectCert(){const w=claimCert();if(!w)return;sfx('wave');buzz(30);con
   document.getElementById('cem').textContent=certName(w)+': '+certPrize(w)+' collected!'+(sk?' '+sk.n+' skins unlocked, wear them from Skins on the menu.':'');showCerts()}
 document.getElementById('cel').addEventListener('click',e=>{if(e.target.closest('.go'))collectCert()});
 document.getElementById('cel').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.go')){e.preventDefault();collectCert()}});
-// Drivers screen: build each driver, then upgrade Size (field) and Power (effect) with packets
+// Drivers screen: install each driver, then upgrade Size (field) and Power (effect) with packets
 function botPreview(k){const c=document.createElement('canvas'),x=c.getContext('2d');c.width=21;c.height=18;x.imageSmoothingEnabled=false;x.fillStyle='#1b2033';x.fillRect(0,0,21,18);
   x.strokeStyle=BOTS[k].c+'88';x.setLineDash([1,1]);x.beginPath();x.arc(10.5,9.5,8,0,Math.PI*2);x.stroke();const s=botCanvas(k,0);x.drawImage(s,10-(s.width>>1),9-(s.height>>1));return c}
 const nibs=n=>big(n)+' packet'+(n===1?'':'s');
@@ -1365,11 +1365,11 @@ function showBots(){
   const l=document.getElementById('rbl');l.innerHTML='';
   for(const k of BOT_KEYS){const B=M.bots[k],on=botBuilt(k),d=document.createElement('div');d.className='dc'+(on?' own':'');if(on)d.style.borderColor=BOTS[k].c;d.dataset.k=k;
     const h=document.createElement('div');h.className='dh';h.appendChild(botPreview(k));
-    const t=document.createElement('span');t.innerHTML='<b><span>'+esc(BOTS[k].n)+'</span><span>'+(on?'S'+B.s+' P'+B.p:'Not built')+'</span></b><small>'+esc(BOTS[k].d)+'</small>'+
+    const t=document.createElement('span');t.innerHTML='<b><span>'+esc(BOTS[k].n)+'</span><span>'+(on?'S'+B.s+' P'+B.p:'Not installed')+'</span></b><small>'+esc(BOTS[k].d)+'</small>'+
       (on?'<small>Now: '+botFx(k,B.p)+', field '+fmt(BOT.field(B.s))+'</small>':'');h.appendChild(t);d.appendChild(h);
     const btn=(tr,html)=>{const b=document.createElement('button');b.dataset.t=tr;b.disabled=!botCanBuy(k,tr);b.innerHTML=html;return b};
     const price=c=>'<small class="'+(M.nib>=c?'go':'need')+'">'+c+' packets'+(M.nib<c?' (need '+(c-M.nib)+')':'')+'</small>';
-    if(!on){const b=btn('s','Build: Size 1, Power 1 ('+esc(botFx(k,1))+', field '+fmt(BOT.field(1))+')'+price(BOT.build));b.className='bd';d.appendChild(b)}
+    if(!on){const b=btn('s','Install: Size 1, Power 1 ('+esc(botFx(k,1))+', field '+fmt(BOT.field(1))+')'+price(BOT.build));b.className='bd';d.appendChild(b)}
     else for(const tr of ['s','p']){const lv=B[tr],mx=lv>=BOT.max;
       d.appendChild(btn(tr,'<b>'+BOT_TR[tr]+' Lv '+lv+'</b>'+(mx?'<small>Max level</small>':'<small>'+(tr==='s'?'field '+fmt(BOT.field(lv))+' > '+fmt(BOT.field(lv+1)):esc(botFx(k,lv+1)))+'</small>'+price(BOT.cost(lv)))))}
     l.appendChild(d)}
@@ -1457,7 +1457,7 @@ function runNews(){
   const a=S.start;if(!a||S.daily)return {items:[],bt:false};
   const items=[],w=S.wave;
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
-  for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.bots?'Drivers unlocked: helper robots, built with packets from Daily runs':m.n+' unlocked');
+  for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.bots?'Drivers unlocked: install them to empower your tower, with packets from Daily runs':m.n+' unlocked');
   for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect '+certPrize(w)+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
   if(!a.idle&&idleOpen())items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));

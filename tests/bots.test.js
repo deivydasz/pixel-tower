@@ -5,7 +5,7 @@ const zbTile=()=>$('hrb'),zbL=()=>[...$('rbl').querySelectorAll('button')],zbCar
 M.best=DAILY.w-1;showHome();ok(!zbTile()&&[...document.querySelectorAll('#hlk .lk')][2].textContent==='DriversWave '+DAILY.w,'Drivers locked until wave '+DAILY.w);
 M.best=40;M.nib=0;showHome();ok(zbTile()&&zbTile().textContent==='Drivers0 packetsFrom Daily runs','menu tile says where packets come from');
 click(zbTile());ok(shown($('rb'))&&!shown($('home'))&&zbL().length===3&&zbL().every(b=>b.disabled),'Drivers screen: three drivers to build, nothing affordable');
-ok([...$('rbl').querySelectorAll('.dh b span:first-child')].map(b=>b.textContent).join()==='Cache Driver,Lag Driver,Debug Driver'&&zbL()[0].textContent.includes('Build: Size 1, Power 1')&&zbL()[0].textContent.includes(BOT.build+' packets'),'names and build cost');
+ok([...$('rbl').querySelectorAll('.dh b span:first-child')].map(b=>b.textContent).join()==='Cache Driver,Lag Driver,Debug Driver'&&zbL()[0].textContent.includes('Install: Size 1, Power 1')&&zbL()[0].textContent.includes(BOT.build+' packets'),'names and build cost');
 click($('rbc'));ok(shown($('home')),'Back returns to the menu');
 // packets from Daily runs: paid as today's best improves, more past the boss, streak bonus
 ok(dailyNibs(DAILY.top,1)===BOT.nib&&dailyNibs(Math.round(DAILY.top/2),1)===Math.round(BOT.nib*Math.round(DAILY.top/2)/DAILY.top)&&dailyNibs(DAILY.top+2*BOT.nibPer,1)===BOT.nib+2,'packet reward: '+BOT.nib+' for the boss, +1 per '+BOT.nibPer+' waves after');
