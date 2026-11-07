@@ -12,8 +12,8 @@ ok(btn_('spray').querySelector('small.met')===null&&!resCanAfford('spray')&&!sta
 M.bk=2;M.best=40;click($('btc'));click($('hbt'));ok(!btn_('nova').classList.contains('lkd')&&!btn_('nova').disabled&&btn_('nova').textContent.includes(RES_FIRST+' chips'),'Blast tech opens at best wave 35 + 2 bosses (shows cost)');
 M.bk=1;M.best=0;click($('btc'));click($('hbt'));
 ok($('btl').querySelectorAll('button').length===BIT_KEYS.length&&!shown($('btq')),'lists all researches, nothing running');
-ok(btn('crit').textContent.includes('Lv 0/10')&&btn('crit').lastChild.textContent==='Free · 15m 00s'&&btn('crit').textContent.includes('0% crit > 10% crit'),'first Critical bits study is free and gives 10%: '+btn('crit').lastChild.textContent);
-ok(btn('pierce').lastChild.textContent==='10 chips · 10m 00s','other level 1 studies cost 10 chips, no cores');
+ok(btn('crit').textContent.includes('Lv 0/10')&&btn('crit').lastChild.textContent==='0% crit > 10% crit · Free · 15m 00s'&&btn('crit').textContent.includes('0% crit > 10% crit'),'first Critical bits study is free and gives 10%: '+btn('crit').lastChild.textContent);
+ok(btn('pierce').lastChild.textContent==='pierce 0 > pierce 1 · 10 chips · 10m 00s','other level 1 studies cost 10 chips, no cores');
 // start a study
 click(btn('crit'));
 ok(M.rq&&M.rq.k==='crit'&&M.cores===3&&M.chips===1000&&M.rq.end===T+15*60000,'starting deducts cost and sets a 15 min timer');

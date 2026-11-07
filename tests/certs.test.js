@@ -10,6 +10,8 @@ S.left=0;S.en=[];step(.05);ok(M.cert===10&&M.claim===0&&M.chips===c0+3&&S.bt1===
 ok(claimCert()===10&&M.chips===c0+3+certChips(10)&&M.claim===10&&claimCert()===0,'collecting pays +'+certChips(10)+' chips once');
 const c1=M.chips;M.cert=10;S.wave=9;S.paid=true;S.gap=0;S.left=0;S.en=[];step(.05);S.left=0;S.en=[];step(.05);ok(M.cert===10&&M.chips===c1+3,'only once');
 ok([10,20,30,50,100].map(certChips).join()==='8,20,38,88,300','certificate rewards grow with the wave');
+ok([10,20,30,50,100].map(certPk).join()==='0,0,6,10,20','certificates from wave 30 also pay packets (1 per 5 waves)');
+{const n0=M.pk,c0=M.claim,k0=M.cert;M.cert=30;M.claim=20;claimCert();ok(M.pk===n0+6,'collecting the wave 30 certificate pays its packets');M.pk=n0;M.claim=c0;M.cert=k0}
 // boss attempt reward
 S.wave=20;S.en=[];const b=enemy(30,0,0,1000);b.boss=1;b.max=1000;b.hp=350;b.t=bossFor(20);const c2=M.chips;S.cert=0;
 endRun(false);ok(S.btry&&Math.abs(S.btry.share-.65)<1e-9&&S.btry.chips===Math.round(bossChips(20)*.65)&&M.chips===c2+S.btry.chips,'dying at a boss pays chips for the damage dealt ('+S.btry.chips+')');
