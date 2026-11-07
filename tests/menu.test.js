@@ -1,7 +1,7 @@
 // Home menu groups, locked modes and the next-unlock hook.
 const lk=()=>[...document.querySelectorAll('#hlk .lk')];
 showHome();
-ok(lk().length===3&&lk().every(b=>b.disabled&&b.querySelector('svg')),'3 locked buttons, disabled, with lock icon');
+ok(lk().length===LOCKED.length&&LOCKED.length===4&&lk().every(b=>b.disabled&&b.querySelector('svg')),'4 locked buttons, disabled, with lock icon');
 ok(lk().map(b=>b.textContent).join('|')===LOCKED.map(m=>(m.boss?'???':m.n)+'Wave '+m.w).join('|'),'locked buttons show their unlock wave (bosses are ???)');
 ok(document.body.classList.contains('noboss')&&!shown(document.querySelector('#how .bx')),'boss text hidden until the first boss is met');
 ok(resReqs('spray').some(q=>q.t==='??? at wave '+BOSS.first),'Bit Theory requirement says ??? instead of bosses');

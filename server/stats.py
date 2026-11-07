@@ -17,7 +17,8 @@ from urllib.parse import urlparse, parse_qs
 
 DB = os.environ.get('STATS_DB', '/var/lib/pixel-tower-stats/stats.db')
 PORT = int(os.environ.get('STATS_PORT', '8787'))
-TYPES = ('open', 'run', 'research', 'foundry', 'idle', 'daily')
+TYPES = ('open', 'run', 'research', 'foundry', 'idle', 'daily', 'bot')
+BOTS = (('cache', 'Cache Bot'), ('lag', 'Lag Bot'), ('debug', 'Debug Bot'))
 ENVS = ('live',)
 MAX_BODY = 8192
 RATE = 240  # events per player ID per hour (a run ends every few minutes; this only stops floods)
@@ -121,7 +122,7 @@ def overview(env, now=None):
     with db() as c:
         evs = c.execute('SELECT ts, pid, type, data FROM events WHERE env=? ORDER BY ts', (env,)).fetchall()
     players = {}
-    runs, research, foundry, idle, daily = [], [], [], [], []
+    runs, research, foundry, idle, daily, bots = [], [], [], [], [], []
     for r in evs:
         d = json.loads(r['data'])
         p = players.setdefault(r['pid'], {'pid': r['pid'], 'first': r['ts'], 'last': r['ts'], 'runs': 0, 'time': 0, 'opens': 0, 'm': {}})
@@ -140,6 +141,8 @@ def overview(env, now=None):
             foundry.append(d)
         elif r['type'] == 'idle':
             idle.append(d)
+        elif r['type'] == 'bot':
+            bots.append(d)
         elif r['type'] == 'daily':
             p['time'] += int(d.get('d') or 0)
             daily.append((r['ts'], r['pid'], d))
@@ -192,6 +195,10 @@ def overview(env, now=None):
     for d in foundry:
         fc[d.get('k')] += 1
     out += '<h2>Foundry upgrades bought</h2>' + bars([(n, fc[k]) for k, n in UPS], 'upgrade')
+    bc = defaultdict(int)
+    for d in bots:
+        bc[d.get('k')] += 1
+    out += '<h2>Bitbots built or upgraded</h2>' + bars([(n, bc[k]) for k, n in BOTS], 'bot')
     # players table
     rows = sorted(players.values(), key=lambda p: -p['last'])[:300]
     out += ('<h2>Players (latest 300)</h2><div class="wrap"><table><tr><th>player</th><th>last seen</th><th>first seen</th>'
@@ -228,8 +235,10 @@ def player(env, pid, now=None):
         elif r['type'] == 'foundry':
             what = 'Foundry: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
         elif r['type'] == 'daily':
-            what = 'Daily run (%s): wave %s, %s, %s, +%s chips, streak %s%s' % (
-                d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
+            what = 'Daily run (%s): wave %s, %s, %s, +%s chips, +%s nibbles, streak %s%s' % (
+                d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('nb') or 0, d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
+        elif r['type'] == 'bot':
+            what = 'Bitbots: %s Lv %s (%s nibbles)' % (dict(BOTS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
         elif r['type'] == 'idle':
             what = 'Came back after %s min: +%s chips, +%s px head start' % (d.get('min'), d.get('c'), d.get('px'))
         else:

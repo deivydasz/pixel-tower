@@ -20,7 +20,7 @@ const exp=400*TYPES[2].px*(1+stat.magnet())*1.3;ok(Math.abs(n-exp)<exp*.03,'enem
 M.skin={e:3,t:1,b:2};save();loadMeta(JSON.parse(localStorage.getItem('pixelTowerMeta')));ok(M.v===SAVE_V&&M.skin.e===3&&M.skin.t===1&&M.skin.b===2,'worn skins survive save and load');
 loadMeta({v:11,chips:5,lv:{},hist:[],best:40,cert:30});ok(M.skin.e===0&&M.skin.t===0&&M.skin.b===0&&skinOwned(1)&&!skinOwned(2),'v11 save: Classic worn, wave 30 set already owned');
 // home card and screen
-M.cert=0;M.claim=0;showHome();ok($('hsk')===null&&[...document.querySelectorAll('#hlk .lk')][2].textContent.includes('Wave 30'),'Skins locked on the menu until the wave 30 certificate');
+M.cert=0;M.claim=0;showHome();ok($('hsk')===null&&[...document.querySelectorAll('#hlk .lk')][3].textContent.includes('Wave 30'),'Skins locked on the menu until the wave 30 certificate');
 M.cert=30;M.claim=30;showHome();ok($('hsk')&&$('hsk').textContent.includes('3 of 9'),'Skins card opens with the first set (3 of 9)');
 click($('hsk'));ok(shown($('sk')),'Skins screen opens');
 const bs=[...document.querySelectorAll('#skl button')];ok(bs.length===12&&bs.filter(b=>b.disabled).length===6,'12 skins shown, Neon and Crystal locked');

@@ -55,5 +55,6 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 - `upgrades.test.js`: six upgrades, wave unlocks (mid-run and Foundry), Pixel magnet drops, suggestions
 - `tips.test.js`: first-play tips, pausing, shown once
 - `glitches.test.js`: byte meter, Glitch offers every 8 waves, panel, waiting for the pick, effects, stacking, Save State, hidden auto-pick, seeded in daily runs
+- `bots.test.js`: Bitbots unlock, nibbles from Daily runs, building/upgrading, Cache/Lag/Debug effects in runs, none in Daily runs, saves
 - `daily.test.js`: Daily run unlock, screen, fresh tower and twists, seeded spawns, rewards as today's best improves, streak, day change, saves, History
 - `balance.sim.js`: bot runs to compare wave reached (results vary about ±2 waves between runs)

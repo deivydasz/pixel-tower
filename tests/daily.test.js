@@ -71,7 +71,7 @@ ok(zdIx.every((v,i)=>i===0||v!==zdIx[i-1]),'no twist two days in a row');
 ok([0,1,2].every(b=>{const st=Math.floor((zdD0+zdL)/zdL)*zdL+b*zdL-zdD0;return new Set(zdIx.slice(st,st+zdL)).size===zdL}),'every twist once per '+zdL+' days');
 // saves
 loadMeta({v:13,chips:5,lv:{},best:30});ok(M.daily&&M.daily.best===0&&M.daily.streak===0&&M.daily.top===0,'v13 saves get an empty daily record');
-loadMeta({v:14,chips:5,lv:{},best:30,daily:{d:5,best:7,paid:9,streak:2,last:5,top:11}});ok(JSON.stringify(M.daily)==='{"d":5,"best":7,"paid":9,"streak":2,"last":5,"top":11}','daily record survives a reload');
+loadMeta({v:14,chips:5,lv:{},best:30,daily:{d:5,best:7,paid:9,streak:2,last:5,top:11,np:4}});ok(JSON.stringify(M.daily)==='{"d":5,"best":7,"paid":9,"streak":2,"last":5,"top":11,"np":4}','daily record survives a reload');
 loadMeta({v:14,chips:5,lv:{},best:30,daily:{best:-3,streak:'x'}});ok(M.daily.best===0&&M.daily.streak===0,'junk daily values cleaned');
 // history marks daily runs and leaves them out of the average
 loadMeta({v:14,chips:5,lv:{},best:30,hist:[{t:Date.now(),w:10,k:'Grunt',c:3,d:60,n:0,dl:1},{t:Date.now(),w:30,k:'Tank',c:3,d:60,n:0}]});showHistory();
