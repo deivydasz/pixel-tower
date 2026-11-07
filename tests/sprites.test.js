@@ -17,6 +17,11 @@ ok([0,1,2,3].every(t=>towerGrid(t).every(r=>r.length===11+2*t)),'tower grids are
 const barrels=()=>{const n0=[];const fr=g.fillRect.bind(g);let c=0;g.fillRect=(x,y,w,h)=>{if(g.fillStyle==='#ffffff')c++;fr(x,y,w,h)};S.mf=0;draw();g.fillRect=fr;return c};
 M.res.spray=0;const b1=barrels();M.res.spray=2;const b3=barrels();M.res.spray=0;
 ok(b3===3*b1,'Spray and Pray 2 draws three barrels ('+b1+' / '+b3+' tip pixels)');
+// never more than 3 barrels: extra bullets make barrels fat (4th: middle, 5th: the sides, 6th: all three)
+const tipArea=()=>{const fr=g.fillRect.bind(g);let n=0,a=0;g.fillRect=(x,y,w,h)=>{if(g.fillStyle==='#ffffff'){n++;a+=w*h}fr(x,y,w,h)};S.mf=0;draw();g.fillRect=fr;return {n,a}};
+M.res.spray=2;const t3=tipArea();M.res.spray=3;const t4=tipArea();M.res.spray=4;const t5=tipArea();S.gl={stray:1};const t6=tipArea();S.gl={};M.res.spray=0;
+ok(t4.n===t3.n&&t5.n===t3.n&&t6.n===t3.n,'4, 5 and 6 bullets still draw three barrels');
+ok(t4.a===t3.a+3*b1&&t5.a===t3.a+6*b1&&t6.a===t3.a+9*b1,'one fat barrel at 4 bullets, two at 5, three at 6 (tip pixels '+[t3.a,t4.a,t5.a,t6.a]+')');
 ui();ok([...$('leg').querySelectorAll('i canvas')].length===TYPES.length,'legend shows a sprite icon per enemy type');
 ok(getComputedStyle($('leg').querySelector('i canvas')).outlineStyle==='none','legend icons have no frame');
 done();

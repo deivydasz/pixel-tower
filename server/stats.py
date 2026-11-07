@@ -18,7 +18,7 @@ from urllib.parse import urlparse, parse_qs
 DB = os.environ.get('STATS_DB', '/var/lib/pixel-tower-stats/stats.db')
 PORT = int(os.environ.get('STATS_PORT', '8787'))
 TYPES = ('open', 'run', 'research', 'foundry', 'idle', 'daily', 'bot')
-BOTS = (('cache', 'Cache Bot'), ('lag', 'Lag Bot'), ('debug', 'Debug Bot'))
+BOTS = (('cache', 'Cache Driver'), ('lag', 'Lag Driver'), ('debug', 'Debug Driver'))
 ENVS = ('live',)
 MAX_BODY = 8192
 RATE = 240  # events per player ID per hour (a run ends every few minutes; this only stops floods)
@@ -198,7 +198,7 @@ def overview(env, now=None):
     bc = defaultdict(int)
     for d in bots:
         bc[d.get('k')] += 1
-    out += '<h2>Bitbots built or upgraded</h2>' + bars([(n, bc[k]) for k, n in BOTS], 'bot')
+    out += '<h2>Drivers built or upgraded</h2>' + bars([(n, bc[k]) for k, n in BOTS], 'bot')
     # players table
     rows = sorted(players.values(), key=lambda p: -p['last'])[:300]
     out += ('<h2>Players (latest 300)</h2><div class="wrap"><table><tr><th>player</th><th>last seen</th><th>first seen</th>'
@@ -235,10 +235,10 @@ def player(env, pid, now=None):
         elif r['type'] == 'foundry':
             what = 'Foundry: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
         elif r['type'] == 'daily':
-            what = 'Daily run (%s): wave %s, %s, %s, +%s chips, +%s nibbles, streak %s%s' % (
+            what = 'Daily run (%s): wave %s, %s, %s, +%s chips, +%s packets, streak %s%s' % (
                 d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('nb') or 0, d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
         elif r['type'] == 'bot':
-            what = 'Bitbots: %s Lv %s (%s nibbles)' % (dict(BOTS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
+            what = 'Drivers: %s %s, size %s power %s (%s packets)' % (dict(BOTS).get(d.get('k'), d.get('k')), {'b': 'built', 's': 'Size up', 'p': 'Power up'}.get(d.get('t'), 'upgraded'), d.get('s'), d.get('p'), d.get('c'))
         elif r['type'] == 'idle':
             what = 'Came back after %s min: +%s chips, +%s px head start' % (d.get('min'), d.get('c'), d.get('px'))
         else:

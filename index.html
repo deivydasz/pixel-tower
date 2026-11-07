@@ -33,7 +33,7 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #upt button{text-align:center;min-height:30px;padding:4px 2px;font-size:8px;position:relative}
 #upt button.on{background:#5ec8ff;color:#0d1019;border-color:#0d1019}
 #upt button.has::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;background:#ffd166;border:1px solid #0d1019}
-#fy,#go,#home,#how,#hi,#bt,#ce,#sk,#dy,#rb{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#fy,#go,#home,#how,#hi,#bt,#ce,#sk,#dy,#rb{position:fixed;inset:0;box-sizing:border-box;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 0 calc(10px + env(safe-area-inset-bottom,0px))}
 #fy p,#go p,#home p,#how p{width:var(--w,360px);margin:0;font-size:8px;line-height:1.8}
 #fyh,#howh,#hih{font-size:11px}
 #bth{font-size:16px;color:var(--violet);text-shadow:3px 3px 0 var(--bd)}
@@ -55,13 +55,16 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #rb>p{margin:0;font-size:8px;line-height:1.8;text-align:center;width:min(360px,92vw)}
 #rb>p b{color:#6ee7a0;font-weight:400}
 #rbl{display:grid;gap:6px;width:min(360px,92vw)}
-#rbl button{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center;font-size:8px;line-height:1.7;text-align:left}
-#rbl button canvas{width:42px;height:36px;outline:0}
+#rbl .dc{display:grid;grid-template-columns:1fr 1fr;gap:6px;border:2px solid var(--bd);padding:6px;background:var(--btn)}
+#rbl .dh{grid-column:1/-1;display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center;font-size:8px;line-height:1.6}
+#rbl canvas{width:42px;height:36px;outline:0}
 #rbl b{display:flex;justify-content:space-between;font-weight:400;font-size:9px}
 #rbl small{display:block;opacity:.75}
 #rbl small.go{color:#6ee7a0;opacity:1}
-#rbl button.own:disabled{opacity:1;cursor:default}
-#rbl button.own:disabled small.need{opacity:.55}
+#rbl button{font-size:8px;line-height:1.6;padding:6px}
+#rbl button b{font-size:8px}
+#rbl button.bd{grid-column:1/-1;text-align:center}
+#rbl button:disabled small.need{opacity:.9}
 #rbc{min-width:140px;min-height:44px;text-align:center}
 #hm .lk.dl.new{box-shadow:0 0 0 2px #c4a7ff}
 #hm .lk.dl small.rdy{color:var(--violet);opacity:1}
@@ -87,6 +90,8 @@ canvas{image-rendering:pixelated;background:#1b2033;display:block;outline:2px so
 #btl .lkd b span:first-child{display:flex;align-items:center;gap:6px}
 #btl small.met{color:#6ee7a0;opacity:1}
 #btc{min-width:140px;min-height:44px;text-align:center}
+#fyc,#btc,#hic,#cec,#skc,#rbc,#dyc,#howc{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:2;flex:none;box-shadow:0 0 0 8px var(--bg),0 -10px 12px 4px var(--bg)}
+@media (max-height:720px){#fy,#bt,#hi,#ce,#sk,#rb,#dy,#how{gap:8px}#how p{line-height:1.6}#btl button{line-height:1.5;padding:6px}}
 #goh{font-size:18px;color:#ff6b6b;text-shadow:3px 3px 0 var(--bd);text-transform:uppercase}
 #goh.rec{color:#ffd166}
 #goh.dl{color:#c4a7ff}
@@ -250,15 +255,15 @@ button b{display:block;font-weight:400}
 <p>After your first run, Bit Theory opens: timed research, paid with chips (and boss cores for higher levels), that unlocks extra bullets, piercing shots, critical hits, a faster Blast, stacking damage and faster fights. Research keeps running while the game is closed.</p>
 <p>Each cleared wave also gives pixel chips. Chips stay between runs: spend them in the Foundry for permanent boosts. Completing wave 10, 20, 30... for the first time earns a certificate with bonus chips.</p>
 <p>From wave 25 there is a Daily run: a new twist every day and a fresh tower (no Foundry, Bit Theory or skin bonuses). Your best wave of the day earns bonus chips, more for every day in a row.</p>
-<p>Daily runs also pay nibbles (half a byte). Spend them on Bitbots: helper robots that fly with your tower in normal runs. The Cache Bot makes enemies drop more pixels, the Lag Bot freezes enemies with lag spikes and the Debug Bot makes enemies take more damage.</p>
+<p>Daily runs (and certificates from wave 30) also pay packets. Spend them on Drivers: helper robots that fly with your tower in normal runs. The Cache Driver makes enemies drop more pixels, the Lag Driver freezes enemies with lag spikes and the Debug Driver makes enemies take more damage. Upgrade each one's Size (its field) and Power.</p>
 <p>After your first run, the tower also keeps earning while you are away (up to 4 hours): chips, and a pixel head start for your next run.</p>
 <p>Every wave is a bit. Clear 8 bit waves and they compile into a byte (the bits next to the wave number fill up): the pixels glitch and you keep one of three Glitches, small boosts for the rest of the run. Pick the same one again to stack it.</p>
 <p>Pause with the Pause button, P or Esc.</p>
 <button id="howc">Back</button></div>
-<div id="bt"><div id="bth">Bit Theory</div><p>Study the pixels to find their deeper meaning. Research runs in real time, even when the game is closed. One study at a time.</p><p id="btw"></p>
+<div id="bt"><div id="bth">Bit Theory</div><p>Find the deeper meaning in pixels. Studies run in real time, even while the game is closed. One at a time.</p><p id="btw"></p>
 <div id="btq" class="goal"><span id="btqt"></span><i><b id="btqb"></b></i></div><div id="btl"></div><button id="btc">Back</button></div>
 <div id="dy"><div id="dyh">Daily run</div><p>A new challenge every day, the same for everyone. You start with a fresh tower: Foundry, Bit Theory and skin bonuses don't count. Try as often as you like.</p><div id="dyt"></div><p id="dyr"></p><button id="dyp">Play today's run</button><button id="dyc">Back</button></div>
-<div id="rb"><div id="rbh">Bitbots</div><p>Little helper robots that fly with your tower in normal runs. Build and upgrade them with <b>nibbles</b> (half a byte): only Daily runs pay nibbles.</p><p id="rbn"></p><div id="rbl"></div><button id="rbc">Back</button></div>
+<div id="rb"><div id="rbh">Drivers</div><p>Helper robots that fly with your tower in normal runs. Build them and upgrade Size and Power with <b>packets</b>, paid by Daily runs and certificates from wave 30.</p><p id="rbn"></p><div id="rbl"></div><button id="rbc">Back</button></div>
 <div id="sk"><div id="skh">Skins</div><p id="skb"></p><div id="skl"></div><button id="skc">Back</button></div>
 <div id="ce"><div id="ceh">Certificates</div><p>Complete wave 10, 20, 30... for the first time to earn a certificate, then collect its one-time reward here.<span class="bx"> Boss waves count once the boss is beaten.</span></p><p id="cem" role="status"></p><div id="cel"></div><button id="cec">Back</button></div>
 <div id="hi"><div id="hih">History</div><p id="his"></p><p id="hin">Highlighted rows set a new best wave.</p><div id="hil"></div><button id="hic">Back</button></div>
@@ -307,7 +312,7 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?nib=50 tops up nibbles (Bitbots), ?best=30 raises the best wave (unlocks), ?fresh=1 wipes the save once (a brand-new player; the URL is cleaned so a reload keeps the new save), ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?nib=50 tops up packets (Drivers), ?best=30 raises the best wave (unlocks), ?fresh=1 wipes the save once (a brand-new player; the URL is cleaned so a reload keeps the new save), ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
@@ -405,35 +410,41 @@ const resMin=(k,lv)=>BITS[k].time?BITS[k].time[Math.min(lv|0,BITS[k].time.length
 // starts a timer after the first run (a reason to come back)
 const RES_FIRST=10;
 const resCost=(k,lv)=>{const c=BITS[k].cost;if(c){const x=c[Math.min(lv|0,c.length-1)];return {cores:x[0],chips:x[1]}}return lv?{cores:1+Math.floor(lv/2),chips:Math.round(25*Math.pow(1.6,lv))}:{cores:0,chips:k==='crit'?0:RES_FIRST}};
-// Bitbots (decided 2026-11-07, the user's idea; our own pixel/bit names): little helper robots that fly with the tower in
-// normal runs (never in Daily runs, which use a fresh tower). Built and upgraded with nibbles (half a byte), which only
+// Drivers (code: bots; decided 2026-11-07, the user's idea and name): little helper robots that fly with the tower in
+// normal runs (never in Daily runs, which use a fresh tower). Built and upgraded with packets, which only
 // Daily runs pay: BOT.nib for beating the wave-16 boss (less below it), +1 per BOT.nibPer waves past it, with the daily streak bonus.
-// Each bot flies to its own kind of target and has a round field (BOT.field) around itself:
-// Cache Bot: enemies destroyed in its field drop more pixels. Lag Bot: every few seconds a lag spike freezes the enemies in
-// its field (bosses for half as long). Debug Bot: enemies in its field take more damage from your shots.
-const BOT={max:10,sp:45,orbit:24,look:12,retarget:.4,nib:10,nibPer:4,field:lv=>14+lv,cost:lv=>10+5*lv};
+// Building one costs BOT.build and gives Size 1 and Power 1; then Size (field radius) and Power (effect) level up separately to BOT.max.
+// Each driver flies to its own kind of target and has a round field (BOT.field) around itself:
+// Cache Driver: enemies destroyed in its field drop more pixels. Lag Driver: every few seconds a lag spike freezes the enemies in
+// its field (bosses for half as long). Debug Driver: enemies in its field take more damage from your shots.
+const BOT={max:10,sp:45,orbit:24,look:12,retarget:.4,nib:10,nibPer:4,build:10,field:s=>13+1.5*s,cost:lv=>3+3*lv};
 const BOTS={
-  cache:{n:'Cache Bot',c:'#ffd166',d:'Enemies destroyed in its field drop more pixels',v:lv=>.2+.06*lv},
-  lag:{n:'Lag Bot',c:'#5ef0ff',d:'Lag spikes freeze the enemies in its field (bosses half as long)',v:lv=>1+.15*lv,cd:lv=>8-.4*lv},
-  debug:{n:'Debug Bot',c:'#6ee7a0',d:'Enemies in its field take more damage from your shots',v:lv=>.1+.05*lv}
+  cache:{n:'Cache Driver',c:'#ffd166',d:'Enemies destroyed in its field drop more pixels',v:p=>.2+.06*p},
+  lag:{n:'Lag Driver',c:'#5ef0ff',d:'Lag spikes freeze the enemies in its field (bosses half as long)',v:p=>1+.15*p,cd:p=>8-.4*p},
+  debug:{n:'Debug Driver',c:'#6ee7a0',d:'Enemies in its field take more damage from your shots',v:p=>.1+.05*p}
 };
-const BOT_KEYS=Object.keys(BOTS);
+const BOT_KEYS=Object.keys(BOTS),BOT_TR={s:'Size',p:'Power'};
 const botsOpen=()=>M.best>=DAILY.w;
-const botFx=(k,lv)=>k==='lag'?'freeze '+fmt(BOTS.lag.v(lv))+'s every '+fmt(BOTS.lag.cd(lv))+'s':'+'+Math.round(100*BOTS[k].v(lv))+'% '+(k==='cache'?'pixels':'damage');
-const botCanBuy=k=>botsOpen()&&M.bots[k]<BOT.max&&M.nib>=BOT.cost(M.bots[k]);
-function buyBot(k){if(!botCanBuy(k))return false;const c=BOT.cost(M.bots[k]);M.nib-=c;M.bots[k]++;save();sfx('buy');track('bot',{k,lv:M.bots[k],c});return true}
+const botFx=(k,p)=>k==='lag'?'freeze '+fmt(BOTS.lag.v(p))+'s every '+fmt(BOTS.lag.cd(p))+'s':'+'+Math.round(100*BOTS[k].v(p))+'% '+(k==='cache'?'pixels':'damage');
+const botBuilt=k=>M.bots[k].s>0;
+// t: 's' Size or 'p' Power ('b' or either on an unbuilt driver = build it)
+const botCost=(k,t)=>botBuilt(k)?BOT.cost(M.bots[k][t]):BOT.build;
+const botCanBuy=(k,t)=>botsOpen()&&(!botBuilt(k)||M.bots[k][t]<BOT.max)&&M.nib>=botCost(k,t);
+const botAny=()=>BOT_KEYS.some(k=>botBuilt(k)?botCanBuy(k,'s')||botCanBuy(k,'p'):botCanBuy(k,'s'));
+function buyBot(k,t){t=t==='p'?'p':'s';if(!botCanBuy(k,t))return false;const c=botCost(k,t),B=M.bots[k];M.nib-=c;
+  if(B.s){B[t]++}else{B.s=1;B.p=1}save();sfx('buy');track('bot',{k,t:B.s===1&&B.p===1?'b':t,s:B.s,p:B.p,c});return true}
 const dailyNibs=(w,s)=>Math.round((BOT.nib*Math.min(1,w/DAILY.top)+Math.floor(Math.max(0,w-DAILY.top)/BOT.nibPer))*streakMul(s));
-function makeBots(){return BOT_KEYS.filter(k=>M.bots[k]>0).map((k,i,a)=>{const an=i/a.length*Math.PI*2;
-  return {k,lv:M.bots[k],x:CX+Math.cos(an)*BOT.orbit,y:CY+Math.sin(an)*BOT.orbit,i,n:a.length,cd:BOTS[k].cd?BOTS[k].cd(M.bots[k])/2:0,rt:0,tg:null}})}
-const inField=(b,e)=>Math.hypot(e.x-b.x,e.y-b.y)<=BOT.field(b.lv)+e.t.s/2;
+function makeBots(){return BOT_KEYS.filter(botBuilt).map((k,i,a)=>{const an=i/a.length*Math.PI*2,B=M.bots[k];
+  return {k,s:B.s,p:B.p,x:CX+Math.cos(an)*BOT.orbit,y:CY+Math.sin(an)*BOT.orbit,i,n:a.length,cd:BOTS[k].cd?BOTS[k].cd(B.p)/2:0,rt:0,tg:null}})}
+const inField=(b,e)=>Math.hypot(e.x-b.x,e.y-b.y)<=BOT.field(b.s)+e.t.s/2;
 // effect of the bot of kind k on enemy e (0 when it has no such bot or e is outside its field)
-const botOn=(k,e)=>{if(!S.bots)return 0;for(const b of S.bots)if(b.k===k&&inField(b,e))return BOTS[k].v(b.lv);return 0};
-// targets: Cache Bot follows the tower's target (the next kill), Lag Bot the biggest crowd near the tower, Debug Bot the toughest enemy
+const botOn=(k,e)=>{if(!S.bots)return 0;for(const b of S.bots)if(b.k===k&&inField(b,e))return BOTS[k].v(b.p);return 0};
+// targets: Cache Driver follows the tower's target (the next kill), Lag Driver the biggest crowd near the tower, Debug Driver the toughest enemy
 // in the tower's range (bosses first; else the tower's target)
 function botTarget(b){const lim=stat.range()+BOT.look,near=S.en.filter(e=>!e.dead&&Math.hypot(e.x-CX,e.y-CY)<=lim);if(!near.length)return null;
   if(b.k==='cache')return S.target&&!S.target.dead?S.target:near.reduce((a,e)=>Math.hypot(e.x-CX,e.y-CY)<Math.hypot(a.x-CX,a.y-CY)?e:a);
   if(b.k==='debug'){const inr=near.filter(e=>Math.hypot(e.x-CX,e.y-CY)<=stat.range());return inr.length?inr.reduce((a,e)=>(e.boss?1e12:0)+e.hp>(a.boss?1e12:0)+a.hp?e:a):S.target||near[0]}
-  const f=BOT.field(b.lv);let best=null,bn=-1e9;for(const e of near){let n=-Math.hypot(e.x-CX,e.y-CY)/40;for(const o of near)if(Math.abs(o.x-e.x)<f&&Math.abs(o.y-e.y)<f)n++;if(n>bn){bn=n;best=e}}return best}
+  const f=BOT.field(b.s);let best=null,bn=-1e9;for(const e of near){let n=-Math.hypot(e.x-CX,e.y-CY)/40;for(const o of near)if(Math.abs(o.x-e.x)<f&&Math.abs(o.y-e.y)<f)n++;if(n>bn){bn=n;best=e}}return best}
 function botsUpdate(dt){
   for(const b of S.bots){
     if((b.rt-=dt)<=0||(b.tg&&b.tg.dead)){b.rt=BOT.retarget;b.tg=botTarget(b)}
@@ -441,7 +452,7 @@ function botsUpdate(dt){
     {const z=S.zoom||1,mx=(W/2-6)/z,my=(H/2-6)/z;tx=Math.max(CX-mx,Math.min(CX+mx,tx));ty=Math.max(CY-my,Math.min(CY+my,ty))}  // stay on screen
     const dx=tx-b.x,dy=ty-b.y,d=Math.hypot(dx,dy);if(d>.5){const m=Math.min(d,BOT.sp*dt);b.x+=dx/d*m;b.y+=dy/d*m}
     if(b.k==='lag'&&(b.cd-=dt)<=0){const hit=S.en.filter(e=>inField(b,e));
-      if(hit.length){const t=BOTS.lag.v(b.lv);for(const e of hit)e.stun=Math.max(e.stun||0,e.boss?t/2:t);b.cd=BOTS.lag.cd(b.lv);ring(b.x,b.y,2,BOT.field(b.lv),BOTS.lag.c,.35);sfx('lag')}else b.cd=0}
+      if(hit.length){const t=BOTS.lag.v(b.p);for(const e of hit)e.stun=Math.max(e.stun||0,e.boss?t/2:t);b.cd=BOTS.lag.cd(b.p);ring(b.x,b.y,2,BOT.field(b.s),BOTS.lag.c,.35);sfx('lag')}else b.cd=0}
   }
 }
 const clock={now:()=>Date.now()};
@@ -459,17 +470,18 @@ const clock={now:()=>Date.now()};
 // v12 adds `skin` {e,t,b}: the worn skin per slot (index into SKINS, 0 = Classic); owned skins come from `cert`.
 // v13 adds `claim`: the highest certificate whose reward was collected (certificates are earned in a run, collected on the menu).
 // v14 adds `daily` {d: day number of best/paid, best: today's best daily wave, paid: chips paid today, streak, last: last day played, top: best daily wave ever}.
-// v15 adds `nib` (nibbles, paid by Daily runs), `bots` {cache,lag,debug} (Bitbot levels, 0 = not built) and `daily.np` (nibbles paid today).
+// v15 adds `nib` (packets, paid by Daily runs), `bots` {cache,lag,debug: {s: Size, p: Power}} (Driver levels, 0 = not built) and `daily.np` (packets paid today).
 // When the shape changes: bump SAVE_V and add a step in loadMeta, e.g. if(v<12){...}.
 const newUid=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('')};
 const SAVE_V=15,HIST_MAX=50;
-let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0,skin:{e:0,t:0,b:0},claim:0,daily:{d:0,best:0,paid:0,streak:0,last:0,top:0,np:0},nib:0,bots:{cache:0,lag:0,debug:0}};
+let M={v:SAVE_V,chips:0,lv:{dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},mute:false,best:0,tips:{},hist:[],cores:0,bk:0,res:{spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},rq:null,music:true,spd:1,uid:newUid(),cert:0,seen:Date.now(),stash:0,skin:{e:0,t:0,b:0},claim:0,daily:{d:0,best:0,paid:0,streak:0,last:0,top:0,np:0},nib:0,bots:{cache:{s:0,p:0},lag:{s:0,p:0},debug:{s:0,p:0}}};
 function loadMeta(m){
   if(!m||!m.lv)return;
   M={v:SAVE_V,chips:m.chips|0,lv:Object.assign({dmg:0,rate:0,range:0,hp:0,armor:0,magnet:0,bank:0},m.lv),mute:!!m.mute,best:m.best|0,tips:Object.assign({},m.tips),hist:Array.isArray(m.hist)?m.hist.slice(0,HIST_MAX):[],cores:m.cores|0,bk:m.bk|0,res:Object.assign({spray:0,pierce:0,crit:0,nova:0,depth:0,speed:0},m.res),rq:m.rq&&BIT_KEYS.includes(m.rq.k)&&isFinite(m.rq.end)?{k:m.rq.k,end:+m.rq.end}:null,music:m.music!==false,spd:+m.spd||1,uid:/^[0-9a-f]{16}$/.test(m.uid)?m.uid:newUid(),seen:+m.seen>0?+m.seen:Date.now(),stash:Math.max(0,m.stash|0),skin:{e:(m.skin&&m.skin.e)|0,t:(m.skin&&m.skin.t)|0,b:(m.skin&&m.skin.b)|0},cert:(m.v|0)>=10?Math.max(0,Math.floor((m.cert|0)/10)*10):Math.floor(Math.max(0,(m.best|0)-1)/10)*10};
   for(const k of BIT_KEYS)M.res[k]=Math.max(0,Math.min(BITS[k].max,M.res[k]|0));
   const dd=m.daily||{},n0=x=>Math.max(0,x|0);M.daily={d:dd.d|0,best:n0(dd.best),paid:n0(dd.paid),streak:n0(dd.streak),last:dd.last|0,top:n0(dd.top),np:n0(dd.np)};
-  M.nib=n0(m.nib);M.bots={};for(const k of BOT_KEYS)M.bots[k]=Math.max(0,Math.min(BOT.max,((m.bots||{})[k])|0));
+  M.nib=n0(m.nib);M.bots={};const lv=x=>Math.max(0,Math.min(BOT.max,x|0));
+  for(const k of BOT_KEYS){const o=(m.bots||{})[k],B=typeof o==='number'?{s:lv(o),p:lv(o)}:{s:lv(o&&o.s),p:lv(o&&o.p)};if(!B.s||!B.p)B.s=B.p=0;M.bots[k]=B}
   M.claim=(m.v|0)>=13?Math.min(M.cert,Math.floor((m.claim|0)/10)*10):M.cert;  // older saves were paid when earned
   M.spd=Math.max(1,Math.min(maxSpeed(),Math.round(M.spd*2)/2));
 }
@@ -658,8 +670,11 @@ const CERT_NAMES=['Pixel Apprentice','Bit Cadet','Byte Guard','Sprite Sentinel',
 const certName=w=>CERT_NAMES[w/10-1]||'Wave '+w+' Master';
 // Collect the lowest earned, uncollected certificate: its chips, and its skin set if it has one. Returns the wave or 0.
 const certReady=()=>M.cert>M.claim;
-function claimCert(){if(!certReady())return 0;const w=M.claim+10;M.claim=w;M.chips+=certChips(w);save();return w}
+function claimCert(){if(!certReady())return 0;const w=M.claim+10;M.claim=w;M.chips+=certChips(w);M.nib+=certNibs(w);save();return w}
 const certChips=w=>Math.round(w*(1+w/20)/2);
+// certificates from wave 30 (the first after Drivers open at 25) also pay packets: 1 per 5 waves (30: 6, 50: 10, 100: 20)
+const certNibs=w=>w>=30?w/5:0;
+const certPrize=w=>'+'+certChips(w)+' chips'+(certNibs(w)?' +'+certNibs(w)+' packets':'');
 // Idle income (unlocks after the first finished run): while the game is closed (or hidden outside a run) the tower keeps
 // earning. A full IDLE.hours away pays one run's worth of chips to your best wave, plus starting pixels for the next
 // run (IDLE.px per best wave). Nothing for under IDLE.minMin minutes; the stash never holds more than one full period.
@@ -784,7 +799,7 @@ const TIPS={
   buy:{t:'<span>You have enough pixels! Tap <b>Damage</b> below to hit harder.</span>'},
   boss:{card:1,t:'<b>Boss!</b><span>Bosses do not stop: at the tower they keep hitting until you or they are destroyed. Beat it to earn a boss core and bonus chips. Every 16 waves (two bytes make a word) the glitch compiles a new one.</span>'},
   warden:{card:1,t:'<b>Warden</b><span>Its shield blocks most of your damage. Hit it with a BLAST to break the shield for '+BOSS.shieldDown+'s.</span>'},
-  bots:{t:'<span><b>Your Bitbots are flying!</b> Each follows its own target: Cache Bot the next kill, Lag Bot the crowd, Debug Bot the toughest enemy.</span>'},
+  bots:{t:'<span><b>Your Drivers are flying!</b> Each follows its own target: Cache the next kill, Lag the crowd, Debug the toughest enemy.</span>'},
   nova:{card:1,btn:'Fire BLAST',t:'<b>Overwhelmed?</b><span>Tap the BLAST button to hit every enemy on screen. It needs '+(novaCd()%60===0?novaCd()/60+' minute'+(novaCd()===60?'':'s'):novaCd()+'s')+' to recharge, so save it for emergencies.</span>'}
 };
 const tipEl=document.getElementById('tip');
@@ -972,8 +987,8 @@ function drawEnemy(e){const t=e.t;if(e.ph==null)e.ph=Math.random();
   const f=Math.floor(S.time*(2+t.sp/5)+e.ph*2)%2,cv=sprCanvas(t,f,e.crit>0?'x':e.hit>0?'h':''),z=S.zoom||1;
   const [sx,sy]=toScreen(e.x,e.y),w=Math.max(1,Math.round(cv.width*z)),h=Math.max(1,Math.round(cv.height*z)),jx=e.stun>0&&!RM.matches&&Math.random()<.3?(Math.random()<.5?-1:1):0;
   g.drawImage(cv,Math.round(sx-w/2)+jx,Math.round(sy-h/2),w,h)}
-// Bitbot sprites: little hovering robots in the bot's colour, two frames (thrusters flicker, lights blink).
-// Cache Bot carries a pixel on its head, Lag Bot has a zigzag antenna, Debug Bot one big lens.
+// Driver sprites: little hovering robots in the driver's colour, two frames (thrusters flicker, lights blink).
+// Cache Driver carries a pixel on its head, Lag Driver has a zigzag antenna, Debug Driver one big lens.
 const BOT_SPR={
   cache:[["..lll..",".ddddd.","dcccccd","dcpcpcd","dcccccd",".ddddd.","..d.d.."],["..ccc..",".ddddd.","dcccccd","dcpcpcd","dcccccd",".ddddd.",".d...d."]],
   lag:[["....l..","...l...","..ddd..",".dcccd.","dcpcpcd",".dcccd.","..d.d.."],["...l...","....l..","..ddd..",".dcccd.","dcpcpcd",".dcccd.",".d...d."]],
@@ -1015,13 +1030,14 @@ function drawTower(){const t=tier('hp'),n=towerN(),h=(n-1)/2,z=WZ,ts=TSK[sk('t')
   // Range: antennas on the corners (1, 2, 4) with blinking tips
   const ra=[0,1,2,4][tier('range')],blink=Math.floor(S.time*2)%2;
   [[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,ra).forEach(([sx,sy],i)=>{const x=CX+sx*(h+1),y=CY+sy*(h+1);R(x,y,1,1,'#c3cde6');R(x+sx,y+sy,1,1,(blink+i)%2?'#7ee8a8':'#2f6b4f')});
-  // turret: barrel(s) towards the target; longer with Damage; one barrel per Spray and Pray bullet, fanned wider so they read
+  // turret: barrel(s) towards the target; longer with Damage; one barrel per Spray and Pray bullet, fanned wider so they read.
+  // At most 3 barrels (the user's rule): a 4th bullet makes the middle barrel fat, a 5th the two side ones instead, a 6th all three.
   const ang=S.target?Math.atan2(S.target.y-CY,S.target.x-CX):(S.aim!=null?S.aim:-Math.PI/2);
-  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray')+G('stray'),bw=dt>=2&&nb===1?2:1;
-  const fan=[];for(let i=0;i<nb;i++)fan.push(ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38);
-  const pts=a=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
-  fan.forEach(a=>{for(const[x,y]of pts(a))R(x-1,y-1,bw+2,bw+2,ts.out)});          // outline first
-  fan.forEach(a=>{for(const[x,y,i]of pts(a))R(x,y,bw,bw,i>=len-1?ts.tip:ts.bar);
+  const dt=tier('dmg'),len=[7,8,10,11][dt]-(S.mf>0?1:0),rateGlow=tier('rate'),nb=1+RL('spray')+G('stray'),bw0=dt>=2&&nb===1?2:1,ex=Math.max(0,nb-3);
+  const fan=[];for(let i=0;i<Math.min(nb,3);i++)fan.push({a:ang+(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*.38,w:bw0+((i===0?ex===1||ex>=3:ex>=2)?1:0)});
+  const pts=(a,bw)=>{const r=[],cx=Math.cos(a),cy=Math.sin(a);for(let i=3;i<=len;i++)r.push([Math.round(CX+.5+cx*i-bw/2),Math.round(CY+.5+cy*i-bw/2),i]);return r};
+  fan.forEach(({a,w})=>{for(const[x,y]of pts(a,w))R(x-1,y-1,w+2,w+2,ts.out)});          // outline first
+  fan.forEach(({a,w})=>{for(const[x,y,i]of pts(a,w))R(x,y,w,w,i>=len-1?ts.tip:ts.bar);
     if(S.mf>0){const fx=Math.round(CX+Math.cos(a)*(len+2)),fy=Math.round(CY+Math.sin(a)*(len+2));R(fx-1,fy-1,3,3,'#ffd166');R(fx,fy,1,1,'#fff')}});
   if(!sk('t')){R(CX-1,CY-1,3,3,'#1b2033');return}
   // dome: gold rim with Pixel magnet, core glows with Fire rate
@@ -1062,8 +1078,8 @@ function draw(){
   // range ring
   g.strokeStyle='rgba(143,163,214,.25)';g.lineWidth=1;
   g.beginPath();g.arc(CX+.5,CY+.5,stat.range()*WZ,0,Math.PI*2);g.stroke();
-  // Bitbot fields (dashed rings)
-  if(S.bots.length){g.lineWidth=1;g.setLineDash([2,2]);for(const b of S.bots){const[x,y]=toScreen(b.x,b.y);g.strokeStyle=BOTS[b.k].c+'66';g.beginPath();g.arc(Math.round(x)+.5,Math.round(y)+.5,BOT.field(b.lv)*WZ,0,Math.PI*2);g.stroke()}g.setLineDash([])}
+  // Driver fields (dashed rings)
+  if(S.bots.length){g.lineWidth=1;g.setLineDash([2,2]);for(const b of S.bots){const[x,y]=toScreen(b.x,b.y);g.strokeStyle=BOTS[b.k].c+'66';g.beginPath();g.arc(Math.round(x)+.5,Math.round(y)+.5,BOT.field(b.s)*WZ,0,Math.PI*2);g.stroke()}g.setLineDash([])}
   // pixels
   for(const p of S.pt)R(p.x-1,p.y-1,2,2,p.c);
   // enemies
@@ -1137,7 +1153,7 @@ function ui(){
   // no best-wave number during a run (it read like a second wave counter); just a gold "New best!" once you pass it
   {const b=$id('bw'),db=M.daily.best,nb=S.daily?inRun()&&db>0&&S.wave>db:inRun()&&M.best>0&&S.wave>M.best,cl=S.daily&&!nb?'dl':'';
   setT(b,S.daily?(nb?'Daily best!':'Daily'):nb?'New best!':'');if(b.className!==cl)b.className=cl}
-  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),[S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'',glitchList()?'Glitches: '+glitchList():'',S.bots.length?'Bitbots: '+S.bots.map(b=>BOTS[b.k].n+' Lv '+b.lv).join(', '):''].filter(Boolean).join(' / '));
+  const pzOn=S.pause&&!S.tip&&!S.menu&&!S.over;if(pzOn)setT($id('pzd'),[S.daily?'Daily run · '+S.daily.n+': '+S.daily.d:'',glitchList()?'Glitches: '+glitchList():'',S.bots.length?'Drivers: '+S.bots.map(b=>BOTS[b.k].n.split(' ')[0]+' (size '+b.s+', power '+b.p+')').join(', '):''].filter(Boolean).join(' / '));
   const gOn=!!S.gpick&&!S.over&&!S.menu;show('gl',gOn);if(gOn)setH($id('glo'),S.gpick.map((k,i)=>'<button data-i="'+i+'"><b><span>'+GLITCHES[k].n+'</span><small>'+(G(k)?'Lv '+G(k)+' > '+(G(k)+1):'New')+'</small></b>'+GLITCHES[k].d+'</button>').join(''));show('pz',pzOn&&!S.confirm);show('cf',pzOn&&S.confirm);
   checkResearch();
   if($id('home').style.display==='flex'&&M.rq)hbtTile();
@@ -1216,14 +1232,14 @@ function showGO(){
 // Daily run over: today's twist, best and the chips it paid
 function showDailyGO(){
   document.getElementById('gdl').style.display='none';
-  const rb=document.getElementById('grb'),rbOn=botsOpen()&&BOT_KEYS.some(botCanBuy);rb.style.display=rbOn?'block':'none';if(rbOn)rb.textContent='Bitbots: build ready! ('+big(M.nib)+' nibbles)';
+  const rb=document.getElementById('grb'),rbOn=botsOpen()&&botAny();rb.style.display=rbOn?'block':'none';if(rbOn)rb.textContent='Drivers: upgrade ready! ('+big(M.nib)+' packets)';
   const D=dailyNow(),goh=document.getElementById('goh'),cell=(l,v)=>'<div><small>'+l+'</small>'+v+'</div>';
   goh.textContent=S.drec&&S.dprev?'Daily best!':'Daily run over';goh.className=S.drec&&S.dprev?'rec':'dl';
   document.getElementById('got').style.display='none';document.getElementById('gnew').style.display='none';
   const kn=S.stopped?'Stopped':S.killer?S.killer.n:'enemy';
   document.getElementById('gop').textContent=S.daily.n+': '+(S.stopped?'you stopped on wave '+S.wave:'killed by a '+kn+' on wave '+S.wave)+(S.drec&&S.dprev?', beating today\'s best of '+S.dprev:'')+'.';
   const sm=streakMul(D.streak),more=D.best<DAILY.top;
-  document.getElementById('gnm').innerHTML=[S.dpay||S.dnib?'+'+big(S.dpay)+' chips'+(S.dnib?' and +'+S.dnib+' nibble'+(S.dnib===1?'':'s'):'')+' for today\'s best wave'+(sm>1?' (streak '+D.streak+' days, +'+Math.round(100*(sm-1))+'%)':''):'Beat wave '+D.best+' to earn more today',
+  document.getElementById('gnm').innerHTML=[S.dpay||S.dnib?'+'+big(S.dpay)+' chips'+(S.dnib?' and +'+S.dnib+' packet'+(S.dnib===1?'':'s'):'')+' for today\'s best wave'+(sm>1?' (streak '+D.streak+' days, +'+Math.round(100*(sm-1))+'%)':''):'Beat wave '+D.best+' to earn more today',
     more?'Up to '+big(dailyChips(DAILY.top,D.streak))+' chips for beating the wave '+BOSS.first+' boss':'Full daily reward earned. New twist tomorrow!'].map(esc).join('<br>');
   const gb=document.getElementById('gbt'),bo=resUnlocked();gb.disabled=!bo;gb.className='';gb.innerHTML=(bo?'':LOCK_SVG)+'Bit Theory';
   document.getElementById('gst').innerHTML=cell('Wave',S.wave)+cell('Killer',kn)+cell('Chips','+'+big(S.dpay))+cell('Time',fmtTime(Math.round(S.time)))+cell('Blasts',S.novas)+cell('Today',D.best);
@@ -1244,7 +1260,7 @@ function nearMiss(){
 const show=(id,on)=>{const el=document.getElementById(id),v=on?'flex':'none';if(el.style.display!==v)el.style.display=v};
 let fyFrom='go';
 // Modes shown locked on the home menu until reached (new players reach ~wave 8; Foundry lv3 in everything ~wave 29).
-const LOCKED=[{n:'Bosses',w:BOSS.first,boss:1},{n:'Daily run',w:DAILY.w,daily:1},{n:'Bitbots',w:DAILY.w,bots:1},{n:'Skins',w:30,cert:1}];
+const LOCKED=[{n:'Bosses',w:BOSS.first,boss:1},{n:'Daily run',w:DAILY.w,daily:1},{n:'Drivers',w:DAILY.w,bots:1},{n:'Skins',w:30,cert:1}];
 // Skins open when the wave 30 certificate is collected, the others when the best wave reaches w
 const lockOpen=m=>m.cert?M.claim>=m.w:M.best>=m.w;
 const LOCK_SVG='<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h1v2h1v5H0V3h1V1h1zM2 1v2h3V1z" fill-rule="evenodd"/></svg>';
@@ -1269,7 +1285,7 @@ function homeUI(){
   document.getElementById('hlk').innerHTML=LOCKED.map(m=>{const open=lockOpen(m);
     if(m.cert&&open)return '<button class="lk tr sk" id="hsk">'+m.n+'<small>'+SKINS.filter((x,i)=>i&&skinOwned(i)).length*3+' of '+(SKINS.length-1)*3+'</small></button>';
     if(m.daily&&open){const D=dailyNow(),fresh=D.best===0;return '<button class="lk tr dl'+(fresh?' new':'')+'" id="hdl">'+m.n+'<small'+(fresh?' class="rdy">New today!':'>'+(D.best>=DAILY.top?'Done: wave ':'Today: wave ')+D.best)+'<br>'+esc(DAILY_MODS[dailyModIx(D.d)].n)+'</small></button>'}
-    if(m.bots&&open){const rd=BOT_KEYS.some(botCanBuy),nb=BOT_KEYS.filter(k=>M.bots[k]).length;return '<button class="lk tr rb" id="hrb">'+m.n+'<small'+(rd?' class="rdy">Build ready!':'>'+big(M.nib)+' nibble'+(M.nib===1?'':'s'))+'<br>'+(nb||M.nib?nb+' of '+BOT_KEYS.length+' built':'From Daily runs')+'</small></button>'}
+    if(m.bots&&open){const rd=botAny(),nb=BOT_KEYS.filter(botBuilt).length;return '<button class="lk tr rb" id="hrb">'+m.n+'<small'+(rd?' class="rdy">Upgrade ready!':'>'+big(M.nib)+' packet'+(M.nib===1?'':'s'))+'<br>'+(nb||M.nib?nb+' of '+BOT_KEYS.length+' built':'From Daily runs')+'</small></button>'}
     if(m.boss&&open)return '<button class="lk tr" disabled>'+m.n+'<small>'+M.bk+' beaten<br>'+M.cores+' core'+(M.cores===1?'':'s')+'</small></button>';
     return '<button class="lk" disabled>'+LOCK_SVG+(m.boss?'???':m.n)+'<small>'+(m.cert&&M.cert>=m.w?'Collect cert':'Wave '+m.w)+'</small></button>'}).join('');
   const il=document.getElementById('idl');il.style.display=idleMsg?'block':'none';
@@ -1300,7 +1316,7 @@ function showDaily(){
   document.getElementById('dyt').innerHTML="<b>Today's twist: "+esc(mod.n)+'</b>'+esc(mod.d)+'<small id="dyn"></small>';dyTick();
   document.getElementById('dyr').innerHTML=[D.best?"Today's best: <b>wave "+D.best+'</b> · earned '+big(D.paid)+' chips'+(D.best>=DAILY.top?' (full reward)':''):'Not played today yet.',
     'Reward: chips for today\'s best wave, up to <b>'+big(full)+' chips</b> for beating the wave '+BOSS.first+' boss.',
-    'Plus <b>nibbles</b> for Bitbots: up to '+dailyNibs(DAILY.top,sn)+' for the boss, +1 for every '+BOT.nibPer+' waves after it'+(D.np?' (today: '+D.np+')':'')+'.',
+    'Plus <b>packets</b> for Drivers: up to '+dailyNibs(DAILY.top,sn)+' for the boss, +1 for every '+BOT.nibPer+' waves after it'+(D.np?' (today: '+D.np+')':'')+'.',
     s0?'Streak: <b>'+s0+' day'+(s0===1?'':'s')+'</b>'+(streakMul(sn)>1?' (+'+Math.round(100*(streakMul(sn)-1))+'% chips)':'')+'. Play every day for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'%.':'Play on days in a row for up to +'+Math.round(100*DAILY.streak*DAILY.streakMax)+'% chips.',
     D.top?'Your best daily run: wave '+D.top+'.':''].filter(Boolean).map(t=>'<span>'+t+'</span>').join('');
   setT(document.getElementById('dyp'),D.best?'Try again':"Play today's run");
@@ -1328,7 +1344,7 @@ document.getElementById('hhi').onclick=showHistory;
 function showCerts(){
   const top=Math.max(100,M.cert+20),rows=[],skinOf=w=>SKINS.find(x=>x.w===w);
   for(let w=10;w<=top;w+=10){const got=w<=M.claim,rdy=w<=M.cert&&!got,first=rdy&&w===M.claim+10,nx=w===M.cert+10,sk=skinOf(w);
-    const reward='+'+certChips(w)+' chips'+(sk?' + '+sk.n+' skins':'');
+    const reward=certPrize(w)+(sk?' + '+sk.n+' skins':'');
     rows.push('<div class="'+(got?'on':rdy?'cl'+(first?' go':''):nx?'nx':'')+'"'+(first?' role="button" tabindex="0" data-w="'+w+'"':'')+'>'+(got||rdy?'':LOCK_SVG+' ')+esc(certName(w))+
       '<small>Wave '+w+' · '+(got?'collected':first?'Tap to collect '+reward:rdy?reward+' (collect the one before)':reward)+'</small></div>')}
   document.getElementById('cel').innerHTML=rows.join('');
@@ -1337,25 +1353,30 @@ function showCerts(){
 document.getElementById('hce').onclick=()=>{document.getElementById('cem').textContent='';showCerts()};
 // tap the next earned certificate to collect it
 function collectCert(){const w=claimCert();if(!w)return;sfx('wave');buzz(30);const sk=SKINS.find(x=>x.w===w);
-  document.getElementById('cem').textContent=certName(w)+': +'+certChips(w)+' chips collected!'+(sk?' '+sk.n+' skins unlocked, wear them from Skins on the menu.':'');showCerts()}
+  document.getElementById('cem').textContent=certName(w)+': '+certPrize(w)+' collected!'+(sk?' '+sk.n+' skins unlocked, wear them from Skins on the menu.':'');showCerts()}
 document.getElementById('cel').addEventListener('click',e=>{if(e.target.closest('.go'))collectCert()});
 document.getElementById('cel').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.go')){e.preventDefault();collectCert()}});
-// Bitbots screen: build (Lv 1) and upgrade the three bots with nibbles
+// Drivers screen: build each driver, then upgrade Size (field) and Power (effect) with packets
 function botPreview(k){const c=document.createElement('canvas'),x=c.getContext('2d');c.width=21;c.height=18;x.imageSmoothingEnabled=false;x.fillStyle='#1b2033';x.fillRect(0,0,21,18);
   x.strokeStyle=BOTS[k].c+'88';x.setLineDash([1,1]);x.beginPath();x.arc(10.5,9.5,8,0,Math.PI*2);x.stroke();const s=botCanvas(k,0);x.drawImage(s,10-(s.width>>1),9-(s.height>>1));return c}
+const nibs=n=>big(n)+' packet'+(n===1?'':'s');
 function showBots(){
-  document.getElementById('rbn').innerHTML='You have <b>'+big(M.nib)+' nibble'+(M.nib===1?'':'s')+'</b>. '+(dailyOpen()?(()=>{const D=dailyNow(),left=dailyNibs(DAILY.top,streakNext())-D.np;return left>0?'Up to '+left+' more from today\'s Daily run.':'Today\'s Daily run pays +1 more for every '+BOT.nibPer+' waves past wave '+Math.max(D.best,DAILY.top)+'.'})():'');
+  document.getElementById('rbn').innerHTML='You have <b>'+nibs(M.nib)+'</b>. '+(dailyOpen()?(()=>{const D=dailyNow(),left=dailyNibs(DAILY.top,streakNext())-D.np;return left>0?'Up to '+left+' more from today\'s Daily run.':'Today\'s Daily run pays +1 more for every '+BOT.nibPer+' waves past wave '+Math.max(D.best,DAILY.top)+'.'})():'');
   const l=document.getElementById('rbl');l.innerHTML='';
-  for(const k of BOT_KEYS){const lv=M.bots[k],b=document.createElement('button'),mx=lv>=BOT.max,c=BOT.cost(lv);
-    b.dataset.k=k;b.disabled=mx||!botCanBuy(k);if(lv){b.className='own';b.style.borderColor=BOTS[k].c}b.appendChild(botPreview(k));
-    const t=document.createElement('span');
-    t.innerHTML='<b><span>'+esc(BOTS[k].n)+'</span><span>'+(lv?'Lv '+lv:'Not built')+'</span></b><small>'+esc(BOTS[k].d)+'</small><small>'+
-      (lv?botFx(k,lv)+', field '+BOT.field(lv)+(mx?'':' > '+botFx(k,lv+1)+', field '+BOT.field(lv+1)):'Lv 1: '+botFx(k,1)+', field '+BOT.field(1))+'</small>'+
-      '<small class="'+(b.disabled?'need':'go')+'">'+(mx?'Max level':(lv?'Upgrade':'Build')+': '+c+' nibbles'+(M.nib<c?' (need '+(c-M.nib)+' more)':''))+'</small>';
-    b.appendChild(t);l.appendChild(b)}
-  show('home',0);show('rb',1);
+  for(const k of BOT_KEYS){const B=M.bots[k],on=botBuilt(k),d=document.createElement('div');d.className='dc'+(on?' own':'');if(on)d.style.borderColor=BOTS[k].c;d.dataset.k=k;
+    const h=document.createElement('div');h.className='dh';h.appendChild(botPreview(k));
+    const t=document.createElement('span');t.innerHTML='<b><span>'+esc(BOTS[k].n)+'</span><span>'+(on?'S'+B.s+' P'+B.p:'Not built')+'</span></b><small>'+esc(BOTS[k].d)+'</small>'+
+      (on?'<small>Now: '+botFx(k,B.p)+', field '+fmt(BOT.field(B.s))+'</small>':'');h.appendChild(t);d.appendChild(h);
+    const btn=(tr,html)=>{const b=document.createElement('button');b.dataset.t=tr;b.disabled=!botCanBuy(k,tr);b.innerHTML=html;return b};
+    const price=c=>'<small class="'+(M.nib>=c?'go':'need')+'">'+c+' packets'+(M.nib<c?' (need '+(c-M.nib)+')':'')+'</small>';
+    if(!on){const b=btn('s','Build: Size 1, Power 1 ('+esc(botFx(k,1))+', field '+fmt(BOT.field(1))+')'+price(BOT.build));b.className='bd';d.appendChild(b)}
+    else for(const tr of ['s','p']){const lv=B[tr],mx=lv>=BOT.max;
+      d.appendChild(btn(tr,'<b>'+BOT_TR[tr]+' Lv '+lv+'</b>'+(mx?'<small>Max level</small>':'<small>'+(tr==='s'?'field '+fmt(BOT.field(lv))+' > '+fmt(BOT.field(lv+1)):esc(botFx(k,lv+1)))+'</small>'+price(BOT.cost(lv)))))}
+    l.appendChild(d)}
+  show('home',0);show('go',0);show('rb',1);
 }
-document.getElementById('rbl').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&buyBot(b.dataset.k)){showBots();flashBtn(document.querySelector('#rbl button[data-k="'+b.dataset.k+'"]'))}});
+document.getElementById('rbl').addEventListener('click',e=>{const b=e.target.closest('button'),d=b&&b.closest('.dc');if(!d)return;const k=d.dataset.k,t=b.dataset.t;
+  if(buyBot(k,t)){showBots();const nb=document.querySelector('#rbl .dc[data-k="'+k+'"] button[data-t="'+t+'"]');if(nb)flashBtn(nb)}});
 document.getElementById('hlk').addEventListener('click',e=>{if(e.target.closest('#hrb')&&botsOpen())showBots()});
 document.getElementById('rbc').onclick=()=>{show('rb',0);showHome()};
 // Skins screen: per slot, every set with a small preview; owned ones can be worn, locked ones show their certificate.
@@ -1414,7 +1435,7 @@ function btUI(){
       '<small>Needs:</small>'+resReqs(k).map(q=>'<small class="'+(q.have>=q.need?'met':'')+'">'+q.t+' ('+Math.min(q.have,q.need)+'/'+q.need+')</small>').join('')+'</button>';
     const foot=max?'Fully studied':now?'Studying...':!c.cores&&!c.chips?'Free · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1)):(c.cores?c.cores+' core'+(c.cores===1?'':'s')+' · ':'')+big(c.chips)+' chips · '+fmtDur(resMin(k,lv)*60/(TEST.fast?60:1));
     return '<button data-k="'+k+'"'+(now?' class="now"':'')+(max||M.rq||!resCanAfford(k)?' disabled':'')+'><b><span>'+r.n+'</span><span>Lv '+lv+'/'+r.max+'</span></b>'+r.d+
-      '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+'</small><small>'+foot+'</small></button>';
+      '<small>'+resFx(k,lv)+(max?'':' > '+resFx(k,lv+1))+' · '+foot+'</small></button>';
   }).join('');
   document.getElementById('btl').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(startResearch(b.dataset.k))btUI()});
   btTick();
@@ -1436,8 +1457,8 @@ function runNews(){
   const a=S.start;if(!a||S.daily)return {items:[],bt:false};
   const items=[],w=S.wave;
   for(const k of META_UPS)if(UP[k].w>a.best&&UP[k].w<=w)items.push('New upgrade: '+UP[k].n);
-  for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.bots?'Bitbots unlocked: helper robots, built with nibbles from Daily runs':m.n+' unlocked');
-  for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect +'+certChips(w)+' chips'+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
+  for(const m of LOCKED)if(!m.cert&&m.w>a.best&&m.w<=w)items.push(m.boss?'Bosses unlocked: track them on the menu':m.daily?'Daily run unlocked: a new challenge every day, on the menu':m.bots?'Drivers unlocked: helper robots, built with packets from Daily runs':m.n+' unlocked');
+  for(const w of S.certs||[]){const sk=SKINS.find(x=>x.w===w);items.push('Certificate: '+certName(w)+'. Collect '+certPrize(w)+(sk?' and the '+sk.n+' skins':'')+' from Certificates on the menu')}
   if(!a.idle&&idleOpen())items.push('Idle income: your tower now earns chips and starting pixels while you are away');
   const cg=S.bosses;if(cg)items.push('+'+cg+' boss core'+(cg===1?'':'s'));
   const btNew=!a.bt&&resUnlocked();if(btNew)items.push('Bit Theory unlocked: your first study is free, and it keeps running while you are away');

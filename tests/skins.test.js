@@ -30,6 +30,6 @@ click($('skc'));ok(shown($('home'))&&!shown($('sk')),'Back returns to the menu')
 // certificate at wave 30 announces skins and lists them on game over
 skipTips();M.cert=20;M.claim=20;M.best=29;reset();S.menu=false;S.pause=false;S.start=S.start||{best:29,bk:0,bt:false,open:[],res:Object.assign({},M.res)};S.wave=30;S.left=0;S.en=[];S.paid=false;step(1/60);
 ok(S.bt1==='CERTIFICATE: Byte Guard'&&M.cert===30&&!skinOwned(1),'wave 30 certificate earned, skins not owned until collected');
-ok(runNews().items.some(t=>t.includes('Collect +38 chips and the Bug Hunt skins')),'game over says to collect the certificate and skins');
+ok(runNews().items.some(t=>t.includes('Collect +38 chips +6 packets and the Bug Hunt skins')),'game over says to collect the certificate and skins');
 const cc0=M.chips;claimCert();ok(skinOwned(1)&&M.chips===cc0+38,'collecting the wave 30 certificate gives the skins');
 done();
