@@ -307,12 +307,12 @@ const TYPES=[
 ];
 let S;
 // Test shortcut, preview and local files only: ?wave=19 starts runs at that wave, ?px=400 gives starting pixels,
-// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?nib=50 tops up nibbles (Bitbots), ?fresh=1 wipes the save once (a brand-new player; the URL is cleaned so a reload keeps the new save), ?cat=1 makes the cat visit
+// ?cores=5&chips=500 tops up the save, ?bosses=5 sets bosses beaten (at least), ?away=180 pretends the game was closed for 180 minutes (idle income), ?fast=1 makes Bit Theory research 60x faster, ?twist=3 picks the Daily run twist (1-7), ?nib=50 tops up nibbles (Bitbots), ?best=30 raises the best wave (unlocks), ?fresh=1 wipes the save once (a brand-new player; the URL is cleaned so a reload keeps the new save), ?cat=1 makes the cat visit
 // every few seconds. Ignored on the live site.
 function testStart(host,proto,search){
   if(!(/^preview\./.test(host)||proto==='file:'))return {};
   const q=new URLSearchParams(search),n=k=>{const v=Math.floor(+q.get(k));return v>0&&v<=1e6?v:0},w=n('wave');
-  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),away:n('away'),fast:q.get('fast')==='1',cat:q.get('cat')==='1',twist:n('twist'),nib:n('nib'),fresh:q.get('fresh')==='1'};
+  return {wave:w>1&&w<=1000?w:0,px:n('px'),cores:n('cores'),chips:n('chips'),bosses:n('bosses'),away:n('away'),fast:q.get('fast')==='1',cat:q.get('cat')==='1',twist:n('twist'),nib:n('nib'),best:n('best'),fresh:q.get('fresh')==='1'};
 }
 const TEST=testStart(location.hostname,location.protocol,location.search);
 function reset(daily){
@@ -479,6 +479,7 @@ if(TEST.cores)M.cores=Math.max(M.cores,TEST.cores);
 if(TEST.chips)M.chips=Math.max(M.chips,TEST.chips);
 if(TEST.bosses)M.bk=Math.max(M.bk,TEST.bosses);
 if(TEST.nib)M.nib=Math.max(M.nib,TEST.nib);
+if(TEST.best)M.best=Math.max(M.best,Math.min(1000,TEST.best));
 if(TEST.away)M.seen=Date.now()-TEST.away*60000;
 const save=()=>{try{localStorage.setItem('pixelTowerMeta',JSON.stringify(M))}catch(e){}};
 // Anonymous gameplay stats for the dashboard (server/stats.py): only the random `uid`, no names, IPs or devices.
