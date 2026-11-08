@@ -9,7 +9,7 @@ VT=150000 tests/run.sh tests/balance.sim.js   # balance simulation (slow, prints
 tests/shot.sh out.png 390 844 setup.js        # screenshot at phone size after an optional setup script
 ```
 
-`VT=90000000 tests/run.sh tests/campaign.sim.js` plays 40 runs in a row with a smart bot (Foundry, research, certificates) and prints hook metrics; define `const CFG={...}` before it to try other numbers (see the top of the file).
+`VT=90000000 tests/run.sh tests/campaign.sim.js` plays 40 runs in a row with a smart bot (Foundry, research, certificates) and prints hook metrics; add `maxWave:10` to CFG to end every run at that wave (quick check that the sim works before a long one); define `const CFG={...}` before it to try other numbers (see the top of the file).
 
 `python3 tests/stats_server.py` tests the stats server (`server/stats.py`): starts it on a spare port with a temp database.
 
@@ -31,6 +31,7 @@ Read tunable numbers from the game (e.g. `NOVA.cd`) rather than hard-coding them
 
 ## Suites
 - `home.test.js`: home menu, How to play, menu/foundry/game over navigation
+- `firmware.test.js`: Firmware levels equal in-run levels, cost growth, Daily runs ignore it, no "Foundry" on screen
 - `menu.test.js`: home menu groups, locked modes, next-unlock hook, Foundry "Upgrade ready!"
 - `polish.test.js`: icons embedded, banner position, no stray canvas text, no DOM writes on idle frames
 - `run-unlocks.test.js`: game over lists what the run unlocked (upgrades, bosses, cores, Bit Theory, research) with a Bit Theory shortcut

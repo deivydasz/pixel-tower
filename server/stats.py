@@ -194,7 +194,7 @@ def overview(env, now=None):
     fc = defaultdict(int)
     for d in foundry:
         fc[d.get('k')] += 1
-    out += '<h2>Foundry upgrades bought</h2>' + bars([(n, fc[k]) for k, n in UPS], 'upgrade')
+    out += '<h2>Firmware upgrades bought</h2>' + bars([(n, fc[k]) for k, n in UPS], 'upgrade')
     bc = defaultdict(int)
     for d in bots:
         bc[d.get('k')] += 1
@@ -233,7 +233,7 @@ def player(env, pid, now=None):
         elif r['type'] == 'research':
             what = 'Research started: %s Lv %s' % (dict(RES).get(d.get('k'), d.get('k')), d.get('lv'))
         elif r['type'] == 'foundry':
-            what = 'Foundry: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
+            what = 'Firmware: %s Lv %s (%s chips)' % (dict(UPS).get(d.get('k'), d.get('k')), d.get('lv'), d.get('c'))
         elif r['type'] == 'daily':
             what = 'Daily run (%s): wave %s, %s, %s, +%s chips, +%s packets, streak %s%s' % (
                 d.get('x') or '?', d.get('w'), d.get('k') or '?', dur(d.get('d')), d.get('c'), d.get('pk') or 0, d.get('s'), ', TODAY\'S BEST' if d.get('r') else '')
@@ -249,7 +249,7 @@ def player(env, pid, now=None):
     info = ('<div class="tiles">' + ''.join('<div class="tile"><small>%s</small><b>%s</b></div>' % (a, e(str(b))) for a, b in (
         ('Best wave', m.get('best', 0)), ('Bosses', m.get('bk', 0)), ('Chips', m.get('chips', 0)), ('Cores', m.get('cores', 0)),
         ('Runs', m.get('runs', 0)))) + '</div>'
-        '<h2>Research</h2><p>%s</p><h2>Foundry</h2><p>%s</p>' % (
+        '<h2>Research</h2><p>%s</p><h2>Firmware</h2><p>%s</p>' % (
             e(', '.join('%s Lv %s' % (n, res.get(k, 0)) for k, n in RES)), e(', '.join('%s Lv %s' % (n, lv.get(k, 0)) for k, n in UPS))))
     return page('Player %s' % pid[:6], info + '<h2>Activity (newest first, UTC)</h2><div class="wrap"><table>' + ''.join(rows) + '</table></div>', env)
 

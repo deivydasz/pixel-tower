@@ -7,8 +7,8 @@ ok(/^Wave=3\|Killer=Grunt\|Chips=\+4\|Time=0:0\d\|Blasts=0\|Best=4$/.test(cells(
 ok($('gor').textContent==='Play again','primary button says Play again');
 ok($('goalt').textContent.includes('wave '+LOCKED[0].w),'next-unlock goal shown: '+$('goalt').textContent);
 ok(!$('gos')&&!$('gsl'),'no suggested upgrades on game over (players go to the Foundry)');
-ok($('gof').classList.contains('rdy')===fyReady()&&$('gof').textContent===(fyReady()?'FoundryUpgrade ready!':'Foundry'+M.chips+' chips'),'Foundry button highlighted when chips buy something: '+$('gof').textContent);
-M.chips=0;showGO();ok(!$('gof').classList.contains('rdy')&&$('gof').textContent==='Foundry0 chips','not highlighted without enough chips');
+ok($('gof').classList.contains('rdy')===fyReady()&&$('gof').textContent===(fyReady()?'FirmwareUpgrade ready!':'Firmware'+M.chips+' chips'),'Foundry button highlighted when chips buy something: '+$('gof').textContent);
+M.chips=0;showGO();ok(!$('gof').classList.contains('rdy')&&$('gof').textContent==='Firmware0 chips','not highlighted without enough chips');
 M.chips=999;showGO();ok($('gof').classList.contains('rdy'),'highlighted with enough chips');
 click($('gor'));ok(!shown($('go'))&&!S.over&&S.wave===0,'Play again starts a new run');
 S.wave=9;die();ok($('goh').textContent==='New record!'&&$('goh').className==='rec'&&$('gop').textContent==='You beat your best of wave 4 by 5 waves!','record header and reason');

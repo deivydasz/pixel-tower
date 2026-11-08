@@ -9,8 +9,8 @@ ok(/\n\d+(\.\d{1,2})? > \d+(\.\d{1,2})?\n/.test(dmgBtn),'in-run damage button ro
 M.res.depth=3;ui();ok(!/\d\.\d{3}/.test($('ups').innerText),'no long decimals with Bit depth: '+[...document.querySelectorAll('#ups button')][0].innerText.replace(/\n/g,' / '));
 M.res.depth=0;M.chips=500;M.best=20;die();click($('gof'));
 const fd=$('fyl').querySelector('button').textContent;
-ok(fd.includes('2.5 > 3')&&!fd.includes('Now'),'Foundry shows current > next damage, no "Now": '+fd);
-ok($('fyl').textContent.includes('1.75 > 2'),'Foundry shows current > next absorb');
+ok(fd.includes('4 > 5')&&!fd.includes('Now'),'Firmware shows current > next damage, no "Now": '+fd);
+ok($('fyl').textContent.includes('3.5 > 4'),'Firmware shows current > next absorb');
 ok([...$('fyl').querySelectorAll('button')].every(b=>/\d\S* > \S*\d/.test(b.textContent)),'every Foundry upgrade shows current > next');
 click($('fyc'));
 S.px=45678;ui();ok($('px').textContent==='45.7k px','HUD shows compact pixels');

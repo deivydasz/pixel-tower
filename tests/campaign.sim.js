@@ -44,16 +44,16 @@ function useBlast(){
 // one run with the current save; returns what happened
 function playRun(bot){
   reset();S.menu=false;S.pause=false;T={lost:0,hp0:S.hp,wave:0,threat:.4};const k0=M.bk,c0=M.chips;
-  for(let t=0;t<60*7200&&!S.over;t++){update(1/60);(bot==='cheap'?cheapBuy:smartBuy)();useBlast()}
+  for(let t=0;t<60*7200&&!S.over&&!(C.maxWave&&S.wave>=C.maxWave);t++){update(1/60);(bot==='cheap'?cheapBuy:smartBuy)();useBlast()}
   if(!S.over)endRun(true);
   if(S.btry)tryChips+=S.btry.chips;for(const w of S.certs||[])certChipsTotal+=certChips(w);
   return {w:S.wave,min:S.time/60,bosses:M.bk-k0,chips:M.chips-c0,killer:S.killer?S.killer.n:'-'};
 }
 // ---- between runs: Foundry and Bit Theory
-const FW={dmg:1,rate:1,range:.6,hp:.7,armor:.6,magnet:.5,bank:.2};
+const FWT={dmg:1,rate:1,range:.6,hp:.7,armor:.6,magnet:.5,bank:.2};
 function foundry(){
   for(let n=0;n<200;n++){let best=null,bv=0;
-    for(const k of META_UPS){if(!upOpen(k))continue;const v=FW[k]/(1+.15*M.lv[k])/mcost(k);if(v>bv){bv=v;best=k}}
+    for(const k of META_UPS){if(!upOpen(k))continue;const v=FWT[k]/(1+.15*M.lv[k])/mcost(k);if(v>bv){bv=v;best=k}}
     if(!best||M.chips<mcost(best))return;M.chips-=mcost(best);M.lv[best]++}
 }
 const RES_ORDER=['crit','pierce','depth','spray','nova','speed'];
