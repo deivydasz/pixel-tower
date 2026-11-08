@@ -86,6 +86,7 @@ if(C.mode==='compare'){
   const ws=runs.map(r=>r.w),mins=runs.map(r=>r.min);
   const at=n=>Math.max(...ws.slice(0,n));
   RES.push('INFO ['+C.name+'] waves: '+ws.join(' '));
+  RES.push('INFO ['+C.name+'] run minutes: '+mins.map(m=>m.toFixed(0)).join(' ')+' | cumulative hours: '+mins.map((m,i)=>(mins.slice(0,i+1).reduce((a,b)=>a+b,0)/60).toFixed(1)).join(' '));
   RES.push('INFO ['+C.name+'] best after run 1/3/5/10/20/'+C.runs+': '+[1,3,5,10,20,C.runs].map(at).join(' / ')+
     ' | new best in '+news+'/'+C.runs+' runs, longest dry streak '+maxDry+' | first boss beaten on run '+(firstBoss||'never')+
     ' | run length min/median/max '+[Math.min(...mins),mins.slice().sort((a,b)=>a-b)[mins.length>>1],Math.max(...mins)].map(x=>x.toFixed(1)).join('/')+' min'+
